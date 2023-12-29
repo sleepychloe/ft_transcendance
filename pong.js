@@ -13,6 +13,7 @@ let players = [];
 let currentMatchIndex = 0;
 let gameLoopId = 0;
 let normalModeGamesPlayed = 0;
+let tournamentModeFlag = 0;
 
 function gameLoop() {
     updatePaddlePosition();
@@ -35,7 +36,7 @@ function paddleCollision() {
 }
 
 function checkScore() {
-    if (ballX < 0 || ballX > canvas.width) {
+    if (!tournamentModeFlag && (ballX < 0 || ballX > canvas.width)) {
         if (ballX < 0) score2++;
         else score1++;
 
@@ -49,6 +50,22 @@ function checkScore() {
             startMatch();
         } else {
             endNormalGame();
+        }
+    }
+    if (tournamentModeFlag && (ballX < 0 || ballX > canvas.width)) {
+        // Tournament mode scoring logic
+        if (ballX < 0) score2++;
+        else score1++;
+
+        // Update the scoreboard
+        document.getElementById("score1").textContent = score1;
+        document.getElementById("score2").textContent = score2;
+
+        // Check if the current match is over
+        if (score1 >= 1 || score2 >= 1) {
+            endMatch();
+        } else {
+            startMatch(); // Start a new rally in the current match
         }
     }
 }
@@ -100,8 +117,8 @@ function startNormalMode() {
 
 function endNormalGame() {
     let winner = score1 > score2 ? 'Player 1' : 'Player 2';
-    // alert(`Game Over! ${winner} wins!`);
-	cancelAnimationFrame(gameLoopId);////
+    // alert(`Winner: ${winner}`);
+	cancelAnimationFrame(gameLoopId);
     resetToHomeScreen();
 }
 
@@ -154,25 +171,19 @@ function displayMatchups() {
     }
 
     upcomingMatchesDisplay.innerHTML = '';
-    // for (let i = 2; i < players.length; i++) {
-    //     const matchInfo = document.createElement("li");
-    //     matchInfo.textContent = `${players[i]} (next opponent)`;
-    //     upcomingMatchesDisplay.appendChild(matchInfo);
-    // }
-	for (let i = 2; i < players.length; i += 2) {
-        if (i + 1 < players.length) {
-            const matchInfo = document.createElement("li");
-            matchInfo.textContent = `${players[i]} vs ${players[i + 1]}`;
-            upcomingMatchesDisplay.appendChild(matchInfo);
-        }
+    for (let i = 2; i < players.length; i++) {
+        const matchInfo = document.createElement("li");
+        matchInfo.textContent = `${players[i]} (next opponent)`;
+        upcomingMatchesDisplay.appendChild(matchInfo);
     }
 }
 
 function startTournamentMode() {
 	resetGame();
+    tournamentModeFlag = 1;
     document.getElementById("modeSelection").style.display = "none";
     document.getElementById("registration").style.display = "block";
-    document.getElementById("tournamentInfo").style.display = "none";
+    document.getElementById("tournamentInfo").style.display = "block";
 }
 
 function startMatch() {
@@ -193,7 +204,7 @@ function endMatch() {
         displayMatchups();
         startMatch();
     } else {
-        // alert(`Tournament Winner: ${winner}`);
+        alert(`Tournament Winner: ${winner}`);
 		cancelAnimationFrame(gameLoopId);
         gameLoopId = null;
         resetToHomeScreen();
@@ -214,8 +225,9 @@ function resetGame() {
 }
 
 function resetToHomeScreen() {
-    document.getElementById("pongCanvas").style.display = "none";
+    document.getElementById("pongCanvas").style.display = "block";
     document.getElementById("gameDashboard").style.display = "none";
     document.getElementById("tournamentInfo").style.display = "none";
     document.getElementById("modeSelection").style.display = "block";
+    tournamentModeFlag = 0;
 }
