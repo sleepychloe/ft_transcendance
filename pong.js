@@ -1,6 +1,84 @@
 const canvas = document.getElementById("pongCanvas");
 const ctx = canvas.getContext("2d");
 
+
+document.getElementById("normalMode").addEventListener("click", startNormalMode);
+document.getElementById("tournamentMode").addEventListener("click", startTournamentMode);
+
+
+// Normal mode
+function startNormalMode() {
+	resetGame();
+    normalModeGamesPlayed = 0;
+    document.getElementById("modeSelection").style.display = "none";
+    document.getElementById("gameDashboard").style.display = "block";
+    document.getElementById("pongCanvas").style.display = "block";
+    startMatch();
+}
+
+function endNormalGame() {
+    let winner = score1 > score2 ? 'Player 1' : 'Player 2';
+    // alert(`Winner: ${winner}`);
+	cancelAnimationFrame(gameLoopId);
+    resetToHomeScreen();
+}
+
+
+// Tournament mode
+function startTournamentMode() {
+	resetGame();
+    tournamentModeFlag = 1;
+    document.getElementById("modeSelection").style.display = "none";
+    document.getElementById("registration").style.display = "block";
+}
+
+function createPlayerInputs() {
+    const numPlayers = parseInt(document.getElementById("numPlayers").value);
+    const playerInputs = document.getElementById("playerInputs");
+    playerInputs.innerHTML = '';
+
+    if (numPlayers >= 3)
+    {
+        for (let i = 1; i <= numPlayers; i++) {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = `Player ${i} Name`;
+            input.id = `player${i}`;
+            playerInputs.appendChild(input);
+        }
+        document.getElementById("registerPlayersButton").classList.remove("hidden");
+    }
+    else
+    {
+        document.getElementById("registerPlayersButton").classList.add("hidden");
+    }
+}
+    
+
+function registerPlayers() {
+    const numPlayers = parseInt(document.getElementById("numPlayers").value);
+    players = [];
+
+    for (let i = 1; i <= numPlayers; i++) {
+        const playerName = document.getElementById(`player${i}`).value;
+        if (playerName) {
+            players.push(playerName);
+        }
+    }
+
+    if (players.length % 2 !== 0) {
+        players.push(players.shift());
+    }
+
+    currentMatchIndex = 0;
+    displayMatchups();
+    document.getElementById("registerPlayersButton").classList.add("hidden");
+    document.getElementById("registration").style.display = "none";
+    startMatch();
+}
+
+
+// Game
 let leftPaddleY = canvas.height / 2;
 let rightPaddleY = canvas.height / 2;
 const paddleWidth = 10, paddleHeight = 100, paddleSpeed = 4;
@@ -15,17 +93,27 @@ let gameLoopId = 0;
 let normalModeGamesPlayed = 0;
 let tournamentModeFlag = 0;
 
-function gameLoop() {
-    updatePaddlePosition();
-    ballX += ballSpeedX;
-    ballY += ballSpeedY;
+document.addEventListener('keydown', event => {
+    if (event.key === 'w') leftPaddleY -= paddleSpeed;
+    if (event.key === 's') leftPaddleY += paddleSpeed;
+    if (event.key === 'ArrowUp') rightPaddleY -= paddleSpeed;
+    if (event.key === 'ArrowDown') rightPaddleY += paddleSpeed;
+});
 
-    if (ballY <= 0 || ballY >= canvas.height) ballSpeedY = -ballSpeedY;
-    paddleCollision();
-    checkScore();
+function resetBall() {
+    ballX = canvas.width / 2;
+    ballY = canvas.height / 2;
+	ballSpeedX = Math.random() > 0.5 ? 2 : -2;
+    ballSpeedY = Math.random() > 0.5 ? 2 : -2;
+	leftPaddleY = canvas.height / 2;
+	rightPaddleY = canvas.height / 2;
+}
 
-    drawEverything();
-    gameLoopId = requestAnimationFrame(gameLoop);
+function updatePaddlePosition() {
+    if (leftPaddleY < 0) leftPaddleY = 0;
+    if (leftPaddleY + paddleHeight > canvas.height) leftPaddleY = canvas.height - paddleHeight;
+    if (rightPaddleY < 0) rightPaddleY = 0;
+    if (rightPaddleY + paddleHeight > canvas.height) rightPaddleY = canvas.height - paddleHeight;
 }
 
 function paddleCollision() {
@@ -70,15 +158,6 @@ function checkScore() {
     }
 }
 
-function resetBall() {
-    ballX = canvas.width / 2;
-    ballY = canvas.height / 2;
-	ballSpeedX = Math.random() > 0.5 ? 2 : -2;
-    ballSpeedY = Math.random() > 0.5 ? 2 : -2;
-	leftPaddleY = canvas.height / 2;
-	rightPaddleY = canvas.height / 2;
-}
-
 function drawEverything() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'white';
@@ -89,104 +168,22 @@ function drawEverything() {
     ctx.fill();
 }
 
-function updatePaddlePosition() {
-    if (leftPaddleY < 0) leftPaddleY = 0;
-    if (leftPaddleY + paddleHeight > canvas.height) leftPaddleY = canvas.height - paddleHeight;
-    if (rightPaddleY < 0) rightPaddleY = 0;
-    if (rightPaddleY + paddleHeight > canvas.height) rightPaddleY = canvas.height - paddleHeight;
-}
+function gameLoop() {
+    updatePaddlePosition();
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
 
-document.addEventListener('keydown', event => {
-    if (event.key === 'w') leftPaddleY -= paddleSpeed;
-    if (event.key === 's') leftPaddleY += paddleSpeed;
-    if (event.key === 'ArrowUp') rightPaddleY -= paddleSpeed;
-    if (event.key === 'ArrowDown') rightPaddleY += paddleSpeed;
-});
+    if (ballY <= 0 || ballY >= canvas.height) ballSpeedY = -ballSpeedY;
+    paddleCollision();
+    checkScore();
 
-document.getElementById("normalMode").addEventListener("click", startNormalMode);
-document.getElementById("tournamentMode").addEventListener("click", startTournamentMode);
-
-function startNormalMode() {
-	resetGame();
-    normalModeGamesPlayed = 0;
-    document.getElementById("modeSelection").style.display = "none";
-    document.getElementById("gameDashboard").style.display = "block";
-    document.getElementById("pongCanvas").style.display = "block";
-    startMatch();
-}
-
-function endNormalGame() {
-    let winner = score1 > score2 ? 'Player 1' : 'Player 2';
-    // alert(`Winner: ${winner}`);
-	cancelAnimationFrame(gameLoopId);
-    resetToHomeScreen();
-}
-
-function createPlayerInputs() {
-    const numPlayers = parseInt(document.getElementById("numPlayers").value);
-    const playerInputs = document.getElementById("playerInputs");
-    playerInputs.innerHTML = '';
-
-    for (let i = 1; i <= numPlayers; i++) {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = `Player ${i} Name`;
-        input.id = `player${i}`;
-        playerInputs.appendChild(input);
-    }
-
-    document.getElementById("registerPlayersButton").classList.remove("hidden");
-}
-
-function registerPlayers() {
-    const numPlayers = parseInt(document.getElementById("numPlayers").value);
-    players = [];
-
-    for (let i = 1; i <= numPlayers; i++) {
-        const playerName = document.getElementById(`player${i}`).value;
-        if (playerName) {
-            players.push(playerName);
-        }
-    }
-
-    if (players.length % 2 !== 0) {
-        players.push(players.shift());
-    }
-
-    currentMatchIndex = 0;
-    displayMatchups();
-    startMatch();
-}
-
-function displayMatchups() {
-    const currentMatchDisplay = document.getElementById("currentMatch");
-    const upcomingMatchesDisplay = document.getElementById("upcomingMatches");
-
-    currentMatchDisplay.textContent = `${players[0]} vs ${players[1]}`;
-
-	if (players.length >= 2) {
-        currentMatchDisplay.textContent = `${players[0]} vs ${players[1]}`;
-    } else {
-        currentMatchDisplay.textContent = "Waiting for players";
-    }
-
-    upcomingMatchesDisplay.innerHTML = '';
-    for (let i = 2; i < players.length; i++) {
-        const matchInfo = document.createElement("li");
-        matchInfo.textContent = `${players[i]} (next opponent)`;
-        upcomingMatchesDisplay.appendChild(matchInfo);
-    }
-}
-
-function startTournamentMode() {
-	resetGame();
-    tournamentModeFlag = 1;
-    document.getElementById("modeSelection").style.display = "none";
-    document.getElementById("registration").style.display = "block";
-    document.getElementById("tournamentInfo").style.display = "block";
+    drawEverything();
+    gameLoopId = requestAnimationFrame(gameLoop);
 }
 
 function startMatch() {
+    if (tournamentModeFlag)
+        document.getElementById("tournamentInfo").style.display = "block";
     resetBall();
     ballSpeedX = 2; // Reset ball speed
     if (!gameLoopId) {
@@ -204,12 +201,34 @@ function endMatch() {
         displayMatchups();
         startMatch();
     } else {
-        alert(`Tournament Winner: ${winner}`);
+        // alert(`Tournament Winner: ${winner}`);
 		cancelAnimationFrame(gameLoopId);
         gameLoopId = null;
         resetToHomeScreen();
     }
 }
+
+
+
+function displayMatchups() {
+    const currentMatchDisplay = document.getElementById("currentMatch");
+    const upcomingMatchesDisplay = document.getElementById("upcomingMatches");
+
+
+	if (players.length >= 2) {
+        currentMatchDisplay.textContent = `${players[0]} vs ${players[1]}`;
+    } else {
+        currentMatchDisplay.textContent = "Waiting for players";
+    }
+    upcomingMatchesDisplay.innerHTML = '';
+    for (let i = 2; i < players.length; i++) {
+        const matchInfo = document.createElement("div");
+        matchInfo.textContent = `${players[i]} (next opponent)`;
+        upcomingMatchesDisplay.appendChild(matchInfo);
+    }
+}
+
+
 
 function resetGame() {
 	if (gameLoopId)
@@ -221,7 +240,6 @@ function resetGame() {
     document.getElementById("score2").textContent = score2;
     players = [];
     currentMatchIndex = 0;
-    // Reset any other game state as necessary
 }
 
 function resetToHomeScreen() {
