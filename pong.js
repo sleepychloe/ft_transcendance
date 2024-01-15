@@ -1,28 +1,53 @@
 const canvas = document.getElementById("pongCanvas");
 const ctx = canvas.getContext("2d");
 
+let normalCount = 0;
+let random = 0;
+
+function updateAIModeVisibility() {
+    const aiModeButton = document.getElementById("aiMode");
+    
+    // Show the AI Mode button after playing normal mode three times
+    if (normalCount < 3) {
+        document.getElementById("aiMode").classList.add("hidden");
+    } else {
+        document.getElementById("aiMode").classList.remove("hidden");
+    }
+}
 
 document.getElementById("normalMode").addEventListener("click", startNormalMode);
 document.getElementById("tournamentMode").addEventListener("click", startTournamentMode);
-
+updateAIModeVisibility();
 
 // Normal mode
 function startNormalMode() {
-	resetGame();
-    normalModeGamesPlayed = 0;
-    document.getElementById("modeSelection").style.display = "none";
-    document.getElementById("gameDashboard").style.display = "block";
-    document.getElementById("pongCanvas").style.display = "block";
-    startMatch();
+    if (!isGameInProgress) {
+        resetGame();
+        normalModeGamesPlayed = 0;
+        document.getElementById("modeSelection").style.display = "none";
+        document.getElementById("gameDashboard").style.display = "block";
+        document.getElementById("pongCanvas").style.display = "block";
+        startMatch();
+        isGameInProgress = true;
+    }
 }
 
 function endNormalGame() {
-    let winner = score1 > score2 ? 'Player 1' : 'Player 2';
-    // alert(`Winner: ${winner}`);
-	cancelAnimationFrame(gameLoopId);
-    resetToHomeScreen();
+    if (isGameInProgress) {
+        let winner = score1 > score2 ? 'Player 1' : 'Player 2';
+        
+        if (gameLoopId){
+            cancelAnimationFrame(gameLoopId);
+            gameLoopId = null;
+            console.log("normal cacled");//
+        }
+        alert(`Winner: ${winner}`);
+        normalCount++;
+        resetToHomeScreen();
+        updateAIModeVisibility();
+        isGameInProgress = false;
+    }
 }
-
 
 // Tournament mode
 function startTournamentMode() {
@@ -36,55 +61,65 @@ function createPlayerInputs() {
     const numPlayers = parseInt(document.getElementById("numPlayers").value);
     const playerInputs = document.getElementById("playerInputs");
     playerInputs.innerHTML = '';
-
-    if (numPlayers >= 3)
-    {
+    if (numPlayers >= 3) {
         for (let i = 1; i <= numPlayers; i++) {
             const input = document.createElement("input");
             input.type = "text";
-            input.placeholder = `Player ${i} Name`;
+            input.placeholder = `Player ${i}`;
             input.id = `player${i}`;
             playerInputs.appendChild(input);
         }
         document.getElementById("registerPlayersButton").classList.remove("hidden");
     }
-    else
-    {
+    else {
+        alert(`At least 3 players required !`);
         document.getElementById("registerPlayersButton").classList.add("hidden");
     }
 }
-    
 
 function registerPlayers() {
-    const numPlayers = parseInt(document.getElementById("numPlayers").value);
-    players = [];
-
-    for (let i = 1; i <= numPlayers; i++) {
-        const playerName = document.getElementById(`player${i}`).value;
-        if (playerName) {
+    if (!isGameInProgress) {
+        const numPlayers = parseInt(document.getElementById("numPlayers").value);
+        players = [];
+        let usedNames = new Set();
+        for (let i = 1; i <= numPlayers; i++) {
+            let playerName = document.getElementById(`player${i}`).value.trim();
+            if (!playerName) {
+                playerName = "Player " + i.toString();
+            }
+            while (usedNames.has(playerName) || /^\d+$/.test(playerName)) {
+                playerName = prompt(`Please enter a new name for Player ${i}:`).trim();
+                if (!playerName) {
+                    playerName = "Player " + i.toString();
+                }
+            }
+            usedNames.add(playerName);
             players.push(playerName);
         }
+        delete usedNames;
+        if (players.length % 2 !== 0) {
+            players.push(players.shift());
+        }
+        currentMatchIndex = 0;
+        displayMatchups();
+        document.getElementById("registerPlayersButton").classList.add("hidden");
+        document.getElementById("registration").style.display = "none";
+        startMatch();
+        isGameInProgress = true;
     }
-
-    if (players.length % 2 !== 0) {
-        players.push(players.shift());
-    }
-
-    currentMatchIndex = 0;
-    displayMatchups();
-    document.getElementById("registerPlayersButton").classList.add("hidden");
-    document.getElementById("registration").style.display = "none";
-    startMatch();
 }
-
 
 // Game
 let leftPaddleY = canvas.height / 2;
 let rightPaddleY = canvas.height / 2;
-const paddleWidth = 10, paddleHeight = 100, paddleSpeed = 4;
+const paddleWidth = 10, paddleHeight = 100, paddleSpeed = 14;
 let ballX = canvas.width / 2, ballY = canvas.height / 2;
-let ballSpeedX = Math.random() > 0.5 ? 2 : -2;
-let ballSpeedY = Math.random() > 0.5 ? 2 : -2;
+let ballSpeedX = Math.random() > 0.5 ? 2 + Math.random() : -2 - Math.random();
+let ballSpeedY = Math.random() > 0.5 ? 2 + Math.random() : -2 - Math.random();
+let temp = Math.random() > 0.5 ? 1 : -1;
+ballSpeedX *= temp;
+
+
 const ballSize = 10;
 let score1 = 0, score2 = 0;
 let players = [];
@@ -92,19 +127,28 @@ let currentMatchIndex = 0;
 let gameLoopId = 0;
 let normalModeGamesPlayed = 0;
 let tournamentModeFlag = 0;
+let isGameInProgress = false;
 
 document.addEventListener('keydown', event => {
     if (event.key === 'w') leftPaddleY -= paddleSpeed;
     if (event.key === 's') leftPaddleY += paddleSpeed;
     if (event.key === 'ArrowUp') rightPaddleY -= paddleSpeed;
     if (event.key === 'ArrowDown') rightPaddleY += paddleSpeed;
+    if (event.key === 'f5')
+    {
+        event.preventDefault(); // Prevent the default F5 key action (refresh)
+        resetGame();
+        resetToHomeScreen()
+    }
 });
 
 function resetBall() {
-    ballX = canvas.width / 2;
-    ballY = canvas.height / 2;
-	ballSpeedX = Math.random() > 0.5 ? 2 : -2;
-    ballSpeedY = Math.random() > 0.5 ? 2 : -2;
+    ballX = canvas.width / 2, ballY = canvas.height / 2;
+    ballSpeedX = Math.random() > 0.5 ? 2 + Math.random() : -2 - Math.random();
+    ballSpeedY = Math.random() > 0.5 ? 2 + Math.random() : -2 - Math.random();
+    temp = Math.random() > 0.5 ? 1 : -1;
+    ballSpeedX *= temp;
+
 	leftPaddleY = canvas.height / 2;
 	rightPaddleY = canvas.height / 2;
 }
@@ -124,10 +168,11 @@ function paddleCollision() {
 }
 
 function checkScore() {
+    console.log(`random: ${random}`);
     if (!tournamentModeFlag && (ballX < 0 || ballX > canvas.width)) {
         if (ballX < 0) score2++;
         else score1++;
-
+        
         document.getElementById("score1").textContent = score1;
         document.getElementById("score2").textContent = score2;
 
@@ -137,6 +182,7 @@ function checkScore() {
             Math.max(score1, score2) < 2) {
             startMatch();
         } else {
+            random++;
             endNormalGame();
         }
     }
@@ -151,6 +197,7 @@ function checkScore() {
 
         // Check if the current match is over
         if (score1 >= 1 || score2 >= 1) {
+            random++;
             endMatch();
         } else {
             startMatch(); // Start a new rally in the current match
@@ -170,10 +217,15 @@ function drawEverything() {
 
 function gameLoop() {
     updatePaddlePosition();
-    ballX += ballSpeedX;
-    ballY += ballSpeedY;
-
-    if (ballY <= 0 || ballY >= canvas.height) ballSpeedY = -ballSpeedY;
+    if (random % 2 !== 0) {
+        ballX -= ballSpeedX;
+        ballY -= ballSpeedY;
+    }
+    else {
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+    }
+    if (ballY <= 5 || ballY >= canvas.height - 5) ballSpeedY = -ballSpeedY;
     paddleCollision();
     checkScore();
 
@@ -182,11 +234,10 @@ function gameLoop() {
 }
 
 function startMatch() {
-    if (tournamentModeFlag)
-        document.getElementById("tournamentInfo").style.display = "block";
+    random++;
     resetBall();
-    ballSpeedX = 2; // Reset ball speed
     if (!gameLoopId) {
+        document.getElementById("tournamentInfo").style.display = "block";
         gameLoopId = requestAnimationFrame(gameLoop);
     }
 }
@@ -201,13 +252,19 @@ function endMatch() {
         displayMatchups();
         startMatch();
     } else {
-        // alert(`Tournament Winner: ${winner}`);
-		cancelAnimationFrame(gameLoopId);
-        gameLoopId = null;
-        resetToHomeScreen();
+        if (isGameInProgress === true) {
+            alert(`Tournament Winner: ${winner}`);
+            if (gameLoopId){
+                cancelAnimationFrame(gameLoopId);
+                gameLoopId = null;
+                console.log("cacled");//
+            }
+            gameLoopId = null;
+            resetToHomeScreen();
+            isGameInProgress = false;
+        }
     }
 }
-
 
 
 function displayMatchups() {
@@ -229,15 +286,20 @@ function displayMatchups() {
 }
 
 
-
 function resetGame() {
 	if (gameLoopId)
 	    cancelAnimationFrame(gameLoopId);
     gameLoopId = null;
+    isGameInProgress = false;
     score1 = 0;
     score2 = 0;
     document.getElementById("score1").textContent = score1;
     document.getElementById("score2").textContent = score2;
+    for (let i = 1; i <= document.getElementById("numPlayers").value; i++) {
+        document.getElementById(`player${i}`).value = "";
+    }
+    document.getElementById("numPlayers").value = "empty";
+    document.getElementById("playerInputs").innerHTML = '';
     players = [];
     currentMatchIndex = 0;
 }
@@ -248,4 +310,6 @@ function resetToHomeScreen() {
     document.getElementById("tournamentInfo").style.display = "none";
     document.getElementById("modeSelection").style.display = "block";
     tournamentModeFlag = 0;
+    isGameInProgress = false;
+    updateAIModeVisibility();
 }
