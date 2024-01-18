@@ -2,7 +2,7 @@ const canvas = document.getElementById("pongCanvas");
 const ctx = canvas.getContext("2d");
 
 let normalCount = 0;
-let random = 0;///fix it
+let random = 0;
 
 function updateAIModeVisibility() {
     const aiModeButton = document.getElementById("aiMode");
@@ -108,11 +108,8 @@ let leftPaddleY = canvas.height / 2;
 let rightPaddleY = canvas.height / 2;
 const paddleWidth = 10, paddleHeight = 100, paddleSpeed = 14;
 let ballX = canvas.width / 2, ballY = canvas.height / 2;
-let ballSpeedX = Math.random() > 0.5 ? 2 + Math.random() : -2 - Math.random();
-let ballSpeedY = Math.random() > 0.5 ? 2 + Math.random() : -2 - Math.random();
-let temp = Math.random() > 0.5 ? 1 : -1;
-ballSpeedX *= temp;
-
+let ballSpeedX = 2 + 1.5 * Math.random();
+let ballSpeedY = 2 + 1.5 * Math.random();
 
 const ballSize = 10;
 let score1 = 0, score2 = 0;
@@ -137,10 +134,8 @@ document.addEventListener('keydown', event => {
 
 function resetBall() {
     ballX = canvas.width / 2, ballY = canvas.height / 2;
-    ballSpeedX = Math.random() > 0.5 ? 2 + Math.random() : -2 - Math.random();
-    ballSpeedY = Math.random() > 0.5 ? 2 + Math.random() : -2 - Math.random();
-    temp = Math.random() > 0.5 ? 1 : -1;
-    ballSpeedX *= temp;
+    ballSpeedX = 2 + 1.5 * Math.random();
+    ballSpeedY = 2 + 1.5 * Math.random();
 
 	leftPaddleY = canvas.height / 2;
 	rightPaddleY = canvas.height / 2;
@@ -165,7 +160,6 @@ function checkScore() {
     if (!tournamentModeFlag && (ballX < 0 || ballX > canvas.width)) {
         if (ballX < 0) score2++;
         else score1++;
-        
         document.getElementById("score1").textContent = score1;
         document.getElementById("score2").textContent = score2;
         normalModeGamesPlayed++;
@@ -173,7 +167,6 @@ function checkScore() {
             Math.max(score1, score2) < 2) {
             startMatch();
         } else {
-            random++;
             endNormalGame();
         }
     }
@@ -184,7 +177,6 @@ function checkScore() {
         document.getElementById("score1").textContent = score1;
         document.getElementById("score2").textContent = score2;
         if (score1 >= 1 || score2 >= 1) {
-            random++;
             endMatch();
         } else {
             startMatch();
