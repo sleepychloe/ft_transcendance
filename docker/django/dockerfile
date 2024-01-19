@@ -1,1 +1,11 @@
-FROM python:3.12.1-slim
+FROM python:3.9-slim
+
+COPY requirements.txt ./
+
+RUN pip install -r --no-cache-dir requirements.txt && mkdir ./backend
+
+COPY ../../srcs/backend ./backend
+
+EXPOSE 8000
+
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
