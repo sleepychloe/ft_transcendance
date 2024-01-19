@@ -106,4 +106,6 @@ ifeq ($(shell ls ./.data | grep mysql | wc -l ), 1)
 endif
 	@echo "$(BLUE)Everything is successfully removed!$(RESET)"
 
-.PHONY: all up list logs stop fclean
+re: fclean up
+
+.PHONY: all up list logs stop fclean re

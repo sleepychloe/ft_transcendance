@@ -8,4 +8,6 @@ COPY . ./backend
 
 EXPOSE 8000
 
+WORKDIR ./backend
+
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]

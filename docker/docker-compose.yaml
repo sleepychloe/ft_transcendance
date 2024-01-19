@@ -7,6 +7,7 @@ services:
       context: ../srcs/backend
       dockerfile: ../../docker/django/dockerfile
     container_name: django
+    restart: always
     volumes:
       - "./.data/django"
     expose:
@@ -17,41 +18,44 @@ services:
     tty: true
   
   #Database server
-  postgresql:
-    build: ./postgresql
-    container_name: postgre
-    volumes:
-      - "./.data/postgre"
-    expose:
-      - "5432"
-    networks:
-      - ft_network
-    tty: true
+  # postgresql:
+  #   build: ./postgresql
+  #   container_name: postgre
+  #   volumes:
+  #     - "./.data/postgre"
+  #   expose:
+  #     - "5432"
+  #   networks:
+  #     - ft_network
+  #   tty: true
   
   #webserver
   nginx:
     build: ./nginx
+    restart: always
     container_name: nginx
     volumes:
       - "./.data/nginx"
-    expose:
-      - "443"
+    ports:
+      - "443:443"
     networks:
       - ft_network
     tty: true
+    depends_on:
+      - django
   
   #ELK containers
-  elasticsearch:
-    build: ./ELK/elasticsearch
-    tty: true
+  # elasticsearch:
+  #   build: ./ELK/elasticsearch
+  #   tty: true
 
-  logstash:
-    build: ./ELK/logstash
-    tty: true
+  # logstash:
+  #   build: ./ELK/logstash
+  #   tty: true
 
-  kibana:
-    build: ./ELK/kibana
-    tty: true
+  # kibana:
+  #   build: ./ELK/kibana
+  #   tty: true
 
 
 volumes:
