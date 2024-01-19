@@ -2,10 +2,10 @@ FROM python:3.9-slim
 
 COPY requirements.txt ./
 
-RUN pip install -r --no-cache-dir requirements.txt && mkdir ./backend
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt && mkdir ./backend
 
-COPY ../../srcs/backend ./backend
+COPY . ./backend
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]

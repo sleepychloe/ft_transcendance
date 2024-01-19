@@ -2,7 +2,7 @@ RESET		:= $(shell tput -Txterm sgr0)
 YELLOW		:= $(shell tput -Txterm setaf 3)
 BLUE		:= $(shell tput -Txterm setaf 6)
 
-NETWORK_NUM	:= $(shell sudo docker network ls | grep -n intra | cut -f 1 -d ':')
+NETWORK_NUM	:= $(shell sudo docker network ls | grep -n ft_network | cut -f 1 -d ':')
 
 COMPOSE_FILE	= ./docker/docker-compose.yaml
 
@@ -35,9 +35,9 @@ list:
 	@echo ""
 
 	@echo "$(BLUE)LIST OF NETWORKS:$(RESET)"
-ifneq ($(findstring intra, $(shell sudo docker network ls)), intra)
+ifneq ($(findstring ft_network, $(shell sudo docker network ls)), ft_network)
 	@sudo docker network ls
-	@echo "$(YELLOW)There is no docker-network named intra$(RESET)"
+	@echo "$(YELLOW)There is no docker-network named ft_network$(RESET)"
 else
 	@sudo docker network ls | head -$(shell echo $(NETWORK_NUM)-1 | bc -l)
 	@echo "$(YELLOW)$(shell docker network ls | grep intra)$(RESET)"
@@ -79,7 +79,7 @@ else
 	@echo "$(YELLOW)There is no container to remove$(RESET)"
 endif
 
-ifneq ($(shell sudo docker network ls | grep intra | wc -l), 0)
+ifneq ($(shell sudo docker network ls | grep ft_network | wc -l), 0)
 	@sudo docker network prune -f
 	@echo "$(YELLOW)Networks successfully removed$(RESET)"
 else
@@ -87,7 +87,7 @@ else
 endif
 
 ifneq ($(shell sudo docker volume ls | wc -l), 1)
-	@sudo docker volume rm $(shell sudo docker volume ls | awk 'NR>1' | cut -c 21-40) -f
+	@sudo docker volume prune -f
 	@echo "$(YELLOW)Volumes successfully removed$(RESET)"
 else
 	@echo "$(YELLOW)There is no volume to remove$(RESET)"

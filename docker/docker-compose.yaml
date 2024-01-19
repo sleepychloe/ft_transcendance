@@ -3,7 +3,9 @@ version: '3'
 services:
   #backend framework
   django:
-    build: ./django
+    build:
+      context: ../srcs/backend
+      dockerfile: ../../docker/django/dockerfile
     container_name: django
     volumes:
       - "./.data/django"
