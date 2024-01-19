@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  #backend framework
+  django:
+    build: ./django
+    container_name: django
+    volumes:
+      - "./.data/django"
+    expose:
+      - "8000"
+    networks:
+      - ft_network
+#    environment:
+    tty: true
+  
+  #Database server
+  postgresql:
+    build: ./postgresql
+    container_name: postgre
+    volumes:
+      - "./.data/postgre"
+    expose:
+      - "5432"
+    networks:
+      - ft_network
+    tty: true
+  
+  #webserver
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    volumes:
+      - "./.data/nginx"
+    expose:
+      - "443"
+    networks:
+      - ft_network
+    tty: true
+  
+  #ELK containers
+  elasticsearch:
+    build: ./ELK/elasticsearch
+    tty: true
+
+  logstash:
+    build: ./ELK/logstash
+    tty: true
+
+  kibana:
+    build: ./ELK/kibana
+    tty: true
+
+
+volumes:
+  postegre-volume:
+    name: postgre-volume
+    driver: local
+    driver_opts:
+      type: none
+      device: ./.data/postgre
+      o: bind
+
+networks:
+  ft_network:
+    driver: bridge

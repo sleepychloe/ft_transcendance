@@ -1,0 +1,2 @@
+## ft_transcendence version 14.1 in ecole42 PARIS
+- [ychun](https://profile.intra.42.fr/users/ychun) , [ywhang](https://profile.intra.42.fr/users/yhwang), [schaehun](https://profile.intra.42.fr/users/schaehun)
