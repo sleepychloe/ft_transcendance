@@ -1,1 +1,5 @@
-FROM postgres:16.1
+FROM postgres:16.1-alpine
+
+EXPOSE 5432
+
+CMD ["postgres", "-c", "listen_addresses=*"]

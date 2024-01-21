@@ -14,20 +14,27 @@ services:
       - "8000"
     networks:
       - ft_network
-#    environment:
+    env_file:
+      .env
+    depends_on:
+      - postgresql
     tty: true
   
   #Database server
-  # postgresql:
-  #   build: ./postgresql
-  #   container_name: postgre
-  #   volumes:
-  #     - "./.data/postgre"
-  #   expose:
-  #     - "5432"
-  #   networks:
-  #     - ft_network
-  #   tty: true
+  postgresql:
+    build: ./postgresql
+    container_name: postgresql
+    volumes:
+      - "./.data/postgre"
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    networks:
+      - ft_network
+    env_file:
+      .env
+    tty: true
   
   #webserver
   nginx:
