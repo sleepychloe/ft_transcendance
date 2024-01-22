@@ -136,35 +136,30 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,      #디폴트 : True, 장고의 디폴트 로그 설정을 대체. / False : 장고의 디폴트 로그 설정의 전부 또는 일부를 다시 정의
-#     'formatters': {                        # message 출력 포맷 형식
-#         'verbose': {
-#             'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-#             'datefmt' : "%d/%b/%Y %H:%M:%S"
-#         },
-#         'simple': {
-#             'format': '%(levelname)s %(message)s'
-#         },
-#     },
-#     'handlers': {
-#         'logstash': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'filename': 'file_name.log',        # message가 저장될 파일명(파일명 변경 가능)
-#             'formatter': 'verbose'
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers':['file'],        # 'file' : handler의 이름
-#             'propagate': True,         
-#             'level':'DEBUG',            # DEBUG 및 그 이상의 메시지를 file 핸들러에게 보내줍니다.
-#         },
-#         'app_name': {                   # Project에서 생성한 app의 이름
-#             'handlers': ['file'],          # 다른 app을 생성 후 해당 app에서도
-#             'level': 'DEBUG',          # 사용하고자 할 경우 해당 app 이름으로
-#         },                                      # 좌측 코드를 추가 작성해서 사용
-#     }
-# }​
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(message)s',
+        },
+    },
+    'handlers': {
+        'logstash': {
+            'level': 'INFO', #로그 레벨 (info, debug, error etc..)
+            'class': 'logstash.TCPLogstashHandler', #python-logstash 설치
+            'host' : 'logstash',
+			'port' : 5959, #default 5959
+			'version' : 1,
+			'message_type' : 'logstash',
+			'fqdn' : False, #Fully qualified domain name. default false
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers' : ['logstash'],
+			'level' : 'DEBUG',
+			'propagate' : True,
+        },
+    },
+}

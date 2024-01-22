@@ -11,12 +11,12 @@ all: up
 up:
 	@echo "$(BLUE)Creating and starting containers..$(RESET)"
 
-ifneq ($(shell ls ./.data/postgre | grep mysql | wc -l ), 1)
-	@sudo mkdir -p ./.data/postgre
-	@echo "$(YELLOW).data/postgre directory is created$(RESET)"
-else
-	@echo "$(YELLOW)./.data/postgre directory already exists$(RESET)"
-endif
+# ifneq ($(shell ls ./.data/postgre | grep mysql | wc -l ), 1)
+# 	@sudo mkdir -p ./.data/postgre
+# 	@echo "$(YELLOW).data/postgre directory is created$(RESET)"
+# else
+# 	@echo "$(YELLOW)./.data/postgre directory already exists$(RESET)"
+# endif
 
 	@sudo sudo docker-compose -f $(COMPOSE_FILE) up --build -d
 	@echo "$(YELLOW)Containers succesfully created and started$(RESET)"

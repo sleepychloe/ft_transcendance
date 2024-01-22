@@ -24,8 +24,6 @@ services:
     container_name: postgresql
     expose:
       - "5432"
-    ports:
-      - "5432:5432"
     networks:
       - ft_network
     env_file:
@@ -45,19 +43,49 @@ services:
     depends_on:
       - django
   
-  #ELK containers
-  # elasticsearch:
-  #   build: ./ELK/elasticsearch
-  #   tty: true
+#ELK containers
+  elasticsearch:
+    container_name: elasticsearch
+    build: ./ELK/elasticsearch
+    expose:
+      - "9200"
+    volumes:
+      - "./ELK/certificat:/usr/share/elasticsearch/config/certs"
+    networks:
+      - ft_network
+    env_file:
+      .env
+    restart: always
 
-  # logstash:
-  #   build: ./ELK/logstash
-  #   tty: true
+  logstash:
+    container_name: logstash
+    build: ./ELK/logstash
+    expose:
+      - "5959"
+    volumes:
+      - "./ELK/certificat:/usr/share/logstash/config/certs"
+    networks:
+      - ft_network
+    env_file:
+      .env
+    restart: always
+    depends_on:
+      - elasticsearch
 
-  # kibana:
-  #   build: ./ELK/kibana
-  #   tty: true
-
+  kibana:
+    container_name: kibana
+    build: ./ELK/kibana
+    ports:
+      - "5601:5601"
+    volumes:
+      - "./ELK/certificat:/usr/share/kibana/config/certs"
+    networks:
+      - ft_network
+    env_file:
+      .env
+    restart: always
+    depends_on:
+      - elasticsearch
 
 networks:
   ft_network:
