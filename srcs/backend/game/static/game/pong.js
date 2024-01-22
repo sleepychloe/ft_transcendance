@@ -126,25 +126,11 @@ document.addEventListener('keydown', event => {
         leftPaddleY -= paddleSpeed;
         if (!tournamentModeFlag) {
             const data = {
-                "PaddleY": leftPaddleY,
-                "ballX": ballX,
-                "ballY": ballY
-            }
-            fetch('ml_save_data/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            })
-            .catch(error => {
-                console.error('error: ', error);
-            });
+                PaddleY: leftPaddleY,
+                ballX: ballX,
+                ballY: ballY
+            };
+            postJSON(data);
         }
     }
     if (event.key === 's') {
@@ -155,20 +141,7 @@ document.addEventListener('keydown', event => {
                 "ballX": ballX,
                 "ballY": ballY
             }
-            fetch('ml_save_data/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log(result);
-            })
-            .catch(error => {
-                console.error('error: ', error);
-            });
+            postJSON(data);
         }
     }
     if (event.key === 'ArrowUp') {
@@ -179,20 +152,7 @@ document.addEventListener('keydown', event => {
                 "ballX": ballX,
                 "ballY": ballY
             }
-            fetch('ml_save_data/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log(result);
-            })
-            .catch(error => {
-                console.error('error: ', error);
-            });
+            postJSON(data);
         }
     }
     if (event.key === 'ArrowDown') {
@@ -203,20 +163,7 @@ document.addEventListener('keydown', event => {
                 "ballX": ballX,
                 "ballY": ballY
             }
-            fetch('ml_save_data/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log(result);
-            })
-            .catch(error => {
-                console.error('error: ', error);
-            });
+            postJSON(data);
         }
     }
     if (event.key === 'f5')
@@ -395,6 +342,7 @@ function resetToHomeScreen() {
 
 }
 
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -408,4 +356,21 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+async function postJSON(data) {
+    try {
+        const response = await fetch('ml_save_data/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        console.log("success: ", result);
+    } catch (error) {
+        console.error("error: ", error);
+    }
 }
