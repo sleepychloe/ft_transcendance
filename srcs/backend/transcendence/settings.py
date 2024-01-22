@@ -162,3 +162,48 @@ LOGGING = {
         },
     },
 }
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'json_formatter': {
+# 			'()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+#             'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
+#         },
+#     },
+#     'handlers': {
+#         'logstash_debug': {
+#             'level': 'DEBUG', #로그 레벨 (info, debug, error etc..)
+#             'class': 'logstash.TCPLogstashHandler', #python-logstash 설치
+#             'host' : 'logstash',
+# 			'port' : 5959, #default 5959
+# 			'version' : 1,
+# 			'message_type' : 'logstash_debug',
+# 			'fqdn' : False, #Fully qualified domain name. default false
+#             'tags' : ['django'],
+#         },
+#         'logstash_info': {
+#             'level': 'INFO', #로그 레벨 (info, debug, error etc..)
+#             'class': 'logstash.TCPLogstashHandler', #python-logstash 설치
+#             'host' : 'logstash',
+# 			'port' : 5959, #default 5959
+# 			'version' : 1.1,
+# 			'message_type' : 'logstash_info',
+# 			'fqdn' : False, #Fully qualified domain name. default false
+#             'tags' : ['django'],
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers' : ['logstash_debug'],
+# 			'level' : 'DEBUG',
+# 			'propagate' : True,
+#         },
+#         'django2': {
+# 			'handlers' : ['logstash_info'],
+# 			'level' : 'INFO',
+# 			'propagate' : True,
+#         },
+#     },
+# }
