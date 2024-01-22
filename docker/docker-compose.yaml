@@ -8,8 +8,6 @@ services:
       dockerfile: ../../docker/django/dockerfile
     container_name: django
     restart: always
-    volumes:
-      - "./.data/django"
     expose:
       - "8000"
     networks:
@@ -24,8 +22,6 @@ services:
   postgresql:
     build: ./postgresql
     container_name: postgresql
-    volumes:
-      - "./.data/postgre"
     expose:
       - "5432"
     ports:
@@ -41,8 +37,6 @@ services:
     build: ./nginx
     restart: always
     container_name: nginx
-    volumes:
-      - "./.data/nginx"
     ports:
       - "443:443"
     networks:
@@ -64,15 +58,6 @@ services:
   #   build: ./ELK/kibana
   #   tty: true
 
-
-volumes:
-  postegre-volume:
-    name: postgre-volume
-    driver: local
-    driver_opts:
-      type: none
-      device: ./.data/postgre
-      o: bind
 
 networks:
   ft_network:

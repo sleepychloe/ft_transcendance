@@ -93,12 +93,12 @@ else
 	@echo "$(YELLOW)There is no volume to remove$(RESET)"
 endif
 
-ifneq ($(shell sudo docker image ls | wc -l), 1)
-	@sudo docker rmi $(shell sudo docker images -q) -f
-	@echo "$(YELLOW)Images succesfully removed$(RESET)"
-else
-	@echo "$(YELLOW)There is no image to remove$(RESET)"
-endif
+# ifneq ($(shell sudo docker image ls | wc -l), 1)
+# 	@sudo docker rmi $(shell sudo docker images -q) -f
+# 	@echo "$(YELLOW)Images succesfully removed$(RESET)"
+# else
+# 	@echo "$(YELLOW)There is no image to remove$(RESET)"
+# endif
 
 ifeq ($(shell ls ./.data | grep mysql | wc -l ), 1)
 	@sudo rm -rf ./.data

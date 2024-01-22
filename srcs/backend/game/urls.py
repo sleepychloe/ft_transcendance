@@ -1,7 +1,11 @@
 from django.urls import path
-from .views import index
+from . import views
+
+app_name = 'game'
 
 urlpatterns = [
-    path('', index, name='index'),
+    path('', views.index, name='index'),
+    path('local_pvp/', views.local_pvp, name='local_pvp'),
+    path('local_pvp/ml_save_data/', views.ml_save_data, name="ml_save_data"),
     # Additional URL patterns for your game's backend logic
 ]

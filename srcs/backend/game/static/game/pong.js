@@ -120,36 +120,103 @@ let normalModeGamesPlayed = 0;
 let tournamentModeFlag = 0;
 let isGameInProgress = false;
 
-let dataPaddleY = [];
-let dataBallY = [];
 
 document.addEventListener('keydown', event => {
     if (event.key === 'w') {
         leftPaddleY -= paddleSpeed;
         if (!tournamentModeFlag) {
-            dataPaddleY.push(leftPaddleY);
-            dataBallY.push(ballY);
+            const data = {
+                "PaddleY": leftPaddleY,
+                "ballX": ballX,
+                "ballY": ballY
+            }
+            fetch('ml_save_data/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('error: ', error);
+            });
         }
     }
     if (event.key === 's') {
         leftPaddleY += paddleSpeed;
         if (!tournamentModeFlag) {
-            dataPaddleY.push(leftPaddleY);
-            dataBallY.push(ballY);
+            const data = {
+                "PaddleY": leftPaddleY,
+                "ballX": ballX,
+                "ballY": ballY
+            }
+            fetch('ml_save_data/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+            })
+            .catch(error => {
+                console.error('error: ', error);
+            });
         }
     }
     if (event.key === 'ArrowUp') {
         rightPaddleY -= paddleSpeed;
         if (!tournamentModeFlag) {
-            dataPaddleY.push(rightPaddleY);
-            dataBallY.push(ballY);
+            const data = {
+                "PaddleY": rightPaddleY,
+                "ballX": ballX,
+                "ballY": ballY
+            }
+            fetch('ml_save_data/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+            })
+            .catch(error => {
+                console.error('error: ', error);
+            });
         }
     }
     if (event.key === 'ArrowDown') {
         rightPaddleY += paddleSpeed;
         if (!tournamentModeFlag) {
-            dataPaddleY.push(rightPaddleY);
-            dataBallY.push(ballY);
+            const data = {
+                "PaddleY": rightPaddleY,
+                "ballX": ballX,
+                "ballY": ballY
+            }
+            fetch('ml_save_data/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+            })
+            .catch(error => {
+                console.error('error: ', error);
+            });
         }
     }
     if (event.key === 'f5')
@@ -326,4 +393,19 @@ function resetToHomeScreen() {
     tournamentModeFlag = 0;
     updateAIModeVisibility();
 
+}
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }

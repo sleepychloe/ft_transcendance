@@ -2,4 +2,6 @@ FROM postgres:16.1-alpine
 
 EXPOSE 5432
 
+COPY config/init.sql /docker-entrypoint-initdb.d/10-init.sql
+
 CMD ["postgres", "-c", "listen_addresses=*"]

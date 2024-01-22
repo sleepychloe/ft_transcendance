@@ -1,3 +1,4 @@
 from django.db import models
 
-# Create your models here.
+class DataSetModel(models.Model):
+        column1 = models.JSONField()
