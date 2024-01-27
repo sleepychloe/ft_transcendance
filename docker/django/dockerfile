@@ -9,8 +9,6 @@ COPY ./settings ./settings
 
 RUN pip install --upgrade pip && pip install --no-cache-dir -r ./settings/requirements.txt
 
-EXPOSE 8000
-
 RUN chmod 777 ./settings/wait_for_it.sh
 
 WORKDIR ./backend

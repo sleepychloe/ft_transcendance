@@ -10,14 +10,6 @@ all: up
 
 up:
 	@echo "$(BLUE)Creating and starting containers..$(RESET)"
-
-# ifneq ($(shell ls ./.data/postgre | grep mysql | wc -l ), 1)
-# 	@sudo mkdir -p ./.data/postgre
-# 	@echo "$(YELLOW).data/postgre directory is created$(RESET)"
-# else
-# 	@echo "$(YELLOW)./.data/postgre directory already exists$(RESET)"
-# endif
-
 	@sudo sudo docker-compose -f $(COMPOSE_FILE) up --build -d
 	@echo "$(YELLOW)Containers succesfully created and started$(RESET)"
 
@@ -99,12 +91,6 @@ endif
 # else
 # 	@echo "$(YELLOW)There is no image to remove$(RESET)"
 # endif
-
-ifeq ($(shell ls ./.data | grep mysql | wc -l ), 1)
-	@sudo rm -rf ./.data
-	@echo "$(YELLOW)data directory is removed$(RESET)"
-endif
-	@echo "$(BLUE)Everything is successfully removed!$(RESET)"
 
 re: fclean up
 
