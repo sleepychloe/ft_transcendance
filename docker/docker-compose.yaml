@@ -1,12 +1,28 @@
 version: '3'
 
 services:
+  #frontend framework
+  node:
+    build:
+      context: "./node/nextjs"
+      dockerfile: "../dockerfile"
+    container_name: node
+    volumes:
+      - "../srcs/frontend:/pages"
+    restart: always
+    expose:
+      - "3000"
+    networks:
+      - ft_network
+    env_file:
+      .env
+
   #backend framework
   django:
-    build:
-      context: ../srcs/backend
-      dockerfile: ../../docker/django/dockerfile
+    build: ./django
     container_name: django
+    volumes:
+      - "../srcs/backend:/backend"
     restart: always
     expose:
       - "8000"
@@ -16,7 +32,6 @@ services:
       .env
     depends_on:
       - postgresql
-    tty: true
   
   #Database server
   postgresql:
