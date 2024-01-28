@@ -1,0 +1,22 @@
+body {
+	background-color: #b6dcee;
+	color: #343a40;
+}
+
+#pongCanvas {
+	background: black;
+	display: block;
+	margin: auto;
+}
+
+#gameDashboard,
+#modeSelection,
+#registration,
+#tournamentInfo {
+	text-align: center;
+	margin-top: 20px;
+}
+
+.hidden {
+	display: none;
+}

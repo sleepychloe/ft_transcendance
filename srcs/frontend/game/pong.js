@@ -45,7 +45,7 @@ function endNormalGame() {
 
 // Tournament mode
 function startTournamentMode() {
-	resetGame();
+    resetGame();
     tournamentModeFlag = 1;
     document.getElementById("modeSelection").style.display = "none";
     document.getElementById("registration").style.display = "block";
@@ -166,8 +166,7 @@ document.addEventListener('keydown', event => {
             postJSON(data);
         }
     }
-    if (event.key === 'f5')
-    {
+    if (event.key === 'f5') {
         event.preventDefault();
         resetToHomeScreen()
     }
@@ -178,8 +177,8 @@ function resetBall() {
     ballSpeedX = 2 + 1.5 * Math.random();
     ballSpeedY = 2 + 1.5 * Math.random();
 
-	leftPaddleY = canvas.height / 2;
-	rightPaddleY = canvas.height / 2;
+    leftPaddleY = canvas.height / 2;
+    rightPaddleY = canvas.height / 2;
 }
 
 function updatePaddlePosition() {
@@ -238,9 +237,9 @@ function drawEverything() {
 function gameLoop() {
     if (!isGameInProgress) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        return ;
+        return;
     }
-        updatePaddlePosition();
+    updatePaddlePosition();
     if (random % 2 !== 0) {
         ballX -= ballSpeedX;
         ballY -= ballSpeedY;
@@ -282,7 +281,7 @@ function endMatch() {
         if (isGameInProgress === true) {
             alert(`Tournament Winner: ${winner}`);
             isGameInProgress = false;
-            if (gameLoopId){
+            if (gameLoopId) {
                 cancelAnimationFrame(gameLoopId);
                 gameLoopId = null;
             }
@@ -297,7 +296,7 @@ function displayMatchups() {
     const upcomingMatchesDisplay = document.getElementById("upcomingMatches");
 
 
-	if (players.length >= 2) {
+    if (players.length >= 2) {
         currentMatchDisplay.textContent = `${players[0]} vs ${players[1]}`;
     } else {
         currentMatchDisplay.textContent = "Waiting for players";
@@ -312,8 +311,8 @@ function displayMatchups() {
 
 function resetGame() {
     isGameInProgress = false;
-	if (gameLoopId) {
-	    cancelAnimationFrame(gameLoopId);
+    if (gameLoopId) {
+        cancelAnimationFrame(gameLoopId);
         gameLoopId = null;
     }
     gameLoopId = null;

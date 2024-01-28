@@ -1,0 +1,25 @@
+body {
+	background-color: #b6dcee;
+	color: #343a40;
+}
+
+.header-container {
+	background-color: #007bff;
+	padding: 20px;
+	color: white;
+	text-align: center;
+}
+
+.header-container h1 {
+	margin-bottom: 20px;
+}
+
+.btn-group {
+	margin-top: 20px;
+}
+
+.btn {
+	font-size: 18px;
+	padding: 15px 30px;
+	margin: 0 10px;
+}
