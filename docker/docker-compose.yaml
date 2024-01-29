@@ -3,10 +3,13 @@ version: '3'
 services:
   #backend framework
   django:
-    build: ./django
+    # build: ./django
+    build:
+      context: ../srcs/backend
+      dockerfile: ../../docker/django/dockerfile
     container_name: django
-    volumes:
-      - "../srcs/backend:/backend"
+    # volumes:
+    #   - "../srcs/backend:/backend"
     restart: always
     expose:
       - "8000"
@@ -20,6 +23,7 @@ services:
   #Database server
   postgresql:
     build: ./postgresql
+    restart: always
     container_name: postgresql
     expose:
       - "5432"
@@ -31,13 +35,17 @@ services:
   
   #webserver
   nginx:
-    build: ./nginx
+    # build: ./nginx
+    build:
+      context: ../srcs/frontend
+      dockerfile: ../../docker/nginx/dockerfile
     restart: always
     container_name: nginx
-    volumes:
-      - "../srcs/frontend:/usr/share/nginx/html"
+    # volumes:
+    #   - "../srcs/frontend:/usr/share/nginx/html"
     ports:
       - "443:443"
+      - "5601:5601"
     networks:
       - ft_network
     tty: true
@@ -50,8 +58,6 @@ services:
 #     build: ./ELK/elasticsearch
 #     expose:
 #       - "9200"
-#     volumes:
-#       - "./ELK/certificat:/usr/share/elasticsearch/config/certs"
 #     networks:
 #       ft_network:
 #         ipv4_address: 42.42.42.0
@@ -64,8 +70,6 @@ services:
 #     build: ./ELK/logstash
 #     expose:
 #       - "5959"
-#     volumes:
-#       - "./ELK/certificat:/usr/share/logstash/config/certs"
 #     networks:
 #       ft_network:
 #         ipv4_address: 42.42.42.1
@@ -78,10 +82,8 @@ services:
 #   kibana:
 #     container_name: kibana
 #     build: ./ELK/kibana
-#     ports:
-#       - "5601:5601"
-#     volumes:
-#       - "./ELK/certificat:/usr/share/kibana/config/certs"
+#     expose:
+#       - "5601"
 #     networks:
 #       ft_network:
 #         ipv4_address: 42.42.42.2

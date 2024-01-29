@@ -11,6 +11,8 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r ./settings/requir
 
 RUN chmod 777 ./settings/wait_for_it.sh
 
-WORKDIR ./backend
+COPY . ./backend
+
+WORKDIR /backend
 
 CMD ["../settings/wait_for_it.sh", "localhost:5432", "--" ,"python3", "manage.py", "runserver", "0.0.0.0:8000"]

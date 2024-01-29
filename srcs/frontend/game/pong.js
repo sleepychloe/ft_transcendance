@@ -359,7 +359,7 @@ function getCookie(name) {
 
 async function postJSON(data) {
     try {
-        const response = await fetch('ml_save_data/', {
+        const response = await fetch('/api/ml_save_data/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

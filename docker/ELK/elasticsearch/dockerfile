@@ -3,3 +3,5 @@ FROM elasticsearch:7.17.16
 RUN	elasticsearch-plugin install analysis-icu
 
 COPY ./config/elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+
+COPY ./certificat/elastic-certificates.p12 /usr/share/elasticsearch/config/certs/elastic-certificates.p12

@@ -1,29 +1,19 @@
-{% load static %}
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pong Game</title>
-    <style>
-        #pongCanvas {
-            background: black;
-            display: block;
-            margin: auto;
-        }
-        #gameDashboard, #modeSelection, #registration, #tournamentInfo {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../assets/css/local_pvp.css" rel="stylesheet">
 </head>
+
 <body>
     <div id="modeSelection">
-        <h2>Select Game Mode</h2>
-        <button id="normalMode">Normal Mode</button>
-        <button id="tournamentMode">Tournament Mode</button>
+        <h2>1 vs 1</h2>
+        <button id="normalMode">Start</button>
+        <button id="tournamentMode" class="hidden">Tournament Mode</button>
         <button id="aiMode" class="hidden">AI Mode</button>
     </div>
 
@@ -49,7 +39,9 @@
     </div>
 
     <canvas id="pongCanvas" width="800" height="400" class="hidden"></canvas>
-    <script src="{% static 'game/pong.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../pong.js"></script>
 
 </body>
+
 </html>
