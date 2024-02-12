@@ -1,6 +1,8 @@
 import { routes } from "./routes.js";
 
 var pongGameScriptTag = undefined;
+var multiGameScriptTag = undefined;
+var tournamentGameScriptTag = undefined;
 
 const app = async () => {
         const pageMatch = routes.map(route => {
@@ -18,6 +20,18 @@ const app = async () => {
                 pongGameScriptTag = document.createElement("script");
                 pongGameScriptTag.src = "./game/local_pvp/pong.js";
                 document.getElementsByTagName("head")[0].appendChild(pongGameScriptTag);
+        }
+        if (match.route.path === '/tournament' && tournamentGameScriptTag === undefined)
+        {
+                tournamentGameScriptTag = document.createElement("script");
+                tournamentGameScriptTag.src = "./game/tournament/pong.js";
+                document.getElementsByTagName("head")[0].appendChild(tournamentGameScriptTag);
+        }
+        if (match.route.path === '/multi' && multiGameScriptTag === undefined)
+        {
+                multiGameScriptTag = document.createElement("script");
+                multiGameScriptTag.src = "./game/multi/ws.js";
+                document.getElementsByTagName("head")[0].appendChild(multiGameScriptTag);
         }
 }
 
