@@ -1,5 +1,5 @@
-const canvas = document.getElementById("pongCanvas");
-const ctx = canvas.getContext("2d");
+var canvas = document.getElementById("pongCanvas");
+var ctx = canvas.getContext("2d");
 
 let normalCount = 0;
 let random = 0;
@@ -122,7 +122,7 @@ let isGameInProgress = false;
 
 
 document.addEventListener('keydown', event => {
-    if (event.key === 'w') {
+    if (isGameInProgress && event.key === 'w') {
         leftPaddleY -= paddleSpeed;
         if (!tournamentModeFlag) {
             const data = {
@@ -133,7 +133,7 @@ document.addEventListener('keydown', event => {
             postJSON(data);
         }
     }
-    if (event.key === 's') {
+    if (isGameInProgress && event.key === 's') {
         leftPaddleY += paddleSpeed;
         if (!tournamentModeFlag) {
             const data = {
@@ -144,7 +144,7 @@ document.addEventListener('keydown', event => {
             postJSON(data);
         }
     }
-    if (event.key === 'ArrowUp') {
+    if (isGameInProgress && event.key === 'ArrowUp') {
         rightPaddleY -= paddleSpeed;
         if (!tournamentModeFlag) {
             const data = {
@@ -155,7 +155,7 @@ document.addEventListener('keydown', event => {
             postJSON(data);
         }
     }
-    if (event.key === 'ArrowDown') {
+    if (isGameInProgress && event.key === 'ArrowDown') {
         rightPaddleY += paddleSpeed;
         if (!tournamentModeFlag) {
             const data = {
