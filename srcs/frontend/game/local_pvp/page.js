@@ -3,7 +3,7 @@ export function localpvpPage() {
         return `
                 <div id="modeSelection">
                         <h2>1 vs 1</h2>
-                        <button id="normalMode">Start</button><button id="tournamentMode" class="hidden">Tournament Mode</button>
+                        <button id="normalMode" onClick="startNormalMode()">Start</button><button id="tournamentMode" class="hidden">Tournament Mode</button>
                         <button id="aiMode" class="hidden">AI Mode</button>
                 </div>
                 <div id="registration" class="hidden">

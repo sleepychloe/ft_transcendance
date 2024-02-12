@@ -9,7 +9,7 @@ export const routes = [
                 template: indexPage()
         },
         {
-                path: '/game',
+                path: '/local',
                 template: localpvpPage()
         },
         {
