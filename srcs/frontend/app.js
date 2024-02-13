@@ -1,9 +1,5 @@
 import { routes } from "./routes.js";
 
-var pongGameScriptTag = undefined;
-var multiGameScriptTag = undefined;
-var tournamentGameScriptTag = undefined;
-
 const app = async () => {
         const pageMatch = routes.map(route => {
                 return {
@@ -13,25 +9,21 @@ const app = async () => {
         });
         let match = pageMatch.find(page => page.isMatch);
         document.getElementById('app').innerHTML = match.route.template;
+        let scriptTag = match.route.script;
 
+        // insert corresponding script inside HTML head on page load
+        if (scriptTag !== null)
+                document.getElementsByTagName("head")[0].appendChild(scriptTag);
+        else
+                console.log("script for ", match.route.path, " is already loaded");
+        
         // insert pong.js script inside HTML head on game page load
-        if (match.route.path === '/local' && pongGameScriptTag === undefined)
+        if (match.route.path !== '/' && !document.getElementById('./game/pong.js'))
         {
-                pongGameScriptTag = document.createElement("script");
-                pongGameScriptTag.src = "./game/local_pvp/pong.js";
-                document.getElementsByTagName("head")[0].appendChild(pongGameScriptTag);
-        }
-        if (match.route.path === '/tournament' && tournamentGameScriptTag === undefined)
-        {
-                tournamentGameScriptTag = document.createElement("script");
-                tournamentGameScriptTag.src = "./game/tournament/pong.js";
-                document.getElementsByTagName("head")[0].appendChild(tournamentGameScriptTag);
-        }
-        if (match.route.path === '/multi' && multiGameScriptTag === undefined)
-        {
-                multiGameScriptTag = document.createElement("script");
-                multiGameScriptTag.src = "./game/multi/ws.js";
-                document.getElementsByTagName("head")[0].appendChild(multiGameScriptTag);
+                var tag = document.createElement("script");
+                tag.src = "./game/pong.js";
+                tag.id = "./game/pong.js";
+                document.getElementsByTagName("head")[0].appendChild(tag);
         }
 }
 
@@ -45,7 +37,7 @@ const navigate = url => {
 document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('popstate', function (event) {
                 // stop pong.js
-                if (this.window.href === '/local')
+                if (window.location.pathname === '/')
                         resetToHomeScreen();
                 app();
         });

@@ -1,7 +1,6 @@
 export function localpvpPage() {
         console.log("local_pvp/page.js : localpvpPage function called");
-        return `
-                <div id="modeSelection">
+        return `<div id="modeSelection">
                         <h2>1 vs 1</h2>
                         <button id="normalMode" onClick="startNormalMode()">Start</button><button id="tournamentMode" class="hidden">Tournament Mode</button>
                         <button id="aiMode" class="hidden">AI Mode</button>
