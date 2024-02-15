@@ -18,11 +18,11 @@ const app = async () => {
                 console.log("script for ", match.route.path, " is already loaded");
         
         // insert pong.js script inside HTML head on game page load
-        if (match.route.path !== '/' && !document.getElementById('./game/pong.js'))
+        if (match.route.path !== '/' && !document.getElementById('script-path-./game/pong.js'))
         {
                 var tag = document.createElement("script");
                 tag.src = "./game/pong.js";
-                tag.id = "./game/pong.js";
+                tag.id = "script-path-./game/pong.js";
                 document.getElementsByTagName("head")[0].appendChild(tag);
         }
 }

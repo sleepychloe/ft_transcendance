@@ -30,7 +30,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'channels',
+    'daphne',
+    # 'channels',
 	'socketapi.apps.SocketapiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
