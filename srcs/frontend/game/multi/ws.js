@@ -54,9 +54,10 @@
 // 	console.log("Received data from server: ", data.message);  // Ensure this logs the echoed message.
 //     };
 
-let gameSocket = new WebSocket(
-		`wss://${window.location.host}/ws/`
-	);; // Declare gameSocket at the top for global access
+let gameSocket;
+//  = new WebSocket(
+// 		`wss://${window.location.host}/ws/`
+// 	);; // Declare gameSocket at the top for global access
 
 connectWebSocket();
 
@@ -72,7 +73,7 @@ function connectWebSocket() {
     gameSocket.onmessage = function(event) {
 	try {
 	    let data = JSON.parse(event.data);
-	    console.log("Parsed data:", data);
+	//     console.log("Parsed data:", data);
 	    updateGameState(data);
 	} catch (error) {
 	    console.error("Error parsing JSON:", error);
@@ -131,10 +132,10 @@ function updateGameState(data) {
 		ctx.beginPath();
 		if (data.data.ball)
 			ctx.arc(ball.x, ball.y, ballSize, 0, Math.PI * 2, false);
-		if (data.paddle)
+		if (data.data.paddle)
 		{
-			paddleX = data.paddle.x;
-			paddleY = data.paddle.y;
+			paddleX = data.data.paddle.x;
+			paddleY = data.data.paddle.y;
 		}
 		ctx.fillRect(paddleX, paddleY, 10, 100);
 		ctx.fill();
@@ -144,6 +145,7 @@ function updateGameState(data) {
 function sendPaddleMovement(direction) {
 	if (gameSocket && gameSocket.readyState === WebSocket.OPEN) {
 	    gameSocket.send(JSON.stringify({
+		'action': 'move_paddle',
 		'type': 'move',
 		'direction': direction
 	    }));

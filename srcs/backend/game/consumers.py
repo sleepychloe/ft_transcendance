@@ -75,15 +75,16 @@ class defaultConsumer(WebsocketConsumer):
                 self.send_game_state()
         else:
                 print("Received unknown action:", action)
+
     def move_paddle(self, direction):
         if direction == 'left':
             self.game_state['paddle']['x'] -= 10
         elif direction == 'right':
             self.game_state['paddle']['x'] += 10
         elif direction == 'down':
-            self.game_state['paddle']['y'] -= 10
-        elif direction == 'up':
             self.game_state['paddle']['y'] += 10
+        elif direction == 'up':
+            self.game_state['paddle']['y'] -= 10
         
 
     #     # Add boundary checks to prevent the paddle from moving out of the canvas
