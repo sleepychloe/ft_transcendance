@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'daphne',
-    # 'channels',
+    'channels',
 	'game.apps.GameConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -77,8 +77,8 @@ ASGI_APPLICATION = 'transcendence.asgi.application'
 
 CHANNEL_LAYERS = {
 	'default': {
-		'BACKEND': 'channels.layers.InMemoryChannelLayer'
-    }
+		'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
 }
 
 # Database
