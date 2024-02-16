@@ -18,7 +18,7 @@ const app = async () => {
                 console.log("script for ", match.route.path, " is already loaded");
         
         // insert pong.js script inside HTML head on game page load
-        if (match.route.path !== '/' && !document.getElementById('script-path-./game/pong.js'))
+        if ((match.route.path !== '/' && match.route.path !== '/multi') && !document.getElementById('script-path-./game/pong.js'))
         {
                 var tag = document.createElement("script");
                 tag.src = "./game/pong.js";
@@ -37,8 +37,15 @@ const navigate = url => {
 document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('popstate', function (event) {
                 // stop pong.js
-                if (window.location.pathname === '/')
+                // will try to find another way to avoid try catch block
+                // if (window.location.pathname === '/')
+                try {
                         resetToHomeScreen();
+                } catch {
+                        console.log("Failed to Reset the Game (game was not loaded)");
+                }
+                // stop multi page
+                //
                 app();
         });
         // prevent default behaviour for all HTML <a> tags
