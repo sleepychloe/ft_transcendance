@@ -176,8 +176,8 @@ if [[ $WAITFORIT_CLI != "" ]]; then
         echoerr "$WAITFORIT_cmdname: strict mode, refusing to execute subprocess"
         exit $WAITFORIT_RESULT
     fi
-    python3 manage.py makemigrations api
-    python3 manage.py sqlmigrate api 0001
+    python3 manage.py makemigrations game
+    python3 manage.py sqlmigrate game 0001
     python3 manage.py migrate
     exec "${WAITFORIT_CLI[@]}"
 else

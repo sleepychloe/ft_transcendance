@@ -1,24 +1,3 @@
-# from channels.generic.websocket import WebsocketConsumer
-# from channels.generic.websocket import AsyncWebsocketConsumer
-# import json
-
-# class defaultConsumer(WebsocketConsumer):
-#     def connect(self):
-#         self.accept()
-
-#     def disconnect(self, close_code):
-#         pass
-
-#     def receive(self, text_data=None, bytes_data=None):
-#         if text_data:
-#             try:
-#                 message = json.loads(text_data)
-#                 self.send(text_data=json.dumps({
-#                     'echo': message  # Echo back the received message
-#                 }))
-#             except json.JSONDecodeError as e:
-#                 print(f"Error decoding JSON: {e}")
-
 from channels.generic.websocket import WebsocketConsumer
 import random
 import json

@@ -3,13 +3,13 @@ version: '3'
 services:
   #backend framework
   django:
-    # build: ./django
-    build:
-      context: ../srcs/backend
-      dockerfile: ../../docker/django/dockerfile
+    build: ./django
+    volumes:
+      - "../srcs/backend:/backend"
+    # build:
+    #   context: ../srcs/backend
+    #   dockerfile: ../../docker/django/dockerfile
     container_name: django
-    # volumes:
-    #   - "../srcs/backend:/backend"
     restart: always
     expose:
       - "8000"
@@ -35,16 +35,17 @@ services:
   
   #webserver
   nginx:
-    # build: ./nginx
-    build:
-      context: ../srcs/frontend
-      dockerfile: ../../docker/nginx/dockerfile
+    build: ./nginx
+    volumes:
+      - "../srcs/frontend:/usr/share/nginx/html"
+      - "../srcs/logs/nginx:/var/log/nginx"
+    # build:
+    #   context: ../srcs/frontend
+    #   dockerfile: ../../docker/nginx/dockerfile
     restart: always
     container_name: nginx
-    # volumes:
-    #   - "../srcs/frontend:/usr/share/nginx/html"
     ports:
-      - "443:443"
+      - "4243:4243"
       - "5601:5601"
     networks:
       - ft_network
@@ -58,6 +59,8 @@ services:
 #     build: ./ELK/elasticsearch
 #     expose:
 #       - "9200"
+#     volumes:
+#       - "./ELK/certificat:/usr/share/elasticsearch/config/certs"
 #     networks:
 #       ft_network:
 #         ipv4_address: 42.42.42.0
@@ -70,6 +73,9 @@ services:
 #     build: ./ELK/logstash
 #     expose:
 #       - "5959"
+#     volumes:
+#       - "./ELK/certificat:/usr/share/logstash/config/certs"
+#       - "../srcs/logs/nginx:/usr/share/logstash/logs"
 #     networks:
 #       ft_network:
 #         ipv4_address: 42.42.42.1
@@ -84,6 +90,8 @@ services:
 #     build: ./ELK/kibana
 #     expose:
 #       - "5601"
+#     volumes:
+#       - "./ELK/certificat:/usr/share/kibana/config/certs"
 #     networks:
 #       ft_network:
 #         ipv4_address: 42.42.42.2

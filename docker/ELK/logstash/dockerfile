@@ -6,4 +6,4 @@ COPY config/logstash.yml /usr/share/logstash/config/logstash.yml
 
 COPY config/logstash.conf /usr/share/logstash/pipeline/logstash.conf
 
-COPY ./certificat/elastic-certificates.p12 /usr/share/logstash/config/certs/elastic-certificates.p12
+# COPY ./certificat/elastic-certificates.p12 /usr/share/logstash/config/certs/elastic-certificates.p12
