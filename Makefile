@@ -10,8 +10,9 @@ all: up
 
 up:
 	@echo "$(BLUE)Creating and starting containers..$(RESET)"
-	@sudo docker-compose -f $(COMPOSE_FILE) up --build -d
 	@mkdir -p srcs/logs/nginx
+	@touch srcs/logs/nginx/access_json.log srcs/logs/nginx/access.log srcs/logs/nginx/error.log
+	@sudo docker-compose -f $(COMPOSE_FILE) up --build -d
 	@echo "$(YELLOW)Containers succesfully created and started$(RESET)"
 
 list:
@@ -62,7 +63,7 @@ endif
 
 fclean:
 	@echo "$(BLUE)Removing everything..$(RESET)"
-	@sudo rm -rf srcs/logs/nginx
+	@rm -rf srcs/logs/nginx
 	@sudo sudo docker-compose -f $(COMPOSE_FILE) stop -t1
 	@echo "$(YELLOW)Containers succesfully stopped$(RESET)"
 

@@ -2,6 +2,8 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-	path('makeroom/', GameMakeRoomView.as_view()),
-	# path('<str:game_id>/', GameRoomInfoView.as_view()),
+	path('makeroom/', GameRoomMakeView.as_view()),
+	path('listroom/', GameRoomListView.as_view()),
+	path('<str:game_id>/', GameRoomJoinView.as_view()),
+	# path('init/', GameInitView.as_view()),
 ]

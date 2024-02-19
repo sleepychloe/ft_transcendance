@@ -2,12 +2,17 @@ from django.db import models
 
 class MultiRoomInfo(models.Model):
 
+        Roomid = models.CharField()
         RoomName = models.CharField()
         QuantityPlayer = models.PositiveSmallIntegerField()
-        Created_time = models.DateTimeField(auto_now_add=True)
+        CreatedTime = models.DateTimeField(auto_now_add=True)
+        client1 = models.CharField()
+        client2 = models.CharField()
+        client3 = models.CharField()
+        client4 = models.CharField()
 
         class Meta:
-                db_table = 'room_info'
+                db_table = 'Room_info'
 
 # Create your models here.
 
