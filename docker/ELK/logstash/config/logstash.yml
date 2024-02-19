@@ -1,8 +1,8 @@
 http.host : "0.0.0.0"
 
 log.level: info
-
-pipeline.ecs_compatibility: v1
+log.format: plain
+path.logs: /usr/share/logstash/log
 
 xpack.monitoring.enabled: true
 xpack.monitoring.elasticsearch.username: elastic

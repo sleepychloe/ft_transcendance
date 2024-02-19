@@ -160,7 +160,7 @@ LOGGING = {
             'host' : 'logstash',
 			'port' : 5959, #default 5959
 			'version' : 1,
-			'message_type' : 'logstash_debug',
+			'message_type' : 'django',
 			'fqdn' : False, #Fully qualified domain name. default false
             'tags' : ['django'],
         },
@@ -170,7 +170,7 @@ LOGGING = {
             'host' : 'logstash',
 			'port' : 5959, #default 5959
 			'version' : 1.1,
-			'message_type' : 'logstash_info',
+			'message_type' : 'django',
 			'fqdn' : False, #Fully qualified domain name. default false
             'tags' : ['django'],
         },

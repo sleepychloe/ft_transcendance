@@ -75,7 +75,7 @@ services:
 #       - "5959"
 #     volumes:
 #       - "./ELK/certificat:/usr/share/logstash/config/certs"
-#       - "../srcs/logs/nginx:/usr/share/logstash/logs"
+#       - "../srcs/logs/nginx:/usr/share/logstash/log/nginx"
 #     networks:
 #       ft_network:
 #         ipv4_address: 42.42.42.1
