@@ -59,7 +59,7 @@ let gameSocket;
 // 		`wss://${window.location.host}/ws/`
 // 	);; // Declare gameSocket at the top for global access
 
-// connectWebSocket();
+connectWebSocket();
 
 function connectWebSocket() {
     // Ensure WebSocket uses the correct protocol (wss for secure, ws for local development)
