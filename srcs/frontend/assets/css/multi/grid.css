@@ -1,0 +1,27 @@
+.grid {
+        display: grid;
+        grid-template-areas:
+                "head head head"
+                "nav main ."
+                "foot main .";
+        grid-template-rows: auto auto 25px;
+        grid-template-columns: 3fr 5fr 3fr;
+}
+
+header {
+        grid-area: head;
+}
+
+nav {
+        grid-area: nav;
+        grid-column: 1fr;
+}
+
+main {
+        grid-area: main;
+        grid-column: 3fr;
+}
+
+footer {
+        grid-area: foot;
+}

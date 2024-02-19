@@ -1,0 +1,135 @@
+html {
+        height: 100%;
+        font-family: "Protest Strike", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+}
+
+body {
+        background-color: rgb(19, 19, 19);
+}
+
+.main-title {
+        color: white;
+        font-size: 72px;
+        font-style: normal;
+        text-align: center;
+        text-overflow: ellipsis;
+        padding: 18px;
+        margin-bottom: 2%;
+}
+
+.main-part {
+        display: flex;
+        flex-direction: column;
+}
+
+.lobby-space-counter {
+        color: rgb(245, 37, 37);
+        margin: 5px auto 5px auto;
+        padding: 10px;
+        font-size: 24px;
+}
+
+.lobby-players-list {
+        display: flex;
+        flex-direction: column;
+}
+
+.lobby-players-list-item {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        margin: auto;
+}
+
+.lobby-players-card {
+        display: flex;
+        flex-direction: row;
+        margin: auto;
+        background-color: rgb(61, 61, 61);
+        border-radius: 14px;
+        width: 420px;
+        height: 100px;
+}
+
+.lobby-players-card:hover {
+        cursor: pointer;
+        background-color: rgb(93, 93, 93);;
+}
+
+.lobby-players-card-icon {
+        width: 80px;
+        height: 80px;
+        padding: 10px;
+        border: 10px;
+}
+
+.img-player-icon {
+        width: 100%;
+        height: 100%;
+}
+
+.lobby-players-card-name {
+        color: white;
+        font-size: 24px;
+        margin: auto auto auto 15px;
+}
+
+.navbar {
+        margin-top: 100px;
+}
+
+.navbar-list {
+        display: flex;
+        flex-direction: column;
+}
+
+.navbar-list-item {
+        margin: auto;
+        padding: 10px 10px 10px 10px;
+        font-size: 42px;
+        color: rgb(110, 110, 110);
+        text-align: center;
+        text-decoration: none !important;
+        transition-duration: 0.3s;
+}
+
+.navbar-list-item:hover {
+        cursor: pointer;
+        color: rgb(243, 243, 243);
+}
+
+#player2 {
+        /* display: none; */
+}
+
+#player3 {
+        /* display: none; */
+}
+
+#player4 {
+        /* display: none; */
+}
+
+.game-start {
+        margin: auto;
+        margin-top: 60px;
+}
+
+.btn-game-start {
+        cursor: pointer;
+        margin: auto;
+        padding: 25px 55px;
+        border: 2px solid rgb(87, 87, 87);
+        border-radius: 12px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 18px;
+        color: rgb(87, 87, 87);
+        background-color: rgb(36, 36, 36);
+}
+
+.btn-game-start:hover {
+        background-color: rgb(28, 28, 28);
+}

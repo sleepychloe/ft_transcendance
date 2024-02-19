@@ -59,7 +59,7 @@ let gameSocket;
 // 		`wss://${window.location.host}/ws/`
 // 	);; // Declare gameSocket at the top for global access
 
-connectWebSocket();
+// connectWebSocket();
 
 function connectWebSocket() {
     // Ensure WebSocket uses the correct protocol (wss for secure, ws for local development)
@@ -173,4 +173,4 @@ function triggerUpdate() {
 	}
     }
     
-setInterval(triggerUpdate, 1000 / 60); // Trigger updates at ~60fps
+// setInterval(triggerUpdate, 1000 / 60); // Trigger updates at ~60fps
