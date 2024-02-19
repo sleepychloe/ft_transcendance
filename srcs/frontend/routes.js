@@ -25,4 +25,9 @@ export const routes = [
                 template: multiPage(),
                 script: createScriptTag('./game/multi/ws.js')
         },
+        // {
+        //         path: '/multi',
+        //         template: multiPage(),
+        //         script: createScriptTag('./game/multi/ws.js')
+        // },
 ];

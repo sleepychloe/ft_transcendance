@@ -133,3 +133,53 @@ body {
 .btn-game-start:hover {
         background-color: rgb(28, 28, 28);
 }
+
+.multi-room-choice-list {
+        display: flex;
+        flex-direction: column;
+        margin-top: 100px;
+}
+
+.multi-room-choice-list-item {
+        margin: auto;
+        padding: 10px;
+}
+
+.btn-multi-room-select {
+        cursor: pointer;
+        margin: auto;
+        padding: 25px 55px;
+        width: 240px;
+        border: 2px solid rgb(87, 87, 87);
+        border-radius: 12px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 18px;
+        color: rgb(14, 14, 14);
+        background-color: rgb(155, 155, 155);
+}
+
+.btn-multi-room-create:hover {
+        background-color: rgb(198, 198, 198);
+}
+
+.loading {
+        width: 2rem;
+        height: 2rem;
+        border: 5px solid #f3f3f3;
+        border-top: 6px solid #313131;
+        border-radius: 100%;
+        margin: auto;
+        visibility: hidden;
+        animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+        from {
+                transform: rotate(0deg);
+        }
+
+        to {
+                transform: rotate(360deg);
+        }
+}

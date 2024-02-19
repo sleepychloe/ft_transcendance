@@ -17,39 +17,9 @@ export function multiPage() {
                                 </div>
                         </nav>
                         <main class="main-part">
-                                <div class="lobby-space-counter">1/4 are ready</div>
-                                <div class="lobby-players-list">
-                                        <div class="lobby-players-list-item">
-                                                <div class="lobby-players-card" id="player1">
-                                                        <div class="lobby-players-card-icon"><img class="img-player-icon" src="../../assets/img/user-person-single-id-account-player-male-female-512.webp" alt="playerIcon" /></div>
-                                                        <div class="lobby-players-card-name">Player 1</div>
-                                                        <div class="lobby-players-card-option"></div>
-                                                </div>
-                                        </div>
-                                        <div class="lobby-players-list-item">
-                                                <div class="lobby-players-card" id="player2">
-                                                        <div class="lobby-players-card-icon"><img class="img-player-icon" src="../../assets/img/user-person-single-id-account-player-male-female-512.webp" alt="playerIcon" /></div>
-                                                        <div class="lobby-players-card-name">Player 2</div>
-                                                        <div class="lobby-players-card-option"></div>
-                                                </div>
-                                        </div>
-                                        <div class="lobby-players-list-item">
-                                                <div class="lobby-players-card" id="player3">
-                                                        <div class="lobby-players-card-icon"><img class="img-player-icon" src="../../assets/img/user-person-single-id-account-player-male-female-512.webp" alt="playerIcon" /></div>
-                                                        <div class="lobby-players-card-name">Player 3</div>
-                                                        <div class="lobby-players-card-option"></div>
-                                                </div>
-                                        </div>
-                                        <div class="lobby-players-list-item">
-                                                <div class="lobby-players-card" id="player4">
-                                                        <div class="lobby-players-card-icon"><img class="img-player-icon" src="../../assets/img/user-person-single-id-account-player-male-female-512.webp" alt="playerIcon" /></div>
-                                                        <div class="lobby-players-card-name">Player 4</div>
-                                                        <div class="lobby-players-card-option"></div>
-                                                </div>
-                                        </div>
-                                </div>
-                                <div class="game-start">
-                                        <button class="btn-game-start">Start Game</button>
+                                <div class="multi-room-choice-list">
+                                        <div class="multi-room-choice-list-item"><button class="btn-multi-room-select" onClick="multiCreateRoom()">Create Game</button></div>
+                                        <div class="multi-room-choice-list-item"><button class="btn-multi-room-select" onClick="multiJoinRoom()">Join Game</button></div>
                                 </div>
                         </main>
                         <footer></footer>

@@ -174,3 +174,61 @@ function triggerUpdate() {
     }
     
 // setInterval(triggerUpdate, 1000 / 60); // Trigger updates at ~60fps
+
+async function reqCreateRoom(url="", data = {}) {
+	try {
+		const response = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
+		const result = await response.json();
+		return result;
+	} catch (error) {
+		console.error("error while creating room (POST): ", error);
+	}
+}
+
+async function getListRoom(url="") {
+	try {
+		const response = await fetch(url);
+		const result = await response.json();
+		return result;
+	} catch (error) {
+		console.error("error while getting room list (GET): ", error);
+	}
+}
+
+function multiCreateRoom() {
+	console.log('creating room...');
+	// establish ws connection here
+	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
+	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
+	reqCreateRoom("https://localhost/api/game/makeroom", { "room_name": "Create - Test Room" }).then((data) => {
+		console.log('create room fetch response: ', data);
+		if (data !== undefined)
+			document.getElementsByClassName('main-part')[0].innerHTML = lobbyComponent();
+		else
+			document.getElementsByClassName('main-part')[0].innerHTML = multiDefaultPageComponent();
+	});
+};
+
+function multiJoinRoom() {
+        console.log('joining room...');
+	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
+	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
+	getListRoom('https://localhost/api/game/listroom').then((data) => {
+		console.log('room list: ', data);
+		if (data !== undefined)
+		{
+			document.getElementsByClassName('main-part')[0].innerHTML = lobbyListRoomComponent(data);
+		}
+		else
+		{
+			document.getElementsByClassName('main-part')[0].innerHTML = multiDefaultPageComponent();
+		}
+	});
+};
+
