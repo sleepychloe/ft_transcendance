@@ -16,19 +16,20 @@ class GameRoomMakeView(View):
 
 	def post(self, request):
 		new_room_id = create_new_uuid()
+		client_id = create_new_uuid()
 
 		quantity_player = request.GET.get('quantity_player', 1)
-		# if quantity_player is None:
-		# 	return JsonResponse({'Error' : 'Quantity player is required.'})
 		if MultiRoomInfo.objects.filter(Roomid=new_room_id).exists():
 			return JsonResponse({'Error' : 'Game id already exists.'})
 		try:
 			room_name = json.loads(request.body).get("room_name")
 		except json.JSONDecodeError:
 			return JsonResponse({'Error' : 'Roomname is not json.'})
-		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player)
+		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, client1=client_id)
 		new_data.save()
-		return JsonResponse({'room_id' : new_room_id, 'room_name' : room_name, 'quantity_player' : quantity_player})
+		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player})
+		response.set_cookie('client_id', client_id)
+		return response
 
 
 class GameRoomListView(View):
@@ -46,6 +47,10 @@ class GameRoomListView(View):
 				'room_name': it.RoomName,
 				'quantity_player': it.QuantityPlayer,
 				'created_time': it.CreatedTime,
+				'client1': it.client1,
+				'client2': it.client2,
+				'client3': it.client3,
+				'client4': it.client4,
 			}
 			for it in queryset
 		]
@@ -74,22 +79,23 @@ class GameRoomJoinView(View):
 	
 	@staticmethod
 	def check_client_id_for_data(game_id, client_id):
-		if not MultiRoomInfo.objects.filter(client1=client_id).exists():
+		room = MultiRoomInfo.objects.get(Roomid=game_id)
+		if not room.client1:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client1 = client_id
 			instance.save()
 			return "client1"
-		elif not MultiRoomInfo.objects.filter(client2=client_id).exists():
+		elif not room.client2:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client2 = client_id
 			instance.save()
 			return "client2"
-		elif not MultiRoomInfo.objects.filter(client3=client_id).exists():
+		elif not room.client3:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client3 = client_id
 			instance.save()
 			return "client3"
-		elif not MultiRoomInfo.objects.filter(client4=client_id).exists():
+		elif not room.client4:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client4 = client_id
 			instance.save()
