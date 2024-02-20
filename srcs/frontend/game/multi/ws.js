@@ -59,7 +59,7 @@ let gameSocket;
 // 		`wss://${window.location.host}/ws/`
 // 	);; // Declare gameSocket at the top for global access
 
-connectWebSocket();
+// connectWebSocket();
 
 function connectWebSocket() {
     // Ensure WebSocket uses the correct protocol (wss for secure, ws for local development)
@@ -178,6 +178,7 @@ function triggerUpdate() {
 async function reqCreateRoom(url="", data = {}) {
 	try {
 		const response = await fetch(url, {
+			mode: 'no-cors',
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -193,7 +194,10 @@ async function reqCreateRoom(url="", data = {}) {
 
 async function getListRoom(url="") {
 	try {
-		const response = await fetch(url);
+		const response = await fetch(url, {
+			mode: 'no-cors',
+			method: 'GET',
+		});
 		const result = await response.json();
 		return result;
 	} catch (error) {
@@ -206,7 +210,7 @@ function multiCreateRoom() {
 	// establish ws connection here
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
-	reqCreateRoom("https://localhost/api/game/makeroom", { "room_name": "Create - Test Room" }).then((data) => {
+	reqCreateRoom("/api/game/makeroom/", { "room_name": "Create - Test Room" }).then((data) => {
 		console.log('create room fetch response: ', data);
 		if (data !== undefined)
 			document.getElementsByClassName('main-part')[0].innerHTML = lobbyComponent();
@@ -219,7 +223,7 @@ function multiJoinRoom() {
         console.log('joining room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
-	getListRoom('https://localhost/api/game/listroom').then((data) => {
+	getListRoom('/api/game/listroom/').then((data) => {
 		console.log('room list: ', data);
 		if (data !== undefined)
 		{
