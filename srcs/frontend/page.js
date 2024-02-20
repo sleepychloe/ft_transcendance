@@ -1,5 +1,5 @@
 export function indexPage() {
-        console.log("page.js : indexPage function called");
+        // console.log("page.js : indexPage function called");
         return `<div class="grid">
                         <header>
                                 <div class="main-title">Welcome to Transcendence</div>
@@ -12,7 +12,9 @@ export function indexPage() {
                                         <a href="/multi" class="navbar-list-item">Multi</a>
                                 </div>
                         </nav>
-                        <main class="main-part"></main>
+                        <main class="main-part">
+                                <div class="img-home"><img class="img-fun" src="https://devm33.com/c1ef06d75ea8b8fd150c7a9022e76ef4/pong.gif" /></div>
+                        </main>
                         <footer></footer>
                 </div>`
 };

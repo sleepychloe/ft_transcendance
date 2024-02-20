@@ -1,5 +1,5 @@
 export function localpvpPage() {
-        console.log("local_pvp/page.js : localpvpPage function called");
+        // console.log("local_pvp/page.js : localpvpPage function called");
         return `<div class="grid">
                         <header>
                                 <div class="main-title">Local Game</div>

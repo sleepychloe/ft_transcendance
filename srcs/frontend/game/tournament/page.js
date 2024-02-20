@@ -1,5 +1,5 @@
 export function tournamentPage() {
-        console.log("tournament/page.js : tournamentPage function called");
+        // console.log("tournament/page.js : tournamentPage function called");
         return `<div class="grid">
                         <header>
                                 <div class="main-title">Tournament Game</div>

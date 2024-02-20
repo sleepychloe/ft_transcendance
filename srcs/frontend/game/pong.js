@@ -58,10 +58,6 @@ document.addEventListener('keydown', event => {
             "ballY": ballY
         };
     }
-//     if (event.key === 'f5') {
-//         event.preventDefault();
-//         resetToHomeScreen()
-//     }
 });
 
 function resetBall() {
@@ -184,8 +180,6 @@ function resetToHomeScreen() {
         tournamentModeFlag = 0;
 }
 
-
-
 // function getCookie(name) {
 //     var cookieValue = null;
 //     if (document.cookie && document.cookie !== '') {
@@ -199,21 +193,4 @@ function resetToHomeScreen() {
 //         }
 //     }
 //     return cookieValue;
-// }
-
-// async function postJSON(data) {
-//     try {
-//         const response = await fetch('/api/ml_save_data/', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRFToken': getCookie('csrftoken'),
-//             },
-//             body: JSON.stringify(data),
-//         });
-//         const result = await response.json();
-//         console.log("success: ", result);
-//     } catch (error) {
-//         console.error("error: ", error);
-//     }
 // }

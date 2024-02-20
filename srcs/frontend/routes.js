@@ -23,11 +23,6 @@ export const routes = [
         {
                 path: '/multi',
                 template: multiPage(),
-                script: createScriptTag('./game/multi/ws.js')
+                script: createScriptTag('./game/multi/pongMulti.js')
         },
-        // {
-        //         path: '/multi',
-        //         template: multiPage(),
-        //         script: createScriptTag('./game/multi/ws.js')
-        // },
 ];

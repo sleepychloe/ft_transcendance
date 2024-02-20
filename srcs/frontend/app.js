@@ -14,8 +14,8 @@ const app = async () => {
         // insert corresponding script inside HTML head on page load
         if (scriptTag !== null)
                 document.getElementsByTagName("head")[0].appendChild(scriptTag);
-        else
-                console.log("script for ", match.route.path, " is already loaded");
+        // else
+        //         console.log("script for ", match.route.path, " is already loaded");
         
         // insert pong.js script inside HTML head on game page load
         if ((match.route.path !== '/' && match.route.path !== '/multi') && !document.getElementById('script-path-./game/pong.js'))

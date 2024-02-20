@@ -1,3 +1,4 @@
+/* constructor */
 .grid {
         display: grid;
         grid-template-areas:
@@ -8,20 +9,24 @@
         grid-template-columns: 3fr 5fr 3fr;
 }
 
+/* title */
 header {
         grid-area: head;
 }
 
+/* home local tournament multi */
 nav {
         grid-area: nav;
         grid-column: 1fr;
 }
 
+/* main-part */
 main {
         grid-area: main;
         grid-column: 3fr;
 }
 
+/* for additional info */
 footer {
         grid-area: foot;
 }
