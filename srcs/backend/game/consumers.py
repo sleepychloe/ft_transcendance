@@ -1,17 +1,22 @@
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import MultiRoomInfo
 import random
+import http.cookies
 import json
 
-class MultiGameConsumer(WebsocketConsumer):
-    def connect(self, game_id):
+class MultiGameConsumer(AsyncWebsocketConsumer):
+    async def connect(self, game_id):
+        raw_cookies = self.scope.get('headers', {}).get(b'cookie', b'').decode('utf-8')
+        cookies = http.cookies.SimpleCookie(raw_cookies)
+        client_id = cookies.get('client_id').value if 'client_id' in cookies else None
+        self.client_id = client_id
         self.accept()
         self.initialize_game(game_id)
 
-    def disconnect(self, close_code):
+    async def disconnect(self, close_code):
         pass
 
-    def init_game_value(self, game_id):
+    async def init_game_value(self, game_id):
         # try :
         #     game_value_info = MultiRoomInfo.objects.get(RoomName=game_id)
         # except MultiRoomInfo.DoesNotExist:
@@ -41,14 +46,14 @@ class MultiGameConsumer(WebsocketConsumer):
                 'y': 150,
             },
         }
-    def initialize_game(self, game_id):
+    async def initialize_game(self, game_id):
         self.init_game_value(self, game_id)
         self.send_game_state()
 
-    def send_game_state(self):
+    async def send_game_state(self):
         self.send(text_data=json.dumps({'type': 'game_state', 'data': self.game_state}))
 
-    def update_game_state(self):
+    async def update_game_state(self):
         # Update the ball's position based on its velocity
         self.game_state['ball']['x'] += self.game_state['ball']['vx']
         self.game_state['ball']['y'] += self.game_state['ball']['vy']
@@ -59,7 +64,7 @@ class MultiGameConsumer(WebsocketConsumer):
         if self.game_state['ball']['y'] <= 0 or self.game_state['ball']['y'] >= 400:
             self.game_state['ball']['vy'] = -self.game_state['ball']['vy']
 
-    def receive(self, text_data=None, bytes_data=None):
+    async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         action = text_data_json.get('action')
 
@@ -73,7 +78,7 @@ class MultiGameConsumer(WebsocketConsumer):
         else:
                 print("Received unknown action:", action)
 
-    def move_paddle(self, direction, client_id):
+    async def move_paddle(self, direction, client_id):
         if direction == 'down':
             if self.game_state['paddle']['y'] < 300:
                 self.game_state['paddle']['y'] += 10
