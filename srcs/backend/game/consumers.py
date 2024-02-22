@@ -9,20 +9,21 @@ import threading
 import time
 
 class MultiGameConsumer(AsyncWebsocketConsumer):
-    async def connect(self, game_id):
-        raw_cookies = self.scope.get('headers', {}).get(b'cookie', b'').decode('utf-8')
-        cookies = http.cookies.SimpleCookie(raw_cookies)
-        client_id = cookies.get('client_id').value if 'client_id' in cookies else None
-        if client_id == None:
-            return JsonResponse({'Error': 'there is no client id in cookie.'})
-        self.client_id = client_id
-        self.accept()
+    async def connect(self):
+        request_header = self.scope['headers']
+        cookie_header = next((header for header in request_header if header[0] == b'cookie'), None)
+        if cookie_header:
+            cookies = cookie_header[1].decode('utf-8')
+        client_id = cookies.lstrip("client_id=")
+        await self.accept()
+        game_id = self.scope["url_route"]["kwargs"]["game_id"]
+        await self.send(text_data=json.dumps({'client_id': client_id, 'game_id': game_id}))
+        self.game_id = game_id
         self.initialize_game(game_id)
         self.channel_layer.group_add(game_id, self.channel_name)
 
-    async def disconnect(self, game_id, close_code):
-        self.channel_layer.group_discard(game_id, self.channel_name)
-        pass
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.game_id, self.channel_name)
 
     async def init_game_value(self, game_id):
         try :
@@ -59,7 +60,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         try :
             game_data = MultiRoomInfo.objects.get(RoomName=game_id)
         except MultiRoomInfo.DoesNotExist:
-             self.send(text_data=json.dumps({'Error': 'Game id URL is not exists in init_game_paddle'}))
+            await self.send(text_data=json.dumps({'Error': 'Game id URL is not exists in init_game_paddle'}))
         if self.client_id == None:
              return self.send(json.dumps({'Error': 'Client id is not exists'}))
         if game_data.paddle1 == None:
@@ -92,7 +93,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
              self.send(text_data=json.dumps({'Error': 'Game id URL is not exists in init_game_paddle'}))
         if game_data.paddle1 and game_data.paddle2 and game_data.paddle3 and game_data.paddle4:
             self.init_thread_ball()
-            self.send(text_data=json.dumps({'type': 'game_state', 'data': self.game_state}))
+            await self.send(text_data=json.dumps({'type': 'game_state', 'data': self.game_state}))
 
     # async def update_game_state(self):
     #     # Update the ball's position based on its velocity
@@ -114,23 +115,23 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             game_data.client3['ready_status'] = 1
         elif n_client == 'client4':
             game_data.client4['ready_status'] = 1
-        game_data.save()
+        await game_data.save()
 
 
     async def check_user_all_ready(self, game_data):
         if game_data.client1['ready_status'] == 1 and game_data.client2['ready_status'] == 1 and game_data.client3['ready_status'] == 1 and game_data.client4['ready_status'] == 1:
-            self.send(text_data=json.dumps({'game_start': 'ok'}))
+            await self.send(text_data=json.dumps({'game_start': 'ok'}))
             self.thread.start()
 
     async def receive(self, game_id, text_data=None, bytes_data=None):
         try :
             game_data = MultiRoomInfo.objects.get(RoomName=game_id)
         except MultiRoomInfo.DoesNotExist:
-             self.send(text_data=json.dumps({'Error': 'Game id URL is not exists in init_game_paddle'}))
+             await self.send(text_data=json.dumps({'Error': 'Game id URL is not exists in init_game_paddle'}))
         text_data_json = json.loads(text_data)
         action = text_data_json.get('action')
         status = text_data_json.get('user_status')
-        self.check_user_all_ready(self, game_data)
+        await self.check_user_all_ready(self, game_data)
 
         if status == 'user_status':
             n_client = text_data_json.get('n_client')

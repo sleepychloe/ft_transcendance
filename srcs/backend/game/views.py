@@ -10,7 +10,7 @@ from channels.layers import get_channel_layer
 
 def create_new_uuid():
 	import uuid
-	return str(uuid.uuid4())
+	return str(uuid.uuid4()).replace("-", "")
 
 @method_decorator(csrf_exempt, name='dispatch')
 class GameRoomMakeView(View):
@@ -27,7 +27,7 @@ class GameRoomMakeView(View):
 			room_name = json.loads(request.body).get("room_name")
 		except json.JSONDecodeError:
 			return JsonResponse({'Error' : 'Roomname is not json.'})
-		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, client1={'client_id':client_id, 'ready_status':0})
+		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, client1={'client_id':client_id, 'ready_status':0}, client2={}, client3={}, client4={})
 		new_data.save()
 		channel_layer.group_add(new_room_id, 'BACKEND')
 		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player})
