@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from .models import MultiRoomInfo
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from channels.layers import get_channel_layer
 # Create your views here.
 
 def create_new_uuid():
@@ -17,6 +18,7 @@ class GameRoomMakeView(View):
 	def post(self, request):
 		new_room_id = create_new_uuid()
 		client_id = create_new_uuid()
+		channel_layer = get_channel_layer()
 
 		quantity_player = request.GET.get('quantity_player', 1)
 		if MultiRoomInfo.objects.filter(Roomid=new_room_id).exists():
@@ -25,8 +27,9 @@ class GameRoomMakeView(View):
 			room_name = json.loads(request.body).get("room_name")
 		except json.JSONDecodeError:
 			return JsonResponse({'Error' : 'Roomname is not json.'})
-		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, client1=client_id)
+		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, client1={'client_id':client_id, 'ready_status':0})
 		new_data.save()
+		channel_layer.group_add(new_room_id, 'BACKEND')
 		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player})
 		response.set_cookie('client_id', client_id)
 		return response
@@ -71,8 +74,8 @@ class GameRoomJoinView(View):
 			room.QuantityPlayer += 1
 			room.save()
 			client_id = create_new_uuid()
-			client = self.check_client_id_for_data(game_id, client_id)
-			response = JsonResponse({'room_id' : game_id, 'quantity_plyaer' : room.QuantityPlayer, 'client_id': client_id, 'N.client': client})			
+			Nclient = self.check_client_id_for_data(game_id, client_id)
+			response = JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'client_id': client_id, 'N_client': Nclient})			
 			response.set_cookie('client_id', client_id)
 			return response
 		return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})
@@ -82,22 +85,22 @@ class GameRoomJoinView(View):
 		room = MultiRoomInfo.objects.get(Roomid=game_id)
 		if not room.client1:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client1 = client_id
+			instance.client1 = {'client_id': client_id, 'ready_status':0}
 			instance.save()
 			return "client1"
 		elif not room.client2:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client2 = client_id
+			instance.client2 = {'client_id': client_id, 'ready_status':0}
 			instance.save()
 			return "client2"
 		elif not room.client3:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client3 = client_id
+			instance.client3 = {'client_id': client_id, 'ready_status':0}
 			instance.save()
 			return "client3"
 		elif not room.client4:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client4 = client_id
+			instance.client4 = {'client_id': client_id, 'ready_status':0}
 			instance.save()
 			return "client4"
 
@@ -117,13 +120,13 @@ class GameRoomJoinView(View):
 	
 	def delete_client_id_in_data(game_id, client_id):
 		room = MultiRoomInfo.objects.get(Roomid=game_id)
-		if room.client1 == client_id:
+		if room.client1['client_id'] == client_id:
 			room.client1 = None
-		elif room.client2 == client_id:
+		elif room.client2['client_id'] == client_id:
 			room.client2 = None
-		elif room.client3 == client_id:
+		elif room.client3['client_id'] == client_id:
 			room.client3 = None
-		elif room.client4 == client_id:
+		elif room.client4['client_id'] == client_id:
 			room.client4 = None
 		room.save()
 

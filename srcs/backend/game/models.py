@@ -6,10 +6,15 @@ class MultiRoomInfo(models.Model):
         RoomName = models.CharField()
         QuantityPlayer = models.PositiveSmallIntegerField()
         CreatedTime = models.DateTimeField(auto_now_add=True)
-        client1 = models.CharField()
-        client2 = models.CharField()
-        client3 = models.CharField()
-        client4 = models.CharField()
+        client1 = models.JSONField()
+        client2 = models.JSONField()
+        client3 = models.JSONField()
+        client4 = models.JSONField()
+
+        paddle1 = models.CharField()
+        paddle2 = models.CharField()
+        paddle3 = models.CharField()
+        paddle4 = models.CharField()
 
         class Meta:
                 db_table = 'room_info'

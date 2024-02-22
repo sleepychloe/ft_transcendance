@@ -72,6 +72,7 @@ TEMPLATES = [
     },
 ]
 
+CSRF_TRUSTED_ORIGINS = ["http://localhsot:4243"]
 WSGI_APPLICATION = 'transcendence.wsgi.application'
 ASGI_APPLICATION = 'transcendence.asgi.application'
 

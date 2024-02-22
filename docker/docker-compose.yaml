@@ -38,6 +38,7 @@ services:
     build: ./nginx
     volumes:
       - "../srcs/frontend:/usr/share/nginx/html"
+      - "./nginx/certs:/etc/nginx/certs"
       - "../srcs/logs/nginx:/var/log/nginx"
     # build:
     #   context: ../srcs/frontend
@@ -45,7 +46,7 @@ services:
     restart: always
     container_name: nginx
     ports:
-      - "4243:4243"
+      - "4243:443"
       - "5601:5601"
     networks:
       - ft_network
