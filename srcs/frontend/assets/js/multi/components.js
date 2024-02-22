@@ -40,6 +40,7 @@ function lobbyListRoomComponent(data) {
 			// generated elements depending on server response (children)
 			let listItem = document.createElement('div');
 			listItem.classList.add('lobby-room-list-item');
+			listItem.addEventListener('click', multiJoinRoom);
 			lobbyRoomList.appendChild(listItem);
 			
 			let roomCard = document.createElement('div');
@@ -48,7 +49,7 @@ function lobbyListRoomComponent(data) {
 			
 			let roomName = document.createElement('div');
 			roomName.classList.add('lobby-room-card-name');
-			roomName.setAttribute("id", data[i].room_id);
+			roomName.setAttribute('id', data[i].room_id);
 			roomName.innerHTML = data[i].room_name;
 			roomCard.appendChild(roomName);
 
@@ -66,6 +67,7 @@ function lobbyListRoomComponent(data) {
 function lobbyPlayersReadyComponent() {
 	let lobbySlot = document.createElement('div');
 	lobbySlot.classList.add('lobby-space-counter');
+	// need to pass ready players count
 	lobbySlot.innerHTML = '1/4 are ready';
 	return lobbySlot;
 }
@@ -111,16 +113,23 @@ function lobbyListPlayersComponent(room) {
 	return lobbyPlayerList;
 }
 
-function lobbyReadyButtonComponent() {
-	let button = document.createElement('div');
-	button.classList.add('game-start');
-	
+function lobbyReadyButtonComponent(ws={}, data={}) {
+	let buttonDiv = document.createElement('div');
+	buttonDiv.classList.add('game-start');
+
 	let btnReady = document.createElement('button');
 	btnReady.classList.add('btn-game-start');
 	btnReady.innerHTML = 'Ready';
-	button.appendChild(btnReady);
+	console.log('ws3: ', ws);
+	btnReady.addEventListener('click', function() {
+		multiPlayerSetReady(
+			ws,
+			{ 'user_status': 1, 'n_client': data.N_client },
+		);
+	});
+	buttonDiv.appendChild(btnReady);
 	
-	return button;
+	return buttonDiv;
 }
 
 function responseMsgComponent(text="fatal error") {

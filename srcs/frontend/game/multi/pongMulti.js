@@ -202,27 +202,13 @@ function deleteAllCookies() {
 }
 ///////////////////////////////////////////////////////////////
 
-
-function connect(url) {
-	return new Promise(function (resolve, reject) {
-		var server = new WebSocket(url);
-		server.onopen = function () {
-			resolve(server);
-		};
-		server.onerror = function (err) {
-			reject(err);
-		};
-	});
-}
-
-async function multiPlayerSetReady(url = "", data = {}) {
-	console.log('i\'m ready!');
-	connect(url).then(function (server) {
-		server.send(JSON.stringify(data));
-	}).catch(function (err) {
-		console.log('error on establishing websocket connection: ', err);
-	});
-}
+// websocket base URL
+const wsBaseURL = "wss://localhost:4243/ws/";
+// api endpoint URLs
+const apiBaseURL = "/api/game/";
+const apiMakeroom = apiBaseURL + "makeroom/";
+const apiListroom = apiBaseURL + "listroom/";
+const apiJoinroom = apiBaseURL + "";
 
 function modalShow() {
 	document.getElementsByClassName('overlay')[0].addEventListener('click', modalClose);
@@ -236,7 +222,43 @@ function modalClose() {
 	document.getElementsByClassName('overlay')[0].style.visibility = 'hidden';
 }
 
-async function reqCreateRoom(url = "", data = {}) {
+function reqWsConnection(url) {
+	return new Promise((resolve, reject) => {
+		var ws = new WebSocket(url);
+		ws.onopen = () => {
+			resolve(ws);
+		};
+		ws.onerror = (error) => {
+			reject(error);
+		};
+	});
+}
+
+async function multiConnectWs(url="", data={}) {
+	// first connection to the room's ws
+	let user_info = {
+		'client_id': data.client_id,
+		'n_client': data.N_client,
+	};
+	reqWsConnection(url + data.room_id + '/').then((ws) => {
+		// alert to server `whoami`: client_id, n_client
+		ws.send(JSON.stringify(user_info));
+		console.log('ws1: ', ws);
+		return ws;
+	}).catch((error) => {
+		console.log('error on establishing websocket connection: ', error);
+	});
+}
+
+async function multiPlayerSetReady(ws={}, data={}) {
+	console.log('i\'m ready!');
+	console.log('ws4: ', ws);
+	ws.on('connection', (websocket) => {
+		websocket.send(JSON.stringify(data));
+	});
+}
+
+async function reqCreateRoom(url="", data={}) {
 	try {
 		// console.log('cookie: ', getCookie('csrftoken'));
 		const response = await fetch(url, {
@@ -265,7 +287,7 @@ function multiCreateRoom() {
 	console.log('sending request to create room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
-	reqCreateRoom("/api/game/makeroom/", { "room_name": roomName }).then((data) => {
+	reqCreateRoom(apiMakeroom, { "room_name": roomName }).then((data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 		if (data && !data.Error) {
 			// debugging
@@ -273,11 +295,14 @@ function multiCreateRoom() {
 				console.log('data: ', data);
 			console.groupEnd();
 
-			mainPart.innerHTML = lobbyComponent();
+			let ws = multiConnectWs(wsBaseURL, data);
+			console.log('ws2: ', ws);
+
+			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
-			document.getElementsByClassName('btn-game-start')[0].addEventListener('click', function() {
-				multiPlayerSetReady('wss://localhost:4243/ws/' + data.room_id + '/', { 'user_status': 1, 'n_client': data.N_client });
-			});
+			mainPart.appendChild(lobbyPlayersReadyComponent());
+			mainPart.appendChild(lobbyListPlayersComponent(data));
+			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
 		} else {
 			// debugging
 			console.groupCollapsed('server responded with error');
@@ -289,7 +314,7 @@ function multiCreateRoom() {
 	});
 };
 
-async function reqJoinRoom(url = "", room_id = "") {
+async function reqJoinRoom(url="", room_id="") {
 	try {
 		const response = await fetch(url + room_id + '/', {});
 		const result = await response.json();
@@ -306,7 +331,7 @@ function multiJoinRoom() {
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
-	reqJoinRoom('/api/game/', room_id).then((data) => {
+	reqJoinRoom(apiJoinroom, room_id).then((data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 		if (data && !data.Error) {
 			// debugging
@@ -314,15 +339,16 @@ function multiJoinRoom() {
 				console.log('data: ', data);
 			console.groupEnd();
 
+			// server allows to join room === user has a token for ws
+			// first websocket connection establish here
+			let ws = multiConnectWs(wsBaseURL, data);
+
 			mainPart.innerHTML = '';
+			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
+			// show how many players are ready
 			mainPart.appendChild(lobbyPlayersReadyComponent());
 			mainPart.appendChild(lobbyListPlayersComponent(data));
-			mainPart.appendChild(lobbyReadyButtonComponent());
-			// document.getElementsByClassName('main-title').innerHTML = data.room_name;
-			// need to send ready status with websocket? - server websocket is not ready
-			document.getElementsByClassName('btn-game-start')[0].addEventListener('click', function() {
-				multiPlayerSetReady('wss://localhost:4243/ws/' + data.room_id + '/', { 'user_status': 1, 'n_client': data.N_client });
-			});
+			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
 		} else {
 			// debugging
 			console.groupCollapsed('server responded with error');
@@ -352,7 +378,7 @@ function multiListRoom() {
 	console.log('sending request to list room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
-	getListRoom('/api/game/listroom/').then((data) => {
+	getListRoom(apiListroom).then((data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 
 		if (data.length === 0) {
@@ -362,8 +388,6 @@ function multiListRoom() {
 			console.groupEnd();
 			
 			mainPart.innerHTML = '';
-
-			// for no lobby found : need to change error msg from the server
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		} else if (data && data.length > 0) {
 			// debugging
@@ -373,10 +397,6 @@ function multiListRoom() {
 
 			mainPart.innerHTML = '';
 			mainPart.appendChild(lobbyListRoomComponent(data));
-			let lobbyRooms = document.getElementsByClassName('lobby-room-list-item');
-			for (var i = 0; i < lobbyRooms.length; i++) {
-				lobbyRooms[i].addEventListener('click', multiJoinRoom);
-			}
 		} else {
 			// debugging
 			console.groupCollapsed('server responded with error');
