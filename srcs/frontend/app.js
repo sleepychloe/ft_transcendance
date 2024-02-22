@@ -9,13 +9,10 @@ const app = async () => {
         });
         let match = pageMatch.find(page => page.isMatch);
         document.getElementById('app').innerHTML = match.route.template;
+        document.getElementsByClassName('main-title')[0].innerHTML = match.route.name;
         let scriptTag = match.route.script;
-
-        // insert corresponding script inside HTML head on page load
         if (scriptTag !== null)
                 document.getElementsByTagName("head")[0].appendChild(scriptTag);
-        // else
-        //         console.log("script for ", match.route.path, " is already loaded");
         
         // insert pong.js script inside HTML head on game page load
         if ((match.route.path !== '/' && match.route.path !== '/multi') && !document.getElementById('script-path-./game/pong.js'))

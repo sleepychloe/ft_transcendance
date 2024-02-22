@@ -185,7 +185,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-        background: rgb(240, 240, 240);
+        background: rgb(110, 110, 110);
 }
 
 .lobby-room-list {
@@ -193,7 +193,7 @@
         flex-direction: column;
         margin-top: 20px;
         padding: 4px;
-        /* border: 4px solid white; */
+        /* border: 4px solid rgb(90, 90, 90); */
         border-radius: 6px;
         overflow: scroll;
         overflow-x: hidden;

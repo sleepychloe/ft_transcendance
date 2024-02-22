@@ -58,7 +58,7 @@ function lobbyListRoomComponent(data) {
 			roomCard.appendChild(roomSlot);
 		}
 	} catch {
-		return `<p class="list-room-status-msg>error while searching lobby</p>`;
+		return responseMsgComponent('error while searching lobby');
 	}
 	return lobbyRoomList;
 }
@@ -96,8 +96,8 @@ function lobbyListPlayersComponent(room) {
 
 			let playersName = document.createElement('div');
 			playersName.classList.add('lobby-players-card-name');
-			playersName.setAttribute("id", "player" + i);
-			playersName.innerHTML = "Player " + i;
+			playersName.setAttribute("id", "player" + (i + 1));
+			playersName.innerHTML = "Player " + (i + 1);
 			playersCard.appendChild(playersName);
 
 			let playerOption = document.createElement('div');
@@ -105,7 +105,7 @@ function lobbyListPlayersComponent(room) {
 			playersCard.appendChild(playerOption);
 		}
 	} catch {
-		return `<p class="list-room-status-msg>error while loading lobby</p>`;
+		return responseMsgComponent('error while loading lobby');
 	}
 	// console.log("lobbyPlayerList: ", lobbyPlayerList);
 	return lobbyPlayerList;
@@ -114,12 +114,19 @@ function lobbyListPlayersComponent(room) {
 function lobbyReadyButtonComponent() {
 	let button = document.createElement('div');
 	button.classList.add('game-start');
-
+	
 	let btnReady = document.createElement('button');
 	btnReady.classList.add('btn-game-start');
 	btnReady.innerHTML = 'Ready';
 	button.appendChild(btnReady);
-
-	console.log(button);
+	
 	return button;
+}
+
+function responseMsgComponent(text="fatal error") {
+	let msg = document.createElement('p');
+	msg.classList.add('list-room-status-msg');
+	msg.innerHTML = text;
+
+	return msg;
 }

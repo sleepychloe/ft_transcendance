@@ -7,21 +7,25 @@ import { createScriptTag } from "./game/createScriptTag.js";
 export const routes = [
         {
                 path: '/',
+                name: 'WELCOME TO TRANSCENDENCE',
                 template: indexPage(),
                 script: createScriptTag('')
         },
         {
                 path: '/local',
+                name: 'LOCAL GAME',
                 template: localpvpPage(),
                 script: createScriptTag('./game/local_pvp/pongLocal.js')
         },
         {
                 path: '/tournament',
+                name: 'TOURNAMENT GAME',
                 template: tournamentPage(),
                 script: createScriptTag('./game/tournament/pongTour.js')
         },
         {
                 path: '/multi',
+                name: 'MULTI GAME',
                 template: multiPage(),
                 script: createScriptTag('./game/multi/pongMulti.js')
         },

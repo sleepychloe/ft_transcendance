@@ -154,17 +154,17 @@ function sendPaddleMovement(direction) {
 	}
 }
 
-document.addEventListener("keydown", (e) => {
-	if (e.key === "ArrowLeft") {
-		sendPaddleMovement("left");
-	} else if (e.key === "ArrowRight") {
-		sendPaddleMovement("right");
-	} else if (e.key === "ArrowDown") {
-		sendPaddleMovement("down");
-	} else if (e.key === "ArrowUp") {
-		sendPaddleMovement("up");
-	}
-});
+// document.addEventListener("keydown", (e) => {
+// 	if (e.key === "ArrowLeft") {
+// 		sendPaddleMovement("left");
+// 	} else if (e.key === "ArrowRight") {
+// 		sendPaddleMovement("right");
+// 	} else if (e.key === "ArrowDown") {
+// 		sendPaddleMovement("down");
+// 	} else if (e.key === "ArrowUp") {
+// 		sendPaddleMovement("up");
+// 	}
+// });
 
 function triggerUpdate() {
 	if (gameSocket.readyState === WebSocket.OPEN) {
@@ -174,35 +174,43 @@ function triggerUpdate() {
 
 // setInterval(triggerUpdate, 1000 / 60); // Trigger updates at ~60fps
 
-async function reqCreateRoom(url = "", data = {}) {
-	try {
-		const response = await fetch(url, {
-			mode: 'no-cors',
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(data),
-		});
-		const result = await response.json();
-		return result;
-	} catch (error) {
-		console.error("error while creating room (POST): ", error);
-		return null;
+// function getCookie(name) {
+//     var cookieValue = null;
+//     if (document.cookie && document.cookie !== '') {
+//         var cookies = document.cookie.split(';');
+//         for (var i = 0; i < cookies.length; i++) {
+//             var cookie = cookies[i].trim();
+//             if (cookie.substring(0, name.length + 1) === (name + '=')) {
+//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+//                 break;
+//             }
+//         }
+//     }
+//     return cookieValue;
+// }
+
+//////////////////////// for debugging ////////////////////////
+function deleteAllCookies() {
+	const cookies = document.cookie.split(";");
+
+	for (let i = 0; i < cookies.length; i++) {
+		const cookie = cookies[i];
+		const eqPos = cookie.indexOf("=");
+		const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+		document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
 	}
 }
+///////////////////////////////////////////////////////////////
 
-async function getListRoom(url = "") {
-	try {
-		const response = await fetch(url, {
-			mode: 'no-cors',
-			method: 'GET',
-		});
-		const result = await response.json();
-		return result;
-	} catch (error) {
-		console.error("error while getting room list (GET): ", error);
-	}
+
+async function multiPlayerSetReady(url = "", data = {}) {
+	console.log('i\'m ready!');
+	// let ws = new WebSocket(url);
+}
+
+function multiGameStart(url="", data="") {
+	console.log('game start!');
+	// ws
 }
 
 function modalShow() {
@@ -217,6 +225,26 @@ function modalClose() {
 	document.getElementsByClassName('overlay')[0].style.visibility = 'hidden';
 }
 
+async function reqCreateRoom(url = "", data = {}) {
+	try {
+		// console.log('cookie: ', getCookie('csrftoken'));
+		const response = await fetch(url, {
+			method: "POST",
+			mode: 'same-origin',
+			headers: {
+				"Content-Type": "application/json",
+				// "X-CSRFToken": getCookie('csrftoken'),
+			},
+			body: JSON.stringify(data),
+		});
+		const result = await response.json();
+		return result;
+	} catch (error) {
+		console.error("error while creating room (POST): ", error);
+		return null;
+	}
+}
+
 function multiCreateRoom() {
 	let roomName = document.getElementById('room-name-input').value;
 	if (!roomName) {
@@ -228,14 +256,26 @@ function multiCreateRoom() {
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
 	reqCreateRoom("/api/game/makeroom/", { "room_name": roomName }).then((data) => {
-		console.log('creating room...');
+		let mainPart = document.getElementsByClassName('main-part')[0];
 		if (data) {
-			document.getElementsByClassName('main-part')[0].innerHTML = lobbyComponent();
+			// debugging
+			console.groupCollapsed('server responded successfully');
+				console.log('data: ', data);
+			console.groupEnd();
+
+			mainPart.innerHTML = lobbyComponent();
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
+			document.getElementsByClassName('btn-game-start')[0].addEventListener('click', function() {
+				multiGameStart('wss://localhost:4243/api/game/' + data.room_id + '/', { 'state': 'ready' });
+			});
 		}
 		else {
-			document.getElementsByClassName('main-part')[0].innerHTML = multiDefaultPageComponent();
-			console.log('failed to create room');
+			// debugging
+			console.groupCollapsed('server responded with error');
+				console.log('data: ', data);
+			console.groupEnd();
+			
+			mainPart.innerHTML = multiDefaultPageComponent();
 		}
 	});
 };
@@ -251,65 +291,81 @@ async function reqJoinRoom(url = "", room_id = "") {
 	}
 }
 
-async function multiSetReady(url = "", data = {}) {
-	// let ws = new WebSocket(url);
-
-	// try {
-	// 	const response = await fetch(url, {
-	// 		mode: 'no-cors',
-	// 		method: "POST",
-	// 		headers: {
-	// 			"Content-Type": "application/json",
-	// 		},
-	// 		body: JSON.stringify(data),
-	// 	});
-	// 	const result = await response.json();
-	// 	return result;
-	// } catch (error) {
-	// 	console.error("error while creating room (POST): ", error);
-	// 	return null;
-	// }
-}
-
 function multiJoinRoom() {
+	// deleteAllCookies();
 	console.log('sending request to join room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
 	reqJoinRoom('/api/game/', room_id).then((data) => {
-		console.log('data: ', data);
-		console.log('joining room...');
+		let mainPart = document.getElementsByClassName('main-part')[0];
 		if (data && !data.Error) {
-			document.getElementsByClassName('main-part')[0].innerHTML = '';
-			document.getElementsByClassName('main-part')[0].appendChild(lobbyPlayersReadyComponent());
-			document.getElementsByClassName('main-part')[0].appendChild(lobbyListPlayersComponent(data));
-			document.getElementsByClassName('main-part')[0].appendChild(lobbyReadyButtonComponent());
+			// debugging
+			console.groupCollapsed('server responded successfully');
+				console.log('data: ', data);
+			console.groupEnd();
+			mainPart.innerHTML = '';
+			mainPart.appendChild(lobbyPlayersReadyComponent());
+			mainPart.appendChild(lobbyListPlayersComponent(data));
+			mainPart.appendChild(lobbyReadyButtonComponent());
+			// document.getElementsByClassName('main-title').innerHTML = data.room_name;
 			// need to send ready status with websocket? - server websocket is not ready
-			// document.getElementsByClassName('btn-game-start')[0].addEventListener('click', function() {
-			// 	multiSetReady('wss://localhost:4243/api/game/' + data.room_id + '/', { 'state': 'ready' });
-			// });
+			document.getElementsByClassName('btn-game-start')[0].addEventListener('click', function() {
+				multiPlayerSetReady('wss://localhost:4243/api/game/' + data.room_id + '/', { 'state': 'ready' });
+			});
 		} else {
-			document.getElementsByClassName('main-part')[0].innerHTML = `<p class="list-room-status-msg">error while joining the lobby</p>`;
+			// debugging
+			console.groupCollapsed('server responded with error');
+				console.log('data: ', data);
+			console.groupEnd();
+			mainPart.innerHTML = '';
+			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
 	});
 }
 
+async function getListRoom(url = "") {
+	try {
+		const response = await fetch(url, {
+			method: 'GET',
+		});
+		const result = await response.json();
+		return result;
+	} catch (error) {
+		console.error("error while getting room list (GET): ", error);
+		return null;
+	}
+}
+
 function multiListRoom() {
+	console.log('sending request to list room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
 	getListRoom('/api/game/listroom/').then((data) => {
-		console.log('room list: ', data);
-		if (!data.length) {
-			document.getElementsByClassName('main-part')[0].innerHTML = `<p class="list-room-status-msg">no lobby found</p>`;
-		} else if (data) {
-			document.getElementsByClassName('main-part')[0].innerHTML = '';
-			document.getElementsByClassName('main-part')[0].appendChild(lobbyListRoomComponent(data));
+		let mainPart = document.getElementsByClassName('main-part')[0];
+
+		// for no lobby found : need to change error msg from the server
+		if (data.length === 0) {
+			mainPart.innerHTML = '';
+			mainPart.appendChild(responseMsgComponent(data.Error));
+		} else if (data && data.length > 0) {
+			// debugging
+			console.groupCollapsed('server responded successfully');
+				console.log('data: ', data);
+			console.groupEnd();
+			mainPart.innerHTML = '';
+			mainPart.appendChild(lobbyListRoomComponent(data));
 			let lobbyRooms = document.getElementsByClassName('lobby-room-list-item');
 			for (var i = 0; i < lobbyRooms.length; i++) {
 				lobbyRooms[i].addEventListener('click', multiJoinRoom);
 			}
 		} else {
-			document.getElementsByClassName('main-part')[0].innerHTML = `<p class="list-room-status-msg">connection error</p>`;
+			// debugging
+			console.groupCollapsed('server responded with error');
+				console.log('data: ', data);
+			console.groupEnd();
+			mainPart.innerHTML = '';
+			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
 	});
 };
