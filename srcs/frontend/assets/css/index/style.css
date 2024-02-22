@@ -10,24 +10,12 @@ body {
         background-color: rgb(19, 19, 19);
 }
 
-.img-home {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+#threejs-canvas {
+        width: 500px;
+        height: 500px;
+        display: block;
         margin: auto;
-        margin-top: 50px;
 }
-
-.img-fun {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: auto;
-        width: 400px;
-        height: 400px;
-}
-
 .main-title {
         color: rgb(240, 240, 240);
         font-size: 72px;

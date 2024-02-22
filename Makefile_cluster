@@ -32,7 +32,7 @@ ifneq ($(findstring ft_network, $(shell docker network ls)), ft_network)
 	@echo "$(YELLOW)There is no docker-network named ft_network$(RESET)"
 else
 	@docker network ls | head -$(shell echo $(NETWORK_NUM)-1 | bc -l)
-	@echo "$(YELLOW)$(shelldocker network ls | grep intra)$(RESET)"
+	@echo "$(YELLOW)$(shelldocker network ls | grep ft_network)$(RESET)"
 	@docker network ls | tail -$(shell echo $(shell echo $(NETWORK_NUM)\
 	-$(shell echo $(NETWORK_NUM)-1 | bc -l) | bc -l))
 endif
