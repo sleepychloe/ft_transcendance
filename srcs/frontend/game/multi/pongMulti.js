@@ -166,11 +166,11 @@ function sendPaddleMovement(direction) {
 // 	}
 // });
 
-function triggerUpdate() {
-	if (gameSocket.readyState === WebSocket.OPEN) {
-		gameSocket.send(JSON.stringify({ action: 'update' })); // Trigger an update
-	}
-}
+// function triggerUpdate() {
+// 	if (gameSocket.readyState === WebSocket.OPEN) {
+// 		gameSocket.send(JSON.stringify({ action: 'update' })); // Trigger an update
+// 	}
+// }
 
 // setInterval(triggerUpdate, 1000 / 60); // Trigger updates at ~60fps
 
@@ -203,14 +203,25 @@ function deleteAllCookies() {
 ///////////////////////////////////////////////////////////////
 
 
-async function multiPlayerSetReady(url = "", data = {}) {
-	console.log('i\'m ready!');
-	// let ws = new WebSocket(url);
+function connect(url) {
+	return new Promise(function (resolve, reject) {
+		var server = new WebSocket(url);
+		server.onopen = function () {
+			resolve(server);
+		};
+		server.onerror = function (err) {
+			reject(err);
+		};
+	});
 }
 
-function multiGameStart(url="", data="") {
-	console.log('game start!');
-	// ws
+async function multiPlayerSetReady(url = "", data = {}) {
+	console.log('i\'m ready!');
+	connect(url).then(function (server) {
+		server.send(JSON.stringify(data));
+	}).catch(function (err) {
+		console.log('error on establishing websocket connection: ', err);
+	});
 }
 
 function modalShow() {
@@ -240,8 +251,7 @@ async function reqCreateRoom(url = "", data = {}) {
 		const result = await response.json();
 		return result;
 	} catch (error) {
-		console.error("error while creating room (POST): ", error);
-		return null;
+		return {'Error':'POST ' + url + ' Failed'};
 	}
 }
 
@@ -257,7 +267,7 @@ function multiCreateRoom() {
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
 	reqCreateRoom("/api/game/makeroom/", { "room_name": roomName }).then((data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
-		if (data) {
+		if (data && !data.Error) {
 			// debugging
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
@@ -266,10 +276,9 @@ function multiCreateRoom() {
 			mainPart.innerHTML = lobbyComponent();
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
 			document.getElementsByClassName('btn-game-start')[0].addEventListener('click', function() {
-				multiGameStart('wss://localhost:4243/api/game/' + data.room_id + '/', { 'state': 'ready' });
+				multiPlayerSetReady('wss://localhost:4243/ws/' + data.room_id + '/', { 'user_status': 1, 'n_client': data.N_client });
 			});
-		}
-		else {
+		} else {
 			// debugging
 			console.groupCollapsed('server responded with error');
 				console.log('data: ', data);
@@ -292,7 +301,7 @@ async function reqJoinRoom(url = "", room_id = "") {
 }
 
 function multiJoinRoom() {
-	// deleteAllCookies();
+	deleteAllCookies();
 	console.log('sending request to join room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
@@ -304,6 +313,7 @@ function multiJoinRoom() {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
+
 			mainPart.innerHTML = '';
 			mainPart.appendChild(lobbyPlayersReadyComponent());
 			mainPart.appendChild(lobbyListPlayersComponent(data));
@@ -311,13 +321,14 @@ function multiJoinRoom() {
 			// document.getElementsByClassName('main-title').innerHTML = data.room_name;
 			// need to send ready status with websocket? - server websocket is not ready
 			document.getElementsByClassName('btn-game-start')[0].addEventListener('click', function() {
-				multiPlayerSetReady('wss://localhost:4243/api/game/' + data.room_id + '/', { 'state': 'ready' });
+				multiPlayerSetReady('wss://localhost:4243/ws/' + data.room_id + '/', { 'user_status': 1, 'n_client': data.N_client });
 			});
 		} else {
 			// debugging
 			console.groupCollapsed('server responded with error');
 				console.log('data: ', data);
 			console.groupEnd();
+
 			mainPart.innerHTML = '';
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
@@ -333,7 +344,7 @@ async function getListRoom(url = "") {
 		return result;
 	} catch (error) {
 		console.error("error while getting room list (GET): ", error);
-		return null;
+		return {"Error":"no lobby found"};
 	}
 }
 
@@ -344,15 +355,22 @@ function multiListRoom() {
 	getListRoom('/api/game/listroom/').then((data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 
-		// for no lobby found : need to change error msg from the server
 		if (data.length === 0) {
+			// debugging
+			console.groupCollapsed('server responded successfully');
+			console.log('data: ', data);
+			console.groupEnd();
+			
 			mainPart.innerHTML = '';
+
+			// for no lobby found : need to change error msg from the server
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		} else if (data && data.length > 0) {
 			// debugging
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
+
 			mainPart.innerHTML = '';
 			mainPart.appendChild(lobbyListRoomComponent(data));
 			let lobbyRooms = document.getElementsByClassName('lobby-room-list-item');
@@ -364,6 +382,7 @@ function multiListRoom() {
 			console.groupCollapsed('server responded with error');
 				console.log('data: ', data);
 			console.groupEnd();
+
 			mainPart.innerHTML = '';
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
