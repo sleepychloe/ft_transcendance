@@ -12,7 +12,7 @@ class MultiRoomInfo(models.Model):
         client4 = models.CharField()
 
         class Meta:
-                db_table = 'Room_info'
+                db_table = 'room_info'
 
 # Create your models here.
 
