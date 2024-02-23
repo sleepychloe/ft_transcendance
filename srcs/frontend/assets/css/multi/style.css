@@ -250,3 +250,9 @@
         margin: auto;
         margin-top: 200px;
 }
+
+#gameDashboard {
+	color: rgb(138, 138, 138);
+	text-align: center;
+	margin-top: 20px;
+}

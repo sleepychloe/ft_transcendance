@@ -1,65 +1,4 @@
-// let roomName = "12345";
-
-// let chatSocket = new WebSocket(
-// 	`wss://${window.location.host}/ws/`
-// );
-
-// chatSocket.onmessage = (e) => {
-// 	let data = JSON.parse(e.data);
-// 	let message = data['message'];
-// 	document.querySelector("#chat-log").value += (message + '\n');
-// };
-
-// chatSocket.onclose = (e) => {
-// 	console.error('Chat socket closed unexpectedly');
-// };
-
-// document.querySelector("#chat-message-input").focus();
-// document.querySelector("#chat-message-input").addEventListener("keyup", (e) => {
-// 	if (e.keyCode === 13) {
-// 		document.querySelector("#chat-message-submit").click();
-// 	}
-// });
-
-// document.querySelector("#chat-message-submit").addEventListener("click", (e) => {
-// 	let messageInputDom = document.querySelector("#chat-message-input");
-// 	let message = messageInputDom.value;
-// 	chatSocket.send(JSON.stringify({
-// 		'message': message
-// 	}));
-
-// 	messageInputDom.value = '';
-// });
-
-
-// function sendMessage() {
-// 	const message = { message: 'Hello from the client!' };
-// 	if (gameSocket.readyState === WebSocket.OPEN) {
-// 	    gameSocket.send(JSON.stringify(message));
-// 	}
-// 	console.log(`sent`);
-//     }
-
-//     // Example usage: Call sendMessage() based on some event, like a button click.
-// document.addEventListener("keydown", (e) => {
-//     if (e.key === "ArrowLeft" || e.key === "a") {
-//        sendMessage();
-//     }
-//     // Consider adding "ArrowUp" or "ArrowDown" if your game logic requires it
-// });
-
-// gameSocket.onmessage = function(event) {
-// 	console.log("Received message from server: ", event.data);
-// 	let data = JSON.parse(event.data);
-// 	console.log("Received data from server: ", data.message);  // Ensure this logs the echoed message.
-//     };
-
 let gameSocket;
-//  = new WebSocket(
-// 		`wss://${window.location.host}/ws/`
-// 	);; // Declare gameSocket at the top for global access
-
-// connectWebSocket();
 
 function connectWebSocket() {
 	// Ensure WebSocket uses the correct protocol (wss for secure, ws for local development)
@@ -104,20 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
 let paddleX = 0, paddleY = 300;
 
 function updateGameState(data) {
-	// if (data.ball) {
-	// 	const canvas = document.getElementById('pongCanvas');
-	// 	const ctx = canvas.getContext('2d');
-	// 	const ball = data.data;
-
-	// 	// Clear the canvas
-	// 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	// 	ctx.fillStyle = 'white';
-	// 	ctx.beginPath();
-	// 	ctx.arc(data['ball']['x'], data['ball']['y'], ballSize, 0, Math.PI * 2, false);
-	// 	// ctx.arc(data.type.ball['x'], data.type.ball['x'], ballSize, 0, Math.PI * 2, false);
-	// 	ctx.fill();
-	// }
 	if (data.type === 'game_state') {
 		const canvas = document.getElementById('pongCanvas');
 		const ctx = canvas.getContext('2d');
@@ -270,7 +195,12 @@ function reqWsConnection(url="") {
 					
 				} else if (response.type === 'start') {
 					console.log('start the game');
-					document.getElementsByClassName('main-part')[0].innerHTML = `<canvas id="pongCanvas" width="800" height="600"></canvas>`;
+					document.getElementsByClassName('main-part')[0].innerHTML = `<div id=gameDashboard>
+					<h2>Score</h2>
+					<p>Player 1: <span id="score1">0</span></p>
+					<p>Player 2: <span id="score2">0</span></p>
+					</div>
+					<canvas id="pongCanvas" width="800" height="400"></canvas>`;
 					// game logic
 					// enable user to control the game - eventListener(keypress)
 					// enable user to leave game at any time
@@ -394,6 +324,7 @@ function multiJoinRoom() {
 	console.log('sending request to join room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
+
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
 	reqJoinRoom(apiJoinroom, room_id).then(async (data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
@@ -436,6 +367,7 @@ async function getListRoom(url = "") {
 		return {"Error":"no lobby found"};
 	}
 }
+
 
 function multiListRoom() {
 	console.log('sending request to list room...');

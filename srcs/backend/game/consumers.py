@@ -317,8 +317,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                                                             'data': self.game_state,
                                                             'sender_channel_name': self.channel_name,
                                                         })
-            time.sleep(1)
-            # time.sleep(0.05)
+            # time.sleep(1)
+            time.sleep(0.1)
 
     def paddle_ball_collision(self):
         left_paddle1 = self.game_data.paddle1
