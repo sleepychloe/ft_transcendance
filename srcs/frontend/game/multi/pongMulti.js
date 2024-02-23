@@ -210,7 +210,7 @@ const apiMakeroom = apiBaseURL + "makeroom/";
 const apiListroom = apiBaseURL + "listroom/";
 const apiJoinroom = apiBaseURL + "";
 
-// let ws;
+let ws;
 
 function modalShow() {
 	document.getElementsByClassName('overlay')[0].addEventListener('click', modalClose);
@@ -226,7 +226,7 @@ function modalClose() {
 
 function reqWsConnection(url="") {
 	return new Promise((resolve, reject) => {
-		let ws = new WebSocket(url);
+		ws = new WebSocket(url);
 		ws.onopen = () => {
 			console.log('websocket connection is open: calling resolve');
 			resolve(ws);
@@ -241,10 +241,10 @@ function reqWsConnection(url="") {
 				// get game info
 			}
 		};
-		// ws.onclose = (event) => {
-		// 	console.log('websocket closed. reconnecting...');
-		// 	setTimeout(reqWsConnection(url), 1000);
-		// }
+		ws.onclose = (event) => {
+			console.log('websocket closed. reconnecting...');
+			// setTimeout(reqWsConnection(url), 1000);
+		}
 		ws.onerror = (error) => {
 			console.log('websocket connection has error: calling reject');
 			reject(error);
@@ -257,9 +257,9 @@ async function multiConnectWs(url="", data={}) {
 	try {
 		let user_info = {
 			'client_id': data.client_id,
-			'n_client': data.N_client,
+			'n_client': data.n_client,
 		};
-		let ws = await reqWsConnection(url + data.room_id + '/');
+		ws = await reqWsConnection(url + data.room_id + '/');
 		// alert to server `whoami`: client_id, n_client
 		ws.send(JSON.stringify(user_info));
 		return ws;
@@ -310,7 +310,7 @@ function multiCreateRoom() {
 				console.log('data: ', data);
 			console.groupEnd();
 
-			let ws = await multiConnectWs(wsBaseURL, data);
+			ws = await multiConnectWs(wsBaseURL, data);
 
 			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
@@ -355,7 +355,7 @@ function multiJoinRoom() {
 
 			// server allows to join room === user has a token for ws
 			// first websocket connection establish here
-			let ws = await multiConnectWs(wsBaseURL, data);
+			ws = await multiConnectWs(wsBaseURL, data);
 
 			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;

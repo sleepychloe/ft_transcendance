@@ -123,7 +123,7 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 	btnReady.addEventListener('click', function() {
 		multiPlayerSetReady(
 			ws,
-			{ 'user_status': 1, 'n_client': data.N_client },
+			{ 'user_status': 1, 'n_client': data.n_client },
 		);
 	});
 	buttonDiv.appendChild(btnReady);
