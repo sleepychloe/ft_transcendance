@@ -10,6 +10,13 @@ import threading
 import time
 
 class MultiGameConsumer(AsyncWebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.client_id = None
+        self.game_id = None
+        self.game_data = None
+        self.game_start = None
+
     async def connect(self):
         await self.accept()
         request_header = self.scope['headers']
@@ -33,7 +40,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_game_data(self):
         try :
-            self.game_data = MultiRoomInfo.objects.get(RoomName=self.game_id)
+            self.game_data = MultiRoomInfo.objects.get(Roomid=self.game_id)
         except MultiRoomInfo.DoesNotExist:
             self.send(text_data=json.dumps({'Error': 'Wrong Url ! (can not match game id)'}))
             self.close()
@@ -99,19 +106,22 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def change_user_status(self, n_client):
+        print(n_client)
         if n_client == 'client1':
-            self.game_data.client1['ready_status'] = 1
+            self.game_data.client1['ready_status'] = "ready"
+            print("good")
         elif n_client == 'client2':
-            self.game_data.client2['ready_status'] = 1
+            self.game_data.client2['ready_status'] = "ready"
         elif n_client == 'client3':
-            self.game_data.client3['ready_status'] = 1
+            self.game_data.client3['ready_status'] = "ready"
         elif n_client == 'client4':
-            self.game_data.client4['ready_status'] = 1
+            self.game_data.client4['ready_status'] = "ready"
         self.game_data.save()
 
     @database_sync_to_async
     def check_user_all_ready(self):
-        if self.game_data.client1['ready_status'] == 1 and self.game_data.client2['ready_status'] == 1 and self.game_data.client3['ready_status'] == 1 and self.game_data.client4['ready_status'] == 1:
+        if (self.game_data.client1['ready_status'] == 'ready' and self.game_data.client2['ready_status'] == 'ready' and 
+            self.game_data.client3['ready_status'] == 'ready' and self.game_data.client4['ready_status'] == 'ready'):
             self.send(text_data=json.dumps({'game_start': 'ok'}))
             time.sleep(3)
             self.thread.start()
@@ -125,10 +135,12 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         action = text_data_json.get('action')
         status = text_data_json.get('user_status')
 
-        if status == 'user_status':
+        if status == 'ready':
             n_client = text_data_json.get('n_client')
-            await self.change_user_status(self, n_client)
-            await self.check_user_all_ready(self)
+            self.send(text_data=json.dumps({'game_start': 'ok'}))
+            await self.change_user_status(n_client)
+            await self.send(text_data=json.dumps({'ready_status': 'changed ok'}))
+            await self.check_user_all_ready()
         elif action == 'move_paddle' and self.game_start == True:
                 direction = text_data_json.get('direction')
                 await self.move_paddle(direction)
