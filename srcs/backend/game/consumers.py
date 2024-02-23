@@ -40,7 +40,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         self.game_id = game_id
         await self.get_game_data()
         self.game_start = False
-        self.initialize_game()
+        # await self.initialize_game() # something is wrong
         await self.channel_layer.group_add(game_id, self.channel_name)
 
     async def disconnect(self, close_code):
@@ -114,7 +114,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             await self.send((await self.make_json_response('game_status', 'wait', self.game_state + self.game_score)))
 
     @database_sync_to_async
-    def change_user_status(self, n_client):
+    def player_ready(self, n_client):
         if n_client == 'client1':
             self.game_data.client1['ready_status'] = "ready"
         elif n_client == 'client2':
@@ -127,12 +127,33 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         self.game_data.save()
 
     @database_sync_to_async
-    def check_user_all_ready(self):
+    def player_unready(self, n_client):
+        if n_client == 'client1':
+            self.game_data.client1['ready_status'] = "not ready"
+        elif n_client == 'client2':
+            self.game_data.client2['ready_status'] = "not ready"
+        elif n_client == 'client3':
+            self.game_data.client3['ready_status'] = "not ready"
+        elif n_client == 'client4':
+            self.game_data.client4['ready_status'] = "not ready"
+        self.game_data.QuantityPlayerReady -= 1
+        self.game_data.save()
+
+    # @database_sync_to_async
+    async def check_user_all_ready(self):
         if not (self.game_data.client1 and self.game_data.client2 and self.game_data.client3 and self.game_data.client4):
             return
         if (self.game_data.client1['ready_status'] == 'ready' and self.game_data.client2['ready_status'] == 'ready' and 
             self.game_data.client3['ready_status'] == 'ready' and self.game_data.client4['ready_status'] == 'ready'):
-            self.send(self.make_json_response('game_status', 'start', {}))
+            # self.send(self.make_json_response('game_status', 'start', {}))
+            await self.channel_layer.group_send(self.game_id,
+                                                    {
+                                                        'type': 'game_status', # pre-defined
+                                                        'action': 'start',
+                                                        'sender_channel_name': self.channel_name,
+                                                    })
+            return
+            # cannot go further - need to fix error
             time.sleep(3)
             self.thread.start()
             self.game_start = True
@@ -141,21 +162,46 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(self.game_id, await self.make_dict_response('info', 'ball', self.game_state))
 
     async def receive(self, text_data=None, bytes_data=None):
+        await self.get_game_data()
         text_data_json = json.loads(text_data)
         action = text_data_json.get('action')
 
         if action == 'update':
             type = text_data_json.get('type')
             data = text_data_json.get('data')
-            if type == 'user_status':
+            if type == 'ready_status':
                 n_client = data['n_client']
-                await self.change_user_status(n_client)
-                await self.send(await self.make_json_response('info', 'ready_status', {'ready_status': 'ok', 'n_client': n_client}))
+                await self.player_ready(n_client)
                 await self.channel_layer.group_send(self.game_id,
                                                     {
-                                                        'info': 'test'
+                                                        'type': 'room_inform', # pre-defined
+                                                        'action': 'ready',
+                                                        'n_client': n_client,
+                                                        'quantity_player_ready': self.game_data.QuantityPlayerReady,
+                                                        'sender_channel_name': self.channel_name,
                                                     })
                 await self.check_user_all_ready()
+            elif type == 'unready_status':
+                n_client = data['n_client']
+                await self.player_unready(n_client)
+                await self.channel_layer.group_send(self.game_id,
+                                                    {
+                                                        'type': 'room_inform', # pre-defined
+                                                        'action': 'unready',
+                                                        'n_client': n_client,
+                                                        'quantity_player_ready': self.game_data.QuantityPlayerReady,
+                                                        'sender_channel_name': self.channel_name,
+                                                    })
+            elif type == 'player_info':
+                n_client = data['n_client']
+                await self.channel_layer.group_send(self.game_id,
+                                                    {
+                                                        'type': 'room_inform', # pre-defined
+                                                        'action': 'join',
+                                                        'n_client': n_client,
+                                                        'quantity_player_ready': self.game_data.QuantityPlayerReady,
+                                                        'sender_channel_name': self.channel_name,
+                                                    })
             else:
                 await self.send(await self.make_json_response('info', 'error', {'error': 'Type is undefined!'}))
         elif action == 'move_paddle' and self.game_start == True:
@@ -164,6 +210,51 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                 self.send_game_state(self)
         else:
             await self.send(await self.make_json_response('info', 'error', {'error': 'There is nothings to do!'}))
+
+    # broadcasting for game event: ex. start/end
+    async def game_status(self, event):
+        action = event['action']
+
+        if action == 'start':
+            await self.send(text_data=json.dumps({
+                    'info': 'game',
+                    'type': 'start', # new
+                    'data': {},
+                }))
+
+    # broadcasting for room event: ex. join/ready
+    async def room_inform(self, event):
+        quantity_player_ready = event['quantity_player_ready']
+        n_client = event['n_client']
+        action = event['action']
+        if self.channel_name != event['sender_channel_name']:
+            if action == 'join':
+                await self.send(text_data=json.dumps({
+                    'info': 'player',
+                    'type': 'join', # new
+                    'data': {
+                        'n_client': n_client,
+                        'quantity_player_ready': quantity_player_ready,
+                    },
+                }))
+        if action == 'ready':
+            await self.send(text_data=json.dumps({
+                'info': 'player',
+                'type': 'ready', # new
+                'data': {
+                    'n_client': n_client,
+                    'quantity_player_ready': quantity_player_ready,
+                },
+            }))
+        elif action == 'unready':
+            await self.send(text_data=json.dumps({
+                'info': 'player',
+                'type': 'unready', # new
+                'data': {
+                    'n_client': n_client,
+                    'quantity_player_ready': quantity_player_ready,
+                },
+            }))
 
     async def move_paddle(self, direction):
         if direction == 'down':

@@ -64,47 +64,56 @@ function lobbyListRoomComponent(data) {
 	return lobbyRoomList;
 }
 
-function lobbyPlayersReadyComponent() {
+function lobbyPlayersReadyComponent(quantity_player_ready) {
 	let lobbySlot = document.createElement('div');
 	lobbySlot.classList.add('lobby-space-counter');
 	// need to pass ready players count
-	lobbySlot.innerHTML = '1/4 are ready';
+	lobbySlot.innerHTML = quantity_player_ready + '/4 are ready';
 	return lobbySlot;
+}
+
+function lobbyPlayersListItemComponent(playerId) {
+	let lobbyPlayerList;
+	lobbyPlayerList = document.createElement('div');
+	lobbyPlayerList.classList.add('lobby-players-list');
+
+	let listItem = document.createElement('div');
+	listItem.classList.add('lobby-players-list-item');
+	lobbyPlayerList.appendChild(listItem);
+	
+	let playersCard = document.createElement('div');
+	playersCard.classList.add('lobby-players-card');
+	listItem.appendChild(playersCard);
+	let playerIcon = document.createElement('div');
+	playerIcon.classList.add('lobby-players-card-icon');
+	playersCard.appendChild(playerIcon);
+
+	let iconImage = document.createElement('img');
+	iconImage.classList.add('img-player-icon');
+	iconImage.src = '../../assets/img/user-person-single-id-account-player-male-female-512.webp';
+	iconImage.alt = 'playerIcon';
+	playerIcon.appendChild(iconImage);
+
+	let playersName = document.createElement('div');
+	playersName.classList.add('lobby-players-card-name');
+	playersName.setAttribute("id", "player" + (playerId + 1));
+	playersName.innerHTML = "Player " + (playerId + 1);
+	playersCard.appendChild(playersName);
+
+	let playerOption = document.createElement('div');
+	playerOption.classList.add('lobby-players-card-option');
+	playersCard.appendChild(playerOption);
+
+	return lobbyPlayerList;
 }
 
 function lobbyListPlayersComponent(room) {
 	let lobbyPlayerList;
+	lobbyPlayerList = document.createElement('div');
+	lobbyPlayerList.classList.add('lobby-players-list');
 	try {
-		lobbyPlayerList = document.createElement('div');
-		lobbyPlayerList.classList.add('lobby-players-list');
-		for (let i = 0; i < room.quantity_player; i++)
-		{
-			let listItem = document.createElement('div');
-			listItem.classList.add('lobby-players-list-item');
-			lobbyPlayerList.appendChild(listItem);
-			
-			let playersCard = document.createElement('div');
-			playersCard.classList.add('lobby-players-card');
-			listItem.appendChild(playersCard);
-			let playerIcon = document.createElement('div');
-			playerIcon.classList.add('lobby-players-card-icon');
-			playersCard.appendChild(playerIcon);
-
-			let iconImage = document.createElement('img');
-			iconImage.classList.add('img-player-icon');
-			iconImage.src = '../../assets/img/user-person-single-id-account-player-male-female-512.webp';
-			iconImage.alt = 'playerIcon';
-			playerIcon.appendChild(iconImage);
-
-			let playersName = document.createElement('div');
-			playersName.classList.add('lobby-players-card-name');
-			playersName.setAttribute("id", "player" + (i + 1));
-			playersName.innerHTML = "Player " + (i + 1);
-			playersCard.appendChild(playersName);
-
-			let playerOption = document.createElement('div');
-			playerOption.classList.add('lobby-players-card-option');
-			playersCard.appendChild(playerOption);
+		for (let i = 0; i < room.quantity_player; i++) {
+			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent(i));
 		}
 	} catch {
 		return responseMsgComponent('error while loading lobby');
@@ -120,15 +129,48 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 	let btnReady = document.createElement('button');
 	btnReady.classList.add('btn-game-start');
 	btnReady.innerHTML = 'Ready';
-	btnReady.addEventListener('click', function() {
+	btnReady.addEventListener('click', () => {
 		multiPlayerSetReady(
 			ws,
-			{ 'action': 'update', 'type': 'user_status', 'data': { 'n_client': data.n_client } },
+			{
+				'action': 'update',
+				'type': 'ready_status',
+				'data': {
+					'n_client': data.n_client
+				}
+			},
+		);
+	});
+	let btnUnready = document.createElement('button');
+	btnUnready.classList.add('btn-game-start');
+	btnUnready.classList.add('ready');
+	btnUnready.innerHTML = 'Undo';
+	btnUnready.addEventListener('click', () => {
+		multiPlayerUnsetReady(
+			ws,
+			{
+				'action': 'update',
+				'type': 'unready_status',
+				'data': {
+					'n_client': data.n_client
+				}
+			},
 		);
 	});
 	buttonDiv.appendChild(btnReady);
+	buttonDiv.appendChild(btnUnready);
 	
 	return buttonDiv;
+}
+
+function lobbyPlayerComponent(n_client) {
+	let playerId = {
+		'client1': 0,
+		'client2': 1,
+		'client3': 2,
+		'client4': 3,
+	};
+	document.getElementsByClassName('lobby-players-list')[0].appendChild(lobbyPlayersListItemComponent(playerId[n_client]));
 }
 
 function responseMsgComponent(text="fatal error") {

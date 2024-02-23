@@ -224,6 +224,10 @@ function modalClose() {
 	document.getElementsByClassName('overlay')[0].style.visibility = 'hidden';
 }
 
+function updateLobbySlot(quantity_player_ready) {
+	document.getElementsByClassName('lobby-space-counter')[0].innerHTML = quantity_player_ready + '/4 are ready';
+}
+
 function reqWsConnection(url="") {
 	return new Promise((resolve, reject) => {
 		ws = new WebSocket(url);
@@ -234,21 +238,32 @@ function reqWsConnection(url="") {
 		ws.onmessage = (event) => {
 			let response = JSON.parse(event.data);
 			let data = response.data;
-			// check if server responded with game:ok status
-			if (response.info === 'ready_status') {
-				// if game:ok start the game
-				if (data.ready_status === 'ok') {
-					console.log('response: ready_status is ok');
-					// do stuff here
+
+			// websocket channel broadcasting
+			console.log('new broadcast arrived: ', response);
+
+			if (response.info === 'player') {
+				if (response.type === 'join') {
+					console.log('new player joined lobby: ', data.n_client);
+					lobbyPlayerComponent(data.n_client);
 				}
-				// if all players are ready - start the game
-				// info: ready_status, game_status: start, data: {...}
+				else if (response.type === 'ready') {
+					console.log('player is ready to play: ', data.n_client);
+					updateLobbySlot(data.quantity_player_ready);
+				}
+				else if (response.type === 'unready') {
+					console.log('player is NOT ready to play: ', data.n_client);
+					updateLobbySlot(data.quantity_player_ready);
+				}
+			} else if (response.info === 'game') {
+				if (response.type === 'start') {
+					console.log('start the game');
+				}
 			}
-			// if someone pressed ready
-			// increase amount of ready players in the lobby
 		};
 		ws.onclose = (event) => {
-			console.log('websocket closed. reconnecting...');
+			console.log('websocket closed');
+			// playerLobbyDisconnect(playerId); // from lobbyPlayersList
 			// setTimeout(reqWsConnection(url), 1000);
 		}
 		ws.onerror = (error) => {
@@ -261,17 +276,17 @@ function reqWsConnection(url="") {
 async function multiConnectWs(url="", data={}) {
 	// first connection to the room's ws
 	try {
-		let user_info = {
+		let player_info = {
 			'action': 'update',
-			'type': 'user_info',
+			'type': 'player_info',
 			'data': {
 				'client_id': data.client_id,
 				'n_client': data.n_client,
 			},
-		}
+		};
 		ws = await reqWsConnection(url + data.room_id + '/');
-		// alert to server `whoami`: client_id, n_client - kind of handshaking
-		ws.send(JSON.stringify(user_info));
+		// alert to server `whoami`: client_id, n_client
+		ws.send(JSON.stringify(player_info));
 		return ws;
 	} catch (error) {
 		console.log('error on establishing websocket connection: ', error);
@@ -279,8 +294,16 @@ async function multiConnectWs(url="", data={}) {
 }
 
 async function multiPlayerSetReady(ws={}, data={}) {
-	console.log('i\'m ready!');
-	document.getElementsByClassName('btn-game-start')[0].classList.add('ready');
+	console.log('player send ready to server: ', data);
+	document.getElementsByClassName('btn-game-start')[0].style.display = 'none';
+	document.getElementsByClassName('ready')[0].style.display = 'block';
+	await ws.send(JSON.stringify(data));
+}
+
+async function multiPlayerUnsetReady(ws={}, data={}) {
+	console.log('player send unready to server: ', data);
+	document.getElementsByClassName('btn-game-start')[0].style.display = 'block';
+	document.getElementsByClassName('ready')[0].style.display = 'none';
 	await ws.send(JSON.stringify(data));
 }
 
@@ -325,7 +348,7 @@ function multiCreateRoom() {
 
 			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
-			mainPart.appendChild(lobbyPlayersReadyComponent());
+			mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
 			mainPart.appendChild(lobbyListPlayersComponent(data));
 			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
 		} else {
@@ -370,8 +393,7 @@ function multiJoinRoom() {
 
 			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
-			// show how many players are ready
-			mainPart.appendChild(lobbyPlayersReadyComponent());
+			mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
 			mainPart.appendChild(lobbyListPlayersComponent(data));
 			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
 		} else {

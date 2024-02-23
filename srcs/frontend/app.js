@@ -25,7 +25,7 @@ const app = async () => {
         if (match.route.path === '/') {
                 // Ensure the DOM update has been processed
                 requestAnimationFrame(() => {
-                initThreeJs();
+                        initThreeJs();
                 });
         }
 }

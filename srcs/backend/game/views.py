@@ -27,10 +27,10 @@ class GameRoomMakeView(View):
 			room_name = json.loads(request.body).get("room_name")
 		except json.JSONDecodeError:
 			return JsonResponse({'Error' : 'Roomname is not json.'})
-		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, QuantityPlayerReady=0, client1={'client_id':client_id, 'ready_status':0}, client2={}, client3={}, client4={})
+		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, QuantityPlayerReady=0, client1={'client_id':client_id, 'ready_status': 'not ready'}, client2={}, client3={}, client4={}) # why this is called on client1 ready
 		new_data.save()
 		channel_layer.group_add(new_room_id, 'BACKEND')
-		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player, 'n_client' : 'client1'})
+		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player, 'quantity_player_ready' : 0, 'n_client' : 'client1'})
 		response.set_cookie('client_id', client_id)
 		return response
 
@@ -75,7 +75,7 @@ class GameRoomJoinView(View):
 			room.save()
 			client_id = create_new_uuid()
 			Nclient = self.check_client_id_for_data(game_id, client_id)
-			response = JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'client_id': client_id, 'n_client': Nclient})			
+			response = JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})			
 			response.set_cookie('client_id', client_id)
 			return response
 		return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})
@@ -83,22 +83,35 @@ class GameRoomJoinView(View):
 	@staticmethod
 	def check_client_id_for_data(game_id, client_id):
 		room = MultiRoomInfo.objects.get(Roomid=game_id)
+		# print('room: ', room)
+		# print('room.client1: ', room.client1)
+		# print('room.client2: ', room.client2)
+		# print('room.client3: ', room.client3)
+		# print('room.client4: ', room.client4)
+		# print('room.client1[\'client_id\']: ', room.client1['client_id'])
+		# print('room.client2[\'client_id\']: ', room.client2['client_id'])
+		# print('room.client3[\'client_id\']: ', room.client3['client_id'])
+		# print('room.client4[\'client_id\']: ', room.client4['client_id'])
 		if not room.client1:
+			# print('client1')
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client1 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client1"
 		elif not room.client2:
+			# print('client2')
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client2 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client2"
 		elif not room.client3:
+			# print('client3')
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client3 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client3"
 		elif not room.client4:
+			# print('client4')
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client4 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
