@@ -120,7 +120,6 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 	let btnReady = document.createElement('button');
 	btnReady.classList.add('btn-game-start');
 	btnReady.innerHTML = 'Ready';
-	console.log('ws3: ', ws);
 	btnReady.addEventListener('click', function() {
 		multiPlayerSetReady(
 			ws,

@@ -210,6 +210,8 @@ const apiMakeroom = apiBaseURL + "makeroom/";
 const apiListroom = apiBaseURL + "listroom/";
 const apiJoinroom = apiBaseURL + "";
 
+// let ws;
+
 function modalShow() {
 	document.getElementsByClassName('overlay')[0].addEventListener('click', modalClose);
 	document.getElementsByClassName('modal')[0].style.visibility = 'visible';
@@ -222,13 +224,29 @@ function modalClose() {
 	document.getElementsByClassName('overlay')[0].style.visibility = 'hidden';
 }
 
-function reqWsConnection(url) {
+function reqWsConnection(url="") {
 	return new Promise((resolve, reject) => {
-		var ws = new WebSocket(url);
+		let ws = new WebSocket(url);
 		ws.onopen = () => {
+			console.log('websocket connection is open: calling resolve');
 			resolve(ws);
 		};
+		ws.onmessage = (event) => {
+			console.log('msg arrived: ', event.data);
+			// check if server responded with game:ok status
+			if (event.data['game_status'] === 'start') {
+				// if game:ok start the game
+			}
+			if (event.data['info'] === 'data') {
+				// get game info
+			}
+		};
+		// ws.onclose = (event) => {
+		// 	console.log('websocket closed. reconnecting...');
+		// 	setTimeout(reqWsConnection(url), 1000);
+		// }
 		ws.onerror = (error) => {
+			console.log('websocket connection has error: calling reject');
 			reject(error);
 		};
 	});
@@ -236,26 +254,23 @@ function reqWsConnection(url) {
 
 async function multiConnectWs(url="", data={}) {
 	// first connection to the room's ws
-	let user_info = {
-		'client_id': data.client_id,
-		'n_client': data.N_client,
-	};
-	reqWsConnection(url + data.room_id + '/').then((ws) => {
+	try {
+		let user_info = {
+			'client_id': data.client_id,
+			'n_client': data.N_client,
+		};
+		let ws = await reqWsConnection(url + data.room_id + '/');
 		// alert to server `whoami`: client_id, n_client
 		ws.send(JSON.stringify(user_info));
-		console.log('ws1: ', ws);
 		return ws;
-	}).catch((error) => {
+	} catch (error) {
 		console.log('error on establishing websocket connection: ', error);
-	});
+	}
 }
 
 async function multiPlayerSetReady(ws={}, data={}) {
 	console.log('i\'m ready!');
-	console.log('ws4: ', ws);
-	ws.on('connection', (websocket) => {
-		websocket.send(JSON.stringify(data));
-	});
+	ws.send(JSON.stringify(data));
 }
 
 async function reqCreateRoom(url="", data={}) {
@@ -287,7 +302,7 @@ function multiCreateRoom() {
 	console.log('sending request to create room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
-	reqCreateRoom(apiMakeroom, { "room_name": roomName }).then((data) => {
+	reqCreateRoom(apiMakeroom, { "room_name": roomName }).then(async (data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 		if (data && !data.Error) {
 			// debugging
@@ -295,8 +310,7 @@ function multiCreateRoom() {
 				console.log('data: ', data);
 			console.groupEnd();
 
-			let ws = multiConnectWs(wsBaseURL, data);
-			console.log('ws2: ', ws);
+			let ws = await multiConnectWs(wsBaseURL, data);
 
 			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
@@ -326,12 +340,12 @@ async function reqJoinRoom(url="", room_id="") {
 }
 
 function multiJoinRoom() {
-	deleteAllCookies();
+	// deleteAllCookies();
 	console.log('sending request to join room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
-	reqJoinRoom(apiJoinroom, room_id).then((data) => {
+	reqJoinRoom(apiJoinroom, room_id).then(async (data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 		if (data && !data.Error) {
 			// debugging
@@ -341,7 +355,7 @@ function multiJoinRoom() {
 
 			// server allows to join room === user has a token for ws
 			// first websocket connection establish here
-			let ws = multiConnectWs(wsBaseURL, data);
+			let ws = await multiConnectWs(wsBaseURL, data);
 
 			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
