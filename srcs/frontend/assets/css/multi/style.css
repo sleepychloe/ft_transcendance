@@ -59,17 +59,28 @@
         cursor: pointer;
         margin: auto;
         padding: 25px 55px;
-        border: 2px solid rgb(87, 87, 87);
+        /* border: 2px solid rgb(237, 237, 237); */
+        border: none;
         border-radius: 12px;
         text-align: center;
         text-decoration: none;
         font-size: 18px;
-        color: rgb(87, 87, 87);
-        background-color: rgb(36, 36, 36);
+        color: rgb(29, 29, 29);
+        background-color: rgb(59, 165, 30);
+}
+
+.ready {
+        color: #f3f3f3;
+        background-color: #313131;
 }
 
 .btn-game-start:hover {
-        background-color: rgb(28, 28, 28);
+        background-color: rgb(19, 117, 15);
+}
+
+.ready:hover {
+        color: #f3f3f3;
+        background-color: #313131;
 }
 
 .multi-room-choice-list {

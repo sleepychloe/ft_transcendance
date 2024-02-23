@@ -147,6 +147,9 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                 await self.change_user_status(n_client)
                 await self.send(await self.make_json_response('info', 'ready_status', {'ready_status': 'ok', 'n_client': n_client}))
                 await self.check_user_all_ready()
+            if type == 'user_info':
+                pass
+                # parse data here { client_id, n_client }
         elif action == 'move_paddle' and self.game_start == True:
                 direction = text_data_json.get('direction')
                 await self.move_paddle(direction)

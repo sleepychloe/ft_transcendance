@@ -232,14 +232,20 @@ function reqWsConnection(url="") {
 			resolve(ws);
 		};
 		ws.onmessage = (event) => {
-			console.log('msg arrived: ', event.data);
+			let response = JSON.parse(event.data);
+			let data = response.data;
 			// check if server responded with game:ok status
-			if (event.data['game_status'] === 'start') {
+			if (response.info === 'ready_status') {
 				// if game:ok start the game
+				if (data.ready_status === 'ok') {
+					console.log('response: ready_status is ok');
+					// do stuff here
+				}
+				// if all players are ready - start the game
+				// info: ready_status, game_status: start, data: {...}
 			}
-			if (event.data['info'] === 'data') {
-				// get game info
-			}
+			// if someone pressed ready
+			// increase amount of ready players in the lobby
 		};
 		ws.onclose = (event) => {
 			console.log('websocket closed. reconnecting...');
@@ -256,11 +262,15 @@ async function multiConnectWs(url="", data={}) {
 	// first connection to the room's ws
 	try {
 		let user_info = {
-			'client_id': data.client_id,
-			'n_client': data.n_client,
-		};
+			'action': 'update',
+			'type': 'user_info',
+			'data': {
+				'client_id': data.client_id,
+				'n_client': data.n_client,
+			},
+		}
 		ws = await reqWsConnection(url + data.room_id + '/');
-		// alert to server `whoami`: client_id, n_client
+		// alert to server `whoami`: client_id, n_client - kind of handshaking
 		ws.send(JSON.stringify(user_info));
 		return ws;
 	} catch (error) {
@@ -270,7 +280,8 @@ async function multiConnectWs(url="", data={}) {
 
 async function multiPlayerSetReady(ws={}, data={}) {
 	console.log('i\'m ready!');
-	ws.send(JSON.stringify(data));
+	document.getElementsByClassName('btn-game-start')[0].classList.add('ready');
+	await ws.send(JSON.stringify(data));
 }
 
 async function reqCreateRoom(url="", data={}) {
@@ -340,7 +351,7 @@ async function reqJoinRoom(url="", room_id="") {
 }
 
 function multiJoinRoom() {
-	// deleteAllCookies();
+	deleteAllCookies();
 	console.log('sending request to join room...');
 	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
