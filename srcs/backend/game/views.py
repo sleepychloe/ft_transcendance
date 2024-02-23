@@ -27,7 +27,7 @@ class GameRoomMakeView(View):
 			room_name = json.loads(request.body).get("room_name")
 		except json.JSONDecodeError:
 			return JsonResponse({'Error' : 'Roomname is not json.'})
-		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, client1={'client_id':client_id, 'ready_status':0}, client2={}, client3={}, client4={})
+		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, QuantityPlayerReady=0, client1={'client_id':client_id, 'ready_status':0}, client2={}, client3={}, client4={})
 		new_data.save()
 		channel_layer.group_add(new_room_id, 'BACKEND')
 		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player, 'n_client' : 'client1'})
@@ -85,22 +85,22 @@ class GameRoomJoinView(View):
 		room = MultiRoomInfo.objects.get(Roomid=game_id)
 		if not room.client1:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client1 = {'client_id': client_id, 'ready_status':0}
+			instance.client1 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client1"
 		elif not room.client2:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client2 = {'client_id': client_id, 'ready_status':0}
+			instance.client2 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client2"
 		elif not room.client3:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client3 = {'client_id': client_id, 'ready_status':0}
+			instance.client3 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client3"
 		elif not room.client4:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client4 = {'client_id': client_id, 'ready_status':0}
+			instance.client4 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client4"
 

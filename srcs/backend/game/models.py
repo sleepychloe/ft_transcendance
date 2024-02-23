@@ -6,6 +6,7 @@ class MultiRoomInfo(models.Model):
         RoomName = models.CharField()
         QuantityPlayer = models.PositiveSmallIntegerField()
         CreatedTime = models.DateTimeField(auto_now_add=True)
+        QuantityPlayerReady = models.PositiveSmallIntegerField()
         client1 = models.JSONField(null=True)
         client2 = models.JSONField(null=True)
         client3 = models.JSONField(null=True)

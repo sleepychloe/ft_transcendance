@@ -1,10 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.http import JsonResponse
 from .models import MultiRoomInfo
-from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 import random
-import http.cookies
 import json
 import threading
 import time
@@ -16,6 +13,11 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         self.game_id = None
         self.game_data = None
         self.game_start = None
+
+    async def make_dict_response(self, first, second, data):
+        jsondata = await self.make_json_response(first, second, data)
+        dictdata = await json.loads(jsondata)
+        return dictdata
 
     async def make_json_response(self, first, second, data):
         jsondata = {}
@@ -39,7 +41,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         await self.get_game_data()
         self.game_start = False
         self.initialize_game()
-        self.channel_layer.group_add(game_id, self.channel_name)
+        await self.channel_layer.group_add(game_id, self.channel_name)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.game_id, self.channel_name)
@@ -121,10 +123,13 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             self.game_data.client3['ready_status'] = "ready"
         elif n_client == 'client4':
             self.game_data.client4['ready_status'] = "ready"
+        self.game_data.QuantityPlayerReady += 1
         self.game_data.save()
 
     @database_sync_to_async
     def check_user_all_ready(self):
+        if not (self.game_data.client1 and self.game_data.client2 and self.game_data.client3 and self.game_data.client4):
+            return
         if (self.game_data.client1['ready_status'] == 'ready' and self.game_data.client2['ready_status'] == 'ready' and 
             self.game_data.client3['ready_status'] == 'ready' and self.game_data.client4['ready_status'] == 'ready'):
             self.send(self.make_json_response('game_status', 'start', {}))
@@ -133,7 +138,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             self.game_start = True
 
     async def send_game_state(self):
-        await self.channel_layer.group_send(await self.make_json_response('info', 'ball', self.game_state))
+        await self.channel_layer.group_send(self.game_id, await self.make_dict_response('info', 'ball', self.game_state))
 
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
@@ -146,10 +151,13 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                 n_client = data['n_client']
                 await self.change_user_status(n_client)
                 await self.send(await self.make_json_response('info', 'ready_status', {'ready_status': 'ok', 'n_client': n_client}))
+                await self.channel_layer.group_send(self.game_id,
+                                                    {
+                                                        'info': 'test'
+                                                    })
                 await self.check_user_all_ready()
-            if type == 'user_info':
-                pass
-                # parse data here { client_id, n_client }
+            else:
+                await self.send(await self.make_json_response('info', 'error', {'error': 'Type is undefined!'}))
         elif action == 'move_paddle' and self.game_start == True:
                 direction = text_data_json.get('direction')
                 await self.move_paddle(direction)
@@ -181,7 +189,7 @@ def ball_move_thread(self):
             self.init_game_value(self)
         if self.game_state['ball']['y'] <= 0 or self.game_state['ball']['y'] >= 400:
            self.game_state['ball']['vy'] = -self.game_state['ball']['vy']
-        self.channel_layer.group_send(self.make_json_response('info', 'ball', self.game_state))
+        self.channel_layer.group_send(self.game_id, {self.make_dict_response('info', 'ball', self.game_state)})
 
 def paddle_ball_collision(self):
     left_paddle1 = self.game_data.paddle1
