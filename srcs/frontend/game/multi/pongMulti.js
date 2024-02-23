@@ -256,8 +256,24 @@ function reqWsConnection(url="") {
 					updateLobbySlot(data.quantity_player_ready);
 				}
 			} else if (response.info === 'game') {
-				if (response.type === 'start') {
+				if (response.type === 'ball') {
+					console.log('recieved ball data: ', data);
+
+					canvas = document.getElementById("pongCanvas");
+					ctx = canvas.getContext("2d");
+					let ball = data.ball;
+					ctx.clearRect(0, 0, 800, 400);
+					ctx.fillStyle = 'white';
+					ctx.beginPath();
+					ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2, false);
+					ctx.fill();
+					
+				} else if (response.type === 'start') {
 					console.log('start the game');
+					document.getElementsByClassName('main-part')[0].innerHTML = `<canvas id="pongCanvas" width="800" height="600"></canvas>`;
+					// game logic
+					// enable user to control the game - eventListener(keypress)
+					// enable user to leave game at any time
 				}
 			}
 		};

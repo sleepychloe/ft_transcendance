@@ -3,7 +3,7 @@ from .models import MultiRoomInfo
 from channels.db import database_sync_to_async
 import random
 import json
-import threading
+import threading, asyncio
 import time
 
 class MultiGameConsumer(AsyncWebsocketConsumer):
@@ -13,6 +13,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         self.game_id = None
         self.game_data = None
         self.game_start = None
+        self.thread = None
 
     async def make_dict_response(self, first, second, data):
         jsondata = await self.make_json_response(first, second, data)
@@ -40,7 +41,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         self.game_id = game_id
         await self.get_game_data()
         self.game_start = False
-        # await self.initialize_game() # something is wrong
+        await self.initialize_game() # fixed
         await self.channel_layer.group_add(game_id, self.channel_name)
 
     async def disconnect(self, close_code):
@@ -88,30 +89,47 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def init_game_paddle(self):
-        if self.game_data.paddle1 == None:
-             self.game_data.paddle1 = self.client_id
-        elif self.game_data.paddle2 == None:
-             self.game_data.paddle2 = self.client_id
-        elif self.game_data.paddle3 == None:
-             self.game_data.paddle3 = self.client_id
-        elif self.game_data.paddle4 == None:
-             self.game_data.paddle4 = self.client_id
+        # print('before init_game_paddle:\n',
+        #     self.game_data.paddle1, '\n',
+        #     self.game_data.paddle2, '\n',
+        #     self.game_data.paddle3, '\n',
+        #     self.game_data.paddle4, '\n')
+        if not self.game_data.paddle1:
+            # print('inside paddle 1 statement')
+            self.game_data.paddle1 = self.client_id
+        elif not self.game_data.paddle2:
+            # print('inside paddle 2 statement')
+            self.game_data.paddle2 = self.client_id
+        elif not self.game_data.paddle3:
+            # print('inside paddle 3 statement')
+            self.game_data.paddle3 = self.client_id
+        elif not self.game_data.paddle4:
+            # print('inside paddle 4 statement')
+            self.game_data.paddle4 = self.client_id
+            # print('after init_game_paddle:\n',
+            # self.game_data.paddle1, '\n',
+            # self.game_data.paddle2, '\n',
+            # self.game_data.paddle3, '\n',
+            # self.game_data.paddle4, '\n')
         self.game_data.save()
 
     async def initialize_game(self):
-        await self.init_game_paddle(self)
-        await self.init_game_value(self)
-        await self.init_game_state(self)
+        await self.init_game_paddle()
+        await self.init_game_value()
+        await self.init_game_state()
 
     
     async def init_thread_ball(self):
-        self.thread = threading.Thread(target=ball_move_thread, args=[self])
+        print('init_thread_ball function called')
+        # self.thread = threading.Thread(target=self.ball_move_thread, args=[])
+        self.thread = threading.Thread(target=asyncio.run, args=(self.ball_move_thread(),))
         self.thread.setDaemon(True)
 
     async def init_game_state(self):
         if self.game_data.paddle1 and self.game_data.paddle2 and self.game_data.paddle3 and self.game_data.paddle4:
-            self.init_thread_ball()
-            await self.send((await self.make_json_response('game_status', 'wait', self.game_state + self.game_score)))
+            # print('init_game_state: inside if')
+            await self.init_thread_ball()
+            # await self.send((await self.make_json_response('game_status', 'wait', self.game_state + self.game_score)))
 
     @database_sync_to_async
     def player_ready(self, n_client):
@@ -148,15 +166,16 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             # self.send(self.make_json_response('game_status', 'start', {}))
             await self.channel_layer.group_send(self.game_id,
                                                     {
-                                                        'type': 'game_status', # pre-defined
+                                                        'type': 'game_status',
                                                         'action': 'start',
+                                                        'data': {},
                                                         'sender_channel_name': self.channel_name,
                                                     })
-            return
-            # cannot go further - need to fix error
-            time.sleep(3)
-            self.thread.start()
-            self.game_start = True
+            # time.sleep(3)
+            print('self.thread: ', self.thread)
+            if (self.thread):
+                self.game_start = True
+                self.thread.start()
 
     async def send_game_state(self):
         await self.channel_layer.group_send(self.game_id, await self.make_dict_response('info', 'ball', self.game_state))
@@ -214,13 +233,22 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
     # broadcasting for game event: ex. start/end
     async def game_status(self, event):
         action = event['action']
+        data = event['data']
+        print('game_status !!!!!!!!!!!!!!!!!')
 
         if action == 'start':
             await self.send(text_data=json.dumps({
                     'info': 'game',
-                    'type': 'start', # new
+                    'type': 'start',
                     'data': {},
                 }))
+        if action == 'ball':
+            await self.send(text_data=json.dumps({
+                    'info': 'game',
+                    'type': 'ball',
+                    'data': data,
+                }))
+
 
     # broadcasting for room event: ex. join/ready
     async def room_inform(self, event):
@@ -266,34 +294,44 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         else:
             await self.send(await self.make_json_response('info', 'error', {'error': 'Can not understand paddle direction !'}))
 
-def ball_move_thread(self):
-    while True:
-        time.sleep(0.05)
-        paddle_ball_collision(self)
-        self.game_state['ball']['x'] += self.game_state['ball']['vx']
-        self.game_state['ball']['y'] += self.game_state['ball']['vy']
-        if self.game_state['ball']['x'] <= 0 or self.game_state['ball']['x'] >= 800:
-            if self.game_state['ball']['x'] <= 0:
-                self.game_score['right'] += 1
-            else:
-                self.game_score['left'] += 1
-            self.init_game_value(self)
-        if self.game_state['ball']['y'] <= 0 or self.game_state['ball']['y'] >= 400:
-           self.game_state['ball']['vy'] = -self.game_state['ball']['vy']
-        self.channel_layer.group_send(self.game_id, {self.make_dict_response('info', 'ball', self.game_state)})
+    async def ball_move_thread(self):
+        # print('ball_move_thread function called, self: ', self)
+        while True:
+            # print('data: ', self.game_state)
+            self.paddle_ball_collision()
+            self.game_state['ball']['x'] += self.game_state['ball']['vx']
+            self.game_state['ball']['y'] += self.game_state['ball']['vy']
+            if self.game_state['ball']['x'] <= 0 or self.game_state['ball']['x'] >= 800:
+                if self.game_state['ball']['x'] <= 0:
+                    self.game_score['right'] += 1
+                else:
+                    self.game_score['left'] += 1
+                self.init_game_value(self)
+            if self.game_state['ball']['y'] <= 0 or self.game_state['ball']['y'] >= 400:
+                self.game_state['ball']['vy'] = -self.game_state['ball']['vy']
+            # self.channel_layer.group_send(self.game_id, {self.make_dict_response('info', 'ball', self.game_state)})
+            await self.channel_layer.group_send(self.game_id,
+                                                        {
+                                                            'type': 'game_status',
+                                                            'action': 'ball',
+                                                            'data': self.game_state,
+                                                            'sender_channel_name': self.channel_name,
+                                                        })
+            time.sleep(1)
+            # time.sleep(0.05)
 
-def paddle_ball_collision(self):
-    left_paddle1 = self.game_data.paddle1
-    left_paddle2 = self.game_data.paddle2
-    right_paddle3 = self.game_data.paddle3
-    right_paddle4 = self.game_data.paddle4
-    ball_x = self.game_state['ball']['x']
-    ball_y = self.game_state['ball']['y']
-    paddle_width = 10
-    paddle_height = 100
-    canvas_width = 800
-    if ((ball_x < paddle_width and ball_y > left_paddle1['y'] and ball_y < left_paddle1['y'] + paddle_height) or 
-        (ball_x + 20 < paddle_width and ball_y > left_paddle2['y'] and ball_y < left_paddle2['y'] + paddle_height) or
-        (ball_x > canvas_width - paddle_width and ball_y > right_paddle3['y'] and ball_y < right_paddle3['y'] + paddle_height) or
-        (ball_x - 20 > canvas_width - paddle_width and ball_y > right_paddle4['y'] and ball_y < right_paddle4['y'] + paddle_height)) :
-        self.game_state['ball']['vx'] = -self.game_state['ball']['vx']
+    def paddle_ball_collision(self):
+        left_paddle1 = self.game_data.paddle1
+        left_paddle2 = self.game_data.paddle2
+        right_paddle3 = self.game_data.paddle3
+        right_paddle4 = self.game_data.paddle4
+        ball_x = self.game_state['ball']['x']
+        ball_y = self.game_state['ball']['y']
+        paddle_width = 10
+        paddle_height = 100
+        canvas_width = 800
+        if ((ball_x < paddle_width and ball_y > left_paddle1['y'] and ball_y < left_paddle1['y'] + paddle_height) or 
+            (ball_x + 20 < paddle_width and ball_y > left_paddle2['y'] and ball_y < left_paddle2['y'] + paddle_height) or
+            (ball_x > canvas_width - paddle_width and ball_y > right_paddle3['y'] and ball_y < right_paddle3['y'] + paddle_height) or
+            (ball_x - 20 > canvas_width - paddle_width and ball_y > right_paddle4['y'] and ball_y < right_paddle4['y'] + paddle_height)) :
+            self.game_state['ball']['vx'] = -self.game_state['ball']['vx']
