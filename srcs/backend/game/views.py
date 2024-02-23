@@ -30,7 +30,7 @@ class GameRoomMakeView(View):
 		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, client1={'client_id':client_id, 'ready_status':0}, client2={}, client3={}, client4={})
 		new_data.save()
 		channel_layer.group_add(new_room_id, 'BACKEND')
-		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player})
+		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player, 'n_client' : 'client1'})
 		response.set_cookie('client_id', client_id)
 		return response
 
@@ -75,7 +75,7 @@ class GameRoomJoinView(View):
 			room.save()
 			client_id = create_new_uuid()
 			Nclient = self.check_client_id_for_data(game_id, client_id)
-			response = JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'client_id': client_id, 'N_client': Nclient})			
+			response = JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'client_id': client_id, 'n_client': Nclient})			
 			response.set_cookie('client_id', client_id)
 			return response
 		return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})

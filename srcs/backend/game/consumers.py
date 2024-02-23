@@ -22,17 +22,21 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             self.close()
         game_id = self.scope["url_route"]["kwargs"]["game_id"]
         self.game_id = game_id
-        try :
-            self.game_data = sync_to_async(MultiRoomInfo.objects.get(RoomName=game_id))
-        except MultiRoomInfo.DoesNotExist:
-            await self.send(text_data=json.dumps({'Error': 'Wrong Url ! (can not match game id)'}))
-            self.close()  
+        await self.get_game_data()
         self.game_start = False
-        self.initialize_game(self)
+        self.initialize_game()
         self.channel_layer.group_add(game_id, self.channel_name)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.game_id, self.channel_name)
+
+    @database_sync_to_async
+    def get_game_data(self):
+        try :
+            self.game_data = MultiRoomInfo.objects.get(RoomName=self.game_id)
+        except MultiRoomInfo.DoesNotExist:
+            self.send(text_data=json.dumps({'Error': 'Wrong Url ! (can not match game id)'}))
+            self.close()
 
     @database_sync_to_async
     def init_game_value(self):
@@ -68,20 +72,15 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def init_game_paddle(self):
-        if self.client_id == None:
-             return self.send(json.dumps({'Error': 'Client id is not exists'}))
         if self.game_data.paddle1 == None:
              self.game_data.paddle1 = self.client_id
-             self.game_data.save()
         elif self.game_data.paddle2 == None:
              self.game_data.paddle2 = self.client_id
-             self.game_data.save()
         elif self.game_data.paddle3 == None:
              self.game_data.paddle3 = self.client_id
-             self.game_data.save()
         elif self.game_data.paddle4 == None:
              self.game_data.paddle4 = self.client_id
-             self.game_data.save()
+        self.game_data.save()
 
     async def initialize_game(self):
         await self.init_game_paddle(self)
@@ -96,7 +95,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
     async def init_game_state(self):
         if self.game_data.paddle1 and self.game_data.paddle2 and self.game_data.paddle3 and self.game_data.paddle4:
             self.init_thread_ball()
-            await self.send(text_data=json.dumps({'type': 'game_state', 'data': self.game_state + self.game_score}))
+            await self.send(text_data=json.dumps({'type': 'game_state', 'data': self.game_state + self.game_score})) ## have to change send after client ready
 
     @database_sync_to_async
     def change_user_status(self, n_client):
