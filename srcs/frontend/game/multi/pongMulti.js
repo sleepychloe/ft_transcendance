@@ -1,34 +1,34 @@
-let gameSocket;
+// let gameSocket;
 
-function connectWebSocket() {
-	// Ensure WebSocket uses the correct protocol (wss for secure, ws for local development)
-	const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-	gameSocket = new WebSocket(`${protocol}${window.location.host}/ws/`);
+// function connectWebSocket() {
+// 	// Ensure WebSocket uses the correct protocol (wss for secure, ws for local development)
+// 	const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+// 	gameSocket = new WebSocket(`${protocol}${window.location.host}/ws/`);
 
-	gameSocket.onopen = function (event) {
-		console.log("WebSocket is open now.");
-	};
+// 	gameSocket.onopen = function (event) {
+// 		console.log("WebSocket is open now.");
+// 	};
 
-	gameSocket.onmessage = function (event) {
-		try {
-			let data = JSON.parse(event.data);
-			//     console.log("Parsed data:", data);
-			updateGameState(data);
-		} catch (error) {
-			console.error("Error parsing JSON:", error);
-		}
-	};
+// 	gameSocket.onmessage = function (event) {
+// 		try {
+// 			let data = JSON.parse(event.data);
+// 			//     console.log("Parsed data:", data);
+// 			updateGameState(data);
+// 		} catch (error) {
+// 			console.error("Error parsing JSON:", error);
+// 		}
+// 	};
 
-	gameSocket.onerror = function (error) {
-		console.error("WebSocket Error:", error);
-	};
+// 	gameSocket.onerror = function (error) {
+// 		console.error("WebSocket Error:", error);
+// 	};
 
-	gameSocket.onclose = function (event) {
-		console.error("WebSocket is closed now. Code:", event.code, "Reason:", event.reason);
-		// Attempt to reconnect after a delay
-		setTimeout(connectWebSocket, 5000);
-	};
-}
+// 	gameSocket.onclose = function (event) {
+// 		console.error("WebSocket is closed now. Code:", event.code, "Reason:", event.reason);
+// 		// Attempt to reconnect after a delay
+// 		setTimeout(connectWebSocket, 5000);
+// 	};
+// }
 
 // Initialize WebSocket connection
 document.addEventListener('DOMContentLoaded', function () {
@@ -40,35 +40,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	connectWebSocket();
 });
 
-let paddleX = 0, paddleY = 300;
-
-function updateGameState(data) {
-	if (data.type === 'game_state') {
-		const canvas = document.getElementById('pongCanvas');
-		const ctx = canvas.getContext('2d');
-		const ball = data.data.ball; // Correctly access the ball data
-		const ballSize = 10; // Define ballSize if not already defined
-
-		// Clear the canvas
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-		// Draw the ball
-		ctx.fillStyle = 'white';
-		ctx.beginPath();
-		if (data.data.ball)
-			ctx.arc(ball.x, ball.y, ballSize, 0, Math.PI * 2, false);
-		if (data.data.paddle) {
-			paddleX = data.data.paddle.x;
-			paddleY = data.data.paddle.y;
-		}
-		ctx.fillRect(paddleX, paddleY, 10, 100);
-		ctx.fill();
-	}
-}
-
 function sendPaddleMovement(direction) {
-	if (gameSocket && gameSocket.readyState === WebSocket.OPEN) {
-		gameSocket.send(JSON.stringify({
+	if (!ws) {
+		console.error("WebSocket has not been initialized.");
+		return;
+	    }
+	if (ws.readyState === WebSocket.OPEN) {
+		ws.send(JSON.stringify({
 			'action': 'move_paddle',
 			'type': 'move',
 			'direction': direction
@@ -79,17 +57,13 @@ function sendPaddleMovement(direction) {
 	}
 }
 
-// document.addEventListener("keydown", (e) => {
-// 	if (e.key === "ArrowLeft") {
-// 		sendPaddleMovement("left");
-// 	} else if (e.key === "ArrowRight") {
-// 		sendPaddleMovement("right");
-// 	} else if (e.key === "ArrowDown") {
-// 		sendPaddleMovement("down");
-// 	} else if (e.key === "ArrowUp") {
-// 		sendPaddleMovement("up");
-// 	}
-// });
+document.addEventListener("keydown", (e) => {
+	if (e.key === "ArrowDown") {
+		sendPaddleMovement("down");
+	} else if (e.key === "ArrowUp") {
+		sendPaddleMovement("up");
+	}
+});
 
 // function triggerUpdate() {
 // 	if (gameSocket.readyState === WebSocket.OPEN) {
@@ -153,6 +127,9 @@ function updateLobbySlot(quantity_player_ready) {
 	document.getElementsByClassName('lobby-space-counter')[0].innerHTML = quantity_player_ready + '/4 are ready';
 }
 
+
+let paddles = [];
+
 function reqWsConnection(url="") {
 	return new Promise((resolve, reject) => {
 		ws = new WebSocket(url);
@@ -184,15 +161,25 @@ function reqWsConnection(url="") {
 				if (response.type === 'ball') {
 					console.log('recieved ball data: ', data);
 
+					for (let key in data) {
+						if (data.hasOwnProperty(key) && key !== 'ball') { // Exclude the 'ball' key
+							let paddle = data[key];
+							paddles.push(paddle);
+						}
+					}
 					canvas = document.getElementById("pongCanvas");
 					ctx = canvas.getContext("2d");
 					let ball = data.ball;
 					ctx.clearRect(0, 0, 800, 400);
 					ctx.fillStyle = 'white';
+					ctx.fillRect(paddles[0].x, paddles[0].y, 10, 50);
+					ctx.fillRect(paddles[1].x, paddles[1].y, 10, 50);
+					ctx.fillRect(paddles[2].x, paddles[2].y, 10, 50);
+					ctx.fillRect(paddles[3].x, paddles[3].y, 10, 50);
+					paddles = [];
 					ctx.beginPath();
 					ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2, false);
 					ctx.fill();
-					
 				} else if (response.type === 'start') {
 					console.log('start the game');
 					document.getElementsByClassName('main-part')[0].innerHTML = `<div id=gameDashboard>
@@ -205,6 +192,10 @@ function reqWsConnection(url="") {
 					// enable user to control the game - eventListener(keypress)
 					// enable user to leave game at any time
 				}
+				// else if (response.action === 'move_paddle')
+				// {
+
+				// }
 			}
 		};
 		ws.onclose = (event) => {

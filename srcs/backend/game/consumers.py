@@ -66,19 +66,19 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             },
             self.game_data.paddle1: {
                 'x': 0,
-                'y': 150,
+                'y': 100,
             },
             self.game_data.paddle2: {
-                'x': 20,
-                'y': 150,
+                'x': 0,
+                'y': 300,
             },
             self.game_data.paddle3: {
                 'x': 790,
-                'y': 150,
+                'y': 100,
             },
             self.game_data.paddle4: {
-                'x': 770,
-                'y': 150,
+                'x': 790,
+                'y': 300,
             },
         }
         if self.game_start == False:
@@ -226,7 +226,14 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         elif action == 'move_paddle' and self.game_start == True:
                 direction = text_data_json.get('direction')
                 await self.move_paddle(direction)
-                self.send_game_state(self)
+                # self.send_game_state(self)
+                await self.channel_layer.group_send(self.game_id,
+                                                        {
+                                                            'type': 'game_status',
+                                                            'action': 'move_paddle',
+                                                            'data': self.game_state,
+                                                            'sender_channel_name': self.channel_name,
+                                                        })
         else:
             await self.send(await self.make_json_response('info', 'error', {'error': 'There is nothings to do!'}))
 
@@ -286,11 +293,9 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
     async def move_paddle(self, direction):
         if direction == 'down':
-            if self.game_state[self.client_id]['y'] < 300:
-                self.game_state[self.client_id]['y'] += 15
+                self.game_state[self.client_id]['y'] += 20
         elif direction == 'up':
-            if self.game_state[self.client_id]['y'] > 0:
-                self.game_state[self.client_id]['y'] -= 15
+                self.game_state[self.client_id]['y'] -= 20
         else:
             await self.send(await self.make_json_response('info', 'error', {'error': 'Can not understand paddle direction !'}))
 
