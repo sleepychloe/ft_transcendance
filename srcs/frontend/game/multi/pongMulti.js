@@ -48,7 +48,7 @@ function sendPaddleMovement(direction) {
 	if (ws.readyState === WebSocket.OPEN) {
 		ws.send(JSON.stringify({
 			'action': 'move_paddle',
-			'type': 'move',
+			'type': n_client,
 			'direction': direction
 		}));
 		console.log("Paddle movement sent:", direction);
@@ -60,6 +60,7 @@ function sendPaddleMovement(direction) {
 document.addEventListener("keydown", (e) => {
 	if (e.key === "ArrowDown") {
 		sendPaddleMovement("down");
+		console.log(`down | data.n_client: ${n_client}`);
 	} else if (e.key === "ArrowUp") {
 		sendPaddleMovement("up");
 	}
@@ -143,7 +144,6 @@ function reqWsConnection(url="") {
 
 			// websocket channel broadcasting
 			console.log('new broadcast arrived: ', response);
-
 			if (response.info === 'player') {
 				if (response.type === 'join') {
 					console.log('new player joined lobby: ', data.n_client);
@@ -161,22 +161,30 @@ function reqWsConnection(url="") {
 				if (response.type === 'ball') {
 					console.log('recieved ball data: ', data);
 
+					
+					canvas = document.getElementById("pongCanvas");
+					ctx = canvas.getContext("2d");
+					let ball = data.ball;
 					for (let key in data) {
 						if (data.hasOwnProperty(key) && key !== 'ball') { // Exclude the 'ball' key
 							let paddle = data[key];
 							paddles.push(paddle);
 						}
 					}
-					canvas = document.getElementById("pongCanvas");
-					ctx = canvas.getContext("2d");
-					let ball = data.ball;
 					ctx.clearRect(0, 0, 800, 400);
 					ctx.fillStyle = 'white';
 					ctx.fillRect(paddles[0].x, paddles[0].y, 10, 50);
 					ctx.fillRect(paddles[1].x, paddles[1].y, 10, 50);
 					ctx.fillRect(paddles[2].x, paddles[2].y, 10, 50);
 					ctx.fillRect(paddles[3].x, paddles[3].y, 10, 50);
-					paddles = [];
+					console.log(`paddle1: ${paddles[0].x}, ${paddles[0].y}`);
+					console.log(`paddle2: ${paddles[1].x}, ${paddles[1].y}`);
+					console.log(`paddle3: ${paddles[2].x}, ${paddles[2].y}`);
+					console.log(`paddle4: ${paddles[3].x}, ${paddles[3].y}`);
+					paddles.pop();
+					paddles.pop();
+					paddles.pop();
+					paddles.pop();
 					ctx.beginPath();
 					ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2, false);
 					ctx.fill();
@@ -192,10 +200,6 @@ function reqWsConnection(url="") {
 					// enable user to control the game - eventListener(keypress)
 					// enable user to leave game at any time
 				}
-				// else if (response.action === 'move_paddle')
-				// {
-
-				// }
 			}
 		};
 		ws.onclose = (event) => {
@@ -221,6 +225,7 @@ async function multiConnectWs(url="", data={}) {
 				'n_client': data.n_client,
 			},
 		};
+		n_client = data.n_client[6] - 1;
 		ws = await reqWsConnection(url + data.room_id + '/');
 		// alert to server `whoami`: client_id, n_client
 		ws.send(JSON.stringify(player_info));

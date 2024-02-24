@@ -1,5 +1,6 @@
 import { indexPage } from "./page.js";
 import { localpvpPage } from "./game/local_pvp/page.js";
+import { local3dPage } from "./game/local_3d/page.js";
 import { multiPage } from "./game/multi/page.js";
 import { tournamentPage } from "./game/tournament/page.js";
 import { createScriptTag } from "./game/createScriptTag.js";
@@ -16,6 +17,12 @@ export const routes = [
                 name: 'LOCAL GAME',
                 template: localpvpPage(),
                 script: createScriptTag('./game/local_pvp/pongLocal.js')
+        },
+        {
+                path: '/local_3d',
+                name: 'LOCAL 3D GAME',
+                template: local3dPage(),
+                script: createScriptTag('./game/local_3d/pongLocal3d.js')
         },
         {
                 path: '/tournament',

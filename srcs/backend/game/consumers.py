@@ -223,17 +223,17 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                                                     })
             else:
                 await self.send(await self.make_json_response('info', 'error', {'error': 'Type is undefined!'}))
-        elif action == 'move_paddle' and self.game_start == True:
+        elif action == 'move_paddle':
                 direction = text_data_json.get('direction')
                 await self.move_paddle(direction)
                 # self.send_game_state(self)
                 await self.channel_layer.group_send(self.game_id,
-                                                        {
-                                                            'type': 'game_status',
-                                                            'action': 'move_paddle',
-                                                            'data': self.game_state,
-                                                            'sender_channel_name': self.channel_name,
-                                                        })
+                                                    {
+                                                        'type': 'game_status',
+                                                        'action': 'ball',
+                                                        'data': self.game_state,  # Ensure this includes all paddles' and the ball's positions.
+                                                    }
+                                                )
         else:
             await self.send(await self.make_json_response('info', 'error', {'error': 'There is nothings to do!'}))
 
@@ -293,12 +293,42 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
     async def move_paddle(self, direction):
         if direction == 'down':
-                self.game_state[self.client_id]['y'] += 20
+                self.game_state[self.client_id]['y'] += 10
         elif direction == 'up':
-                self.game_state[self.client_id]['y'] -= 20
+                self.game_state[self.client_id]['y'] -= 10
         else:
             await self.send(await self.make_json_response('info', 'error', {'error': 'Can not understand paddle direction !'}))
+        # paddle_key = self.client_paddles.get(self.client_id)
+        # if paddle_key:
+        #     pass;
+        #     # Update the paddle position based on the direction
+        #     if direction == 'down':
+        #         self.game_state[paddle_key]['y'] += 20
+        #     elif direction == 'up':
+        #         self.game_state[paddle_key]['y'] -= 20
 
+        #     # Now, broadcast or send the updated game state
+        #     # await self.broadcast_game_state()
+        # else:
+        #     # Handle case where client's paddle could not be found or direction is invalid
+        #     await self.send_error('Invalid paddle or direction.')
+    
+    # async def broadcast_game_state(self):
+    #     game_state_json = self.make_json_response('game_state', 'update', self.game_state)
+    #     # Assuming you're using a group named after the game_id to communicate with all clients in the game
+    #     await self.channel_layer.group_send(
+    #         self.game_id,
+    #         {
+    #             "type": "game_state_message",
+    #             "message": game_state_json
+    #         }
+    #     )
+        
+    #     # Handler for game_state_message events. Adjust the method name as needed.
+    # async def game_state_message(self, event):
+    #     # Send the actual message
+    #     await self.send(text_data=event["message"])
+###########################
     async def ball_move_thread(self):
         # print('ball_move_thread function called, self: ', self)
         while True:
