@@ -243,9 +243,9 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(self.game_id,
                                                     {
                                                         'type': 'game_status',
-                                                        'action': 'move_paddle',
+                                                        'action': 'update',
                                                         'data': self.game_state,
-                                                        'sender_channel_name': self.channel_name
+                                                        'sender_channel_name': self.channel_name,
                                                     }
                                                 )
         else:
@@ -331,7 +331,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(self.game_id,
                                                         {
                                                             'type': 'game_status',
-                                                            'action': 'ball',
+                                                            'action': 'update',
                                                             'data': self.game_state,
                                                             'sender_channel_name': self.channel_name,
                                                         })

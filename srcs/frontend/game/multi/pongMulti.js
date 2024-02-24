@@ -1,10 +1,3 @@
-function sendPaddleMovement(direction) {
-	ws.send(JSON.stringify({
-		'action': 'move_paddle',
-		'direction': direction
-	}));
-	console.log("Paddle movement sent:", direction);
-}
 
 // function getCookie(name) {
 //     var cookieValue = null;
@@ -60,8 +53,23 @@ function updateLobbySlot(quantity_player_ready) {
 	document.getElementsByClassName('lobby-space-counter')[0].innerHTML = quantity_player_ready + '/4 are ready';
 }
 
+const sendPaddleMovement = async (e) => {
+	let direction = undefined;
 
-let paddles = [];
+	if (e.key === 'ArrowUp') {
+		direction = "up";
+	} else if (e.key === 'ArrowDown') {
+		direction = "down";
+	} else {
+		console.log('no such action: ', e.key);
+		return;
+	}
+	await ws.send(JSON.stringify({
+		'action': 'move_paddle',
+		'direction': direction,
+	}));
+	console.log("Paddle movement sent:", direction);
+}
 
 function reqWsConnection(url="") {
 	return new Promise((resolve, reject) => {
@@ -71,81 +79,57 @@ function reqWsConnection(url="") {
 			resolve(ws);
 		};
 		ws.onmessage = (event) => {
-			let response = JSON.parse(event.data);
-			let data = response.data;
+			const response = JSON.parse(event.data);
+			const data = response.data;
 
-			// websocket channel broadcasting
-			console.log('new broadcast arrived: ', response);
 			if (response.info === 'player') {
 				if (response.type === 'join') {
 					console.log('new player joined lobby: ', data.n_client);
 					lobbyPlayerComponent(data.n_client);
-				}
-				else if (response.type === 'ready') {
+				} else if (response.type === 'ready') {
 					console.log('player is ready to play: ', data.n_client);
 					updateLobbySlot(data.quantity_player_ready);
-				}
-				else if (response.type === 'unready') {
+					document.getElementsByClassName('btn-game-start')[0].style.display = 'none';
+					document.getElementsByClassName('ready')[0].style.display = 'block';
+				} else if (response.type === 'unready') {
 					console.log('player is NOT ready to play: ', data.n_client);
 					updateLobbySlot(data.quantity_player_ready);
+					document.getElementsByClassName('btn-game-start')[0].style.display = 'block';
+					document.getElementsByClassName('ready')[0].style.display = 'none';
+				} else {
+					console.log('wrong player info type has been recieved: ', response.type);
 				}
 			} else if (response.info === 'game') {
 				if (response.type === 'position') {
-					console.log('recieved data: ', data);
-
 					canvas = document.getElementById("pongCanvas");
 					ctx = canvas.getContext("2d");
-					let ball = data.ball;
-					for (let key in data) {
-						if (data.hasOwnProperty(key) && key !== 'ball') { // Exclude the 'ball' key
-							let paddle = data[key];
-							paddles.push(paddle);
-						}
-					}
-					ctx.clearRect(0, 0, 800, 400);
 					ctx.fillStyle = 'white';
-					ctx.fillRect(paddles[0].x, paddles[0].y, 10, 50);
-					ctx.fillRect(paddles[1].x, paddles[1].y, 10, 50);
-					ctx.fillRect(paddles[2].x, paddles[2].y, 10, 50);
-					ctx.fillRect(paddles[3].x, paddles[3].y, 10, 50);
-					// console.log(`paddle1: ${paddles[0].x}, ${paddles[0].y}`);
-					// console.log(`paddle2: ${paddles[1].x}, ${paddles[1].y}`);
-					// console.log(`paddle3: ${paddles[2].x}, ${paddles[2].y}`);
-					// console.log(`paddle4: ${paddles[3].x}, ${paddles[3].y}`);
-					paddles.pop();
-					paddles.pop();
-					paddles.pop();
-					paddles.pop();
-					ctx.beginPath();
-					ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2, false);
-					ctx.fill();
-				} else if (response.type === 'start') {
-					console.log('start the game');
-					document.getElementsByClassName('main-part')[0].innerHTML = `<div id=gameDashboard>
-					<h2>Score</h2>
-					<p>Player 1: <span id="score1">0</span></p>
-					<p>Player 2: <span id="score2">0</span></p>
-					</div>
-					<canvas id="pongCanvas" width="800" height="400"></canvas>`;
-
-					// removeEventListener on end of game
-					document.addEventListener("keydown", (e) => {
-						if (e.key === "ArrowDown") {
-							sendPaddleMovement("down");
-							console.log(`down | data.n_client: ${n_client}`);
-						} else if (e.key === "ArrowUp") {
-							sendPaddleMovement("up");
+					ctx.clearRect(0, 0, 800, 400);
+					Object.entries(data).forEach(([key, value]) => {
+						if (key === 'ball') {
+							ctx.beginPath();
+							ctx.arc(value.x, value.y, 10, 0, Math.PI * 2, false);
+							ctx.fill();
+						} else {
+							ctx.fillRect(value.x, value.y, 10, 50);
 						}
 					});
-					// game logic
-					// enable user to control the game - eventListener(keypress)
-					// enable user to leave game at any time
+				} else if (response.type === 'start') {
+					console.log('start the game');
+					document.getElementsByClassName('main-part')[0].innerHTML = '';
+					document.getElementsByClassName('main-part')[0].appendChild(multiGameScreenComponent());
+					document.addEventListener('keydown', sendPaddleMovement);
+				} else if (response.type === 'finish') {
+					console.log('finish the game');
+					document.removeEventListener('keydown', sendPaddleMovement);
+				} else {
+					console.log('wrong game info type has been recieved: ', response.type);
 				}
 			}
 		};
 		ws.onclose = (event) => {
 			console.log('websocket closed');
-			// playerLobbyDisconnect(playerId); // from lobbyPlayersList
+			// playerLobbyDisconnect(); // from lobbyPlayersList
 			// setTimeout(reqWsConnection(url), 1000);
 		}
 		ws.onerror = (error) => {
@@ -156,7 +140,6 @@ function reqWsConnection(url="") {
 }
 
 async function multiConnectWs(url="", data={}) {
-	// first connection to the room's ws
 	try {
 		let player_info = {
 			'action': 'update',
@@ -168,7 +151,6 @@ async function multiConnectWs(url="", data={}) {
 		};
 		n_client = data.n_client[6] - 1;
 		ws = await reqWsConnection(url + data.room_id + '/');
-		// alert to server `whoami`: client_id, n_client
 		ws.send(JSON.stringify(player_info));
 		return ws;
 	} catch (error) {
@@ -177,17 +159,17 @@ async function multiConnectWs(url="", data={}) {
 }
 
 async function multiPlayerSetReady(ws={}, data={}) {
-	console.log('player send ready to server: ', data);
-	document.getElementsByClassName('btn-game-start')[0].style.display = 'none';
-	document.getElementsByClassName('ready')[0].style.display = 'block';
+	// console.log('player send ready to server: ', data);
+	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'none';
 	await ws.send(JSON.stringify(data));
+	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'visible';
 }
 
 async function multiPlayerUnsetReady(ws={}, data={}) {
-	console.log('player send unready to server: ', data);
-	document.getElementsByClassName('btn-game-start')[0].style.display = 'block';
-	document.getElementsByClassName('ready')[0].style.display = 'none';
+	// console.log('player send unready to server: ', data);
+	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'none';
 	await ws.send(JSON.stringify(data));
+	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'visible';
 }
 
 async function reqCreateRoom(url="", data={}) {
@@ -222,7 +204,6 @@ function multiCreateRoom() {
 	reqCreateRoom(apiMakeroom, { "room_name": roomName }).then(async (data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 		if (data && !data.Error) {
-			// debugging
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -235,7 +216,6 @@ function multiCreateRoom() {
 			mainPart.appendChild(lobbyListPlayersComponent(data));
 			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
 		} else {
-			// debugging
 			console.groupCollapsed('server responded with error');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -251,7 +231,7 @@ async function reqJoinRoom(url="", room_id="") {
 		const result = await response.json();
 		return result;
 	} catch (error) {
-		console.error("error while joining room: ", error);
+		console.error('error while joining room: ', error);
 		return null;
 	}
 }
@@ -266,7 +246,6 @@ function multiJoinRoom() {
 	reqJoinRoom(apiJoinroom, room_id).then(async (data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 		if (data && !data.Error) {
-			// debugging
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -281,7 +260,6 @@ function multiJoinRoom() {
 			mainPart.appendChild(lobbyListPlayersComponent(data));
 			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
 		} else {
-			// debugging
 			console.groupCollapsed('server responded with error');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -300,11 +278,10 @@ async function getListRoom(url = "") {
 		const result = await response.json();
 		return result;
 	} catch (error) {
-		console.error("error while getting room list (GET): ", error);
-		return {"Error":"no lobby found"};
+		console.error('error while getting room list (GET): ', error);
+		return {'Error': 'couldn\'t get lobby data from the server'};
 	}
 }
-
 
 function multiListRoom() {
 	console.log('sending request to list room...');
@@ -314,15 +291,13 @@ function multiListRoom() {
 		let mainPart = document.getElementsByClassName('main-part')[0];
 
 		if (data.length === 0) {
-			// debugging
 			console.groupCollapsed('server responded successfully');
-			console.log('data: ', data);
+				console.log('data: ', data);
 			console.groupEnd();
 			
 			mainPart.innerHTML = '';
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		} else if (data && data.length > 0) {
-			// debugging
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -330,7 +305,6 @@ function multiListRoom() {
 			mainPart.innerHTML = '';
 			mainPart.appendChild(lobbyListRoomComponent(data));
 		} else {
-			// debugging
 			console.groupCollapsed('server responded with error');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -340,7 +314,3 @@ function multiListRoom() {
 		}
 	});
 };
-
-// document.getElementsByClassName('main-part')[0].innerHTML = multiDefaultPageComponent();
-// document.getElementsByClassName('overlay')[0].addEventListener('click', modalClose);
-// lobbyRooms[i].addEventListener('click', multiJoinRoom);

@@ -28,6 +28,14 @@ function lobbyComponent() {
                 </div>`
 };
 
+function multiGameScreenComponent() {
+	let gameCanvas = document.createElement('canvas');
+	gameCanvas.setAttribute('id', 'pongCanvas');
+	gameCanvas.setAttribute('width', '800');
+	gameCanvas.setAttribute('height', '400');
+	return gameCanvas;
+}
+
 function lobbyListRoomComponent(data) {
 	let lobbyRoomList;
 	var i = 0;
@@ -136,8 +144,8 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 				'action': 'update',
 				'type': 'ready_status',
 				'data': {
-					'n_client': data.n_client
-				}
+					'n_client': data.n_client,
+				},
 			},
 		);
 	});
@@ -152,8 +160,8 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 				'action': 'update',
 				'type': 'unready_status',
 				'data': {
-					'n_client': data.n_client
-				}
+					'n_client': data.n_client,
+				},
 			},
 		);
 	});
