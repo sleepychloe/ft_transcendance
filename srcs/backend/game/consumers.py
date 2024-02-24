@@ -193,7 +193,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                 await self.player_ready(n_client)
                 await self.channel_layer.group_send(self.game_id,
                                                     {
-                                                        'type': 'room_inform', # pre-defined
+                                                        'type': 'room_inform',
                                                         'action': 'ready',
                                                         'n_client': n_client,
                                                         'quantity_player_ready': self.game_data.QuantityPlayerReady,
@@ -205,7 +205,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                 await self.player_unready(n_client)
                 await self.channel_layer.group_send(self.game_id,
                                                     {
-                                                        'type': 'room_inform', # pre-defined
+                                                        'type': 'room_inform',
                                                         'action': 'unready',
                                                         'n_client': n_client,
                                                         'quantity_player_ready': self.game_data.QuantityPlayerReady,
@@ -215,7 +215,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                 n_client = data['n_client']
                 await self.channel_layer.group_send(self.game_id,
                                                     {
-                                                        'type': 'room_inform', # pre-defined
+                                                        'type': 'room_inform',
                                                         'action': 'join',
                                                         'n_client': n_client,
                                                         'quantity_player_ready': self.game_data.QuantityPlayerReady,
@@ -230,8 +230,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_send(self.game_id,
                                                     {
                                                         'type': 'game_status',
-                                                        'action': 'ball',
-                                                        'data': self.game_state,  # Ensure this includes all paddles' and the ball's positions.
+                                                        'action': 'update',
+                                                        'data': self.game_state,
                                                     }
                                                 )
         else:
@@ -241,7 +241,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
     async def game_status(self, event):
         action = event['action']
         data = event['data']
-        print('game_status !!!!!!!!!!!!!!!!!')
 
         if action == 'start':
             await self.send(text_data=json.dumps({
@@ -249,10 +248,10 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
                     'type': 'start',
                     'data': {},
                 }))
-        if action == 'ball':
+        if action == 'update':
             await self.send(text_data=json.dumps({
                     'info': 'game',
-                    'type': 'ball',
+                    'type': 'position',
                     'data': data,
                 }))
 
@@ -266,7 +265,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
             if action == 'join':
                 await self.send(text_data=json.dumps({
                     'info': 'player',
-                    'type': 'join', # new
+                    'type': 'join',
                     'data': {
                         'n_client': n_client,
                         'quantity_player_ready': quantity_player_ready,
@@ -275,7 +274,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         if action == 'ready':
             await self.send(text_data=json.dumps({
                 'info': 'player',
-                'type': 'ready', # new
+                'type': 'ready',
                 'data': {
                     'n_client': n_client,
                     'quantity_player_ready': quantity_player_ready,
@@ -284,7 +283,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
         elif action == 'unready':
             await self.send(text_data=json.dumps({
                 'info': 'player',
-                'type': 'unready', # new
+                'type': 'unready',
                 'data': {
                     'n_client': n_client,
                     'quantity_player_ready': quantity_player_ready,

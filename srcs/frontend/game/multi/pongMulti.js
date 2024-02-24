@@ -1,78 +1,10 @@
-// let gameSocket;
-
-// function connectWebSocket() {
-// 	// Ensure WebSocket uses the correct protocol (wss for secure, ws for local development)
-// 	const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-// 	gameSocket = new WebSocket(`${protocol}${window.location.host}/ws/`);
-
-// 	gameSocket.onopen = function (event) {
-// 		console.log("WebSocket is open now.");
-// 	};
-
-// 	gameSocket.onmessage = function (event) {
-// 		try {
-// 			let data = JSON.parse(event.data);
-// 			//     console.log("Parsed data:", data);
-// 			updateGameState(data);
-// 		} catch (error) {
-// 			console.error("Error parsing JSON:", error);
-// 		}
-// 	};
-
-// 	gameSocket.onerror = function (error) {
-// 		console.error("WebSocket Error:", error);
-// 	};
-
-// 	gameSocket.onclose = function (event) {
-// 		console.error("WebSocket is closed now. Code:", event.code, "Reason:", event.reason);
-// 		// Attempt to reconnect after a delay
-// 		setTimeout(connectWebSocket, 5000);
-// 	};
-// }
-
-// Initialize WebSocket connection
-document.addEventListener('DOMContentLoaded', function () {
-	if (document.getElementById('pongCanvas')) {
-		console.log("Canvas is initialized.");
-	} else {
-		console.log("Canvas is not found.");
-	}
-	connectWebSocket();
-});
-
 function sendPaddleMovement(direction) {
-	if (!ws) {
-		console.error("WebSocket has not been initialized.");
-		return;
-	    }
-	if (ws.readyState === WebSocket.OPEN) {
-		ws.send(JSON.stringify({
-			'action': 'move_paddle',
-			'type': n_client,
-			'direction': direction
-		}));
-		console.log("Paddle movement sent:", direction);
-	} else {
-		console.error("WebSocket is not open. Unable to send message.");
-	}
+	ws.send(JSON.stringify({
+		'action': 'move_paddle',
+		'direction': direction
+	}));
+	console.log("Paddle movement sent:", direction);
 }
-
-document.addEventListener("keydown", (e) => {
-	if (e.key === "ArrowDown") {
-		sendPaddleMovement("down");
-		console.log(`down | data.n_client: ${n_client}`);
-	} else if (e.key === "ArrowUp") {
-		sendPaddleMovement("up");
-	}
-});
-
-// function triggerUpdate() {
-// 	if (gameSocket.readyState === WebSocket.OPEN) {
-// 		gameSocket.send(JSON.stringify({ action: 'update' })); // Trigger an update
-// 	}
-// }
-
-// setInterval(triggerUpdate, 1000 / 60); // Trigger updates at ~60fps
 
 // function getCookie(name) {
 //     var cookieValue = null;
@@ -158,10 +90,9 @@ function reqWsConnection(url="") {
 					updateLobbySlot(data.quantity_player_ready);
 				}
 			} else if (response.info === 'game') {
-				if (response.type === 'ball') {
-					console.log('recieved ball data: ', data);
+				if (response.type === 'position') {
+					console.log('recieved data: ', data);
 
-					
 					canvas = document.getElementById("pongCanvas");
 					ctx = canvas.getContext("2d");
 					let ball = data.ball;
@@ -177,10 +108,10 @@ function reqWsConnection(url="") {
 					ctx.fillRect(paddles[1].x, paddles[1].y, 10, 50);
 					ctx.fillRect(paddles[2].x, paddles[2].y, 10, 50);
 					ctx.fillRect(paddles[3].x, paddles[3].y, 10, 50);
-					console.log(`paddle1: ${paddles[0].x}, ${paddles[0].y}`);
-					console.log(`paddle2: ${paddles[1].x}, ${paddles[1].y}`);
-					console.log(`paddle3: ${paddles[2].x}, ${paddles[2].y}`);
-					console.log(`paddle4: ${paddles[3].x}, ${paddles[3].y}`);
+					// console.log(`paddle1: ${paddles[0].x}, ${paddles[0].y}`);
+					// console.log(`paddle2: ${paddles[1].x}, ${paddles[1].y}`);
+					// console.log(`paddle3: ${paddles[2].x}, ${paddles[2].y}`);
+					// console.log(`paddle4: ${paddles[3].x}, ${paddles[3].y}`);
 					paddles.pop();
 					paddles.pop();
 					paddles.pop();
@@ -196,6 +127,16 @@ function reqWsConnection(url="") {
 					<p>Player 2: <span id="score2">0</span></p>
 					</div>
 					<canvas id="pongCanvas" width="800" height="400"></canvas>`;
+
+					// removeEventListener on end of game
+					document.addEventListener("keydown", (e) => {
+						if (e.key === "ArrowDown") {
+							sendPaddleMovement("down");
+							console.log(`down | data.n_client: ${n_client}`);
+						} else if (e.key === "ArrowUp") {
+							sendPaddleMovement("up");
+						}
+					});
 					// game logic
 					// enable user to control the game - eventListener(keypress)
 					// enable user to leave game at any time
