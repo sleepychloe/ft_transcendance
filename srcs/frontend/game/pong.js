@@ -160,12 +160,14 @@ function resetGame() {
     score2 = 0;
     document.getElementById("score1").textContent = score1;
     document.getElementById("score2").textContent = score2;
-    for (let i = 1; i <= document.getElementById("numPlayers").value; i++) {
-        document.getElementById(`player${i}`).value = "";
+    if (tournamentModeFlag === 1) {
+        for (let i = 1; i <= document.getElementById("numPlayers").value; i++) {
+            document.getElementById(`player${i}`).value = "";
+        }
+        document.getElementById("numPlayers").value = "empty";
+        document.getElementById("playerInputs").innerHTML = '';
+        players = [];
     }
-    document.getElementById("numPlayers").value = "empty";
-    document.getElementById("playerInputs").innerHTML = '';
-    players = [];
     currentMatchIndex = 0;
 }
 
@@ -179,18 +181,3 @@ function resetToHomeScreen() {
         document.getElementById("modeSelection").style.display = "block";
         tournamentModeFlag = 0;
 }
-
-// function getCookie(name) {
-//     var cookieValue = null;
-//     if (document.cookie && document.cookie !== '') {
-//         var cookies = document.cookie.split(';');
-//         for (var i = 0; i < cookies.length; i++) {
-//             var cookie = cookies[i].trim();
-//             if (cookie.substring(0, name.length + 1) === (name + '=')) {
-//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-//                 break;
-//             }
-//         }
-//     }
-//     return cookieValue;
-// }
