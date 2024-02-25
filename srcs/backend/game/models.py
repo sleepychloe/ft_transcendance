@@ -14,10 +14,10 @@ class MultiRoomInfo(models.Model):
         client3 = models.JSONField(null=True)
         client4 = models.JSONField(null=True)
 
-        paddle1 = models.CharField()
-        paddle2 = models.CharField()
-        paddle3 = models.CharField()
-        paddle4 = models.CharField()
+        paddle1 = models.JSONField(null=True)
+        paddle2 = models.JSONField(null=True)
+        paddle3 = models.JSONField(null=True)
+        paddle4 = models.JSONField(null=True)
 
         class Meta:
                 db_table = 'room_info'

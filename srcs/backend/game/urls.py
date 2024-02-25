@@ -5,5 +5,5 @@ urlpatterns = [
 	path('makeroom/', GameRoomMakeView.as_view()),
 	path('listroom/', GameRoomListView.as_view()),
 	path('<str:game_id>/', GameRoomJoinView.as_view()),
-	# path('init/', GameInitView.as_view()),
+	# path('<str:game_id>/start', GameStartView.as_view()),
 ]

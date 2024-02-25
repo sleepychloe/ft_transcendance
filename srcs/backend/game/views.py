@@ -67,7 +67,9 @@ class GameRoomJoinView(View):
 		except MultiRoomInfo.DoesNotExist:
 				return JsonResponse({'Error' : 'Game id URL is not exists'})
 		client_id = request.COOKIES.get('client_id')
-		if client_id:
+		if room.GameStatus == True:
+			return JsonResponse({'reconnect': client_id})
+		elif client_id:
 			return JsonResponse({'Error' : 'Can not request several time in same browser'})
 
 		if room.QuantityPlayer < 4 and not client_id:
@@ -83,35 +85,22 @@ class GameRoomJoinView(View):
 	@staticmethod
 	def check_client_id_for_data(game_id, client_id):
 		room = MultiRoomInfo.objects.get(Roomid=game_id)
-		# print('room: ', room)
-		# print('room.client1: ', room.client1)
-		# print('room.client2: ', room.client2)
-		# print('room.client3: ', room.client3)
-		# print('room.client4: ', room.client4)
-		# print('room.client1[\'client_id\']: ', room.client1['client_id'])
-		# print('room.client2[\'client_id\']: ', room.client2['client_id'])
-		# print('room.client3[\'client_id\']: ', room.client3['client_id'])
-		# print('room.client4[\'client_id\']: ', room.client4['client_id'])
 		if not room.client1:
-			# print('client1')
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client1 = {'client_id': client_id, 'ready_status':"not ready"}
+			instance.client1 = {'client_id': client_id,  'ready_status':"not ready"}
 			instance.save()
 			return "client1"
 		elif not room.client2:
-			# print('client2')
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client2 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client2"
 		elif not room.client3:
-			# print('client3')
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client3 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
 			return "client3"
 		elif not room.client4:
-			# print('client4')
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
 			instance.client4 = {'client_id': client_id, 'ready_status':"not ready"}
 			instance.save()
@@ -143,5 +132,11 @@ class GameRoomJoinView(View):
 			room.client4 = None
 		room.save()
 
-
-# class GameInitView(View):
+# class GameStartView(View):
+# 	def get(self, request, game_id):
+# 		layer = get_channel_layer()
+# 		print(game_id)
+# 		print(layer)
+# 		layer.group_add(game_id, 'websocket.consumer.channel_name')
+# 		layer.group_send(game_id, {'Hi': 'hi'})
+# 		return JsonResponse({})
