@@ -36,7 +36,7 @@ function multiGameScreenComponent() {
 	return gameCanvas;
 }
 
-function lobbyListRoomComponent(data) {
+function lobbyListRoomComponent(data={}) {
 	let lobbyRoomList;
 	var i = 0;
 	try {
@@ -72,15 +72,14 @@ function lobbyListRoomComponent(data) {
 	return lobbyRoomList;
 }
 
-function lobbyPlayersReadyComponent(quantity_player_ready) {
+function lobbyPlayersReadyComponent(quantity_player_ready=0) {
 	let lobbySlot = document.createElement('div');
 	lobbySlot.classList.add('lobby-space-counter');
-	// need to pass ready players count
 	lobbySlot.innerHTML = quantity_player_ready + '/4 are ready';
 	return lobbySlot;
 }
 
-function lobbyPlayersListItemComponent(playerId) {
+function lobbyPlayersListItemComponent(playerId=0) {
 	let lobbyPlayerList;
 	lobbyPlayerList = document.createElement('div');
 	lobbyPlayerList.classList.add('lobby-players-list');
@@ -115,7 +114,7 @@ function lobbyPlayersListItemComponent(playerId) {
 	return lobbyPlayerList;
 }
 
-function lobbyListPlayersComponent(room) {
+function lobbyListPlayersComponent(room={}) {
 	let lobbyPlayerList;
 	lobbyPlayerList = document.createElement('div');
 	lobbyPlayerList.classList.add('lobby-players-list');
@@ -171,7 +170,7 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 	return buttonDiv;
 }
 
-function lobbyPlayerComponent(n_client) {
+function lobbyPlayerComponent(n_client=0) {
 	let playerId = {
 		'client1': 0,
 		'client2': 1,
@@ -181,7 +180,7 @@ function lobbyPlayerComponent(n_client) {
 	document.getElementsByClassName('lobby-players-list')[0].appendChild(lobbyPlayersListItemComponent(playerId[n_client]));
 }
 
-function responseMsgComponent(text="fatal error") {
+function responseMsgComponent(text="error") {
 	let msg = document.createElement('p');
 	msg.classList.add('list-room-status-msg');
 	msg.innerHTML = text;

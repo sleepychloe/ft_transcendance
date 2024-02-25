@@ -1,4 +1,15 @@
 
+// language
+// task: have to put in external .json file and fetch from api server
+// depending on user language setting
+
+// problem: how to change language after loading first one
+const languagePack = {
+	'error': {
+		'lobbyFull': 'lobby is full!',
+	},
+};
+
 // function getCookie(name) {
 //     var cookieValue = null;
 //     if (document.cookie && document.cookie !== '') {
@@ -49,7 +60,7 @@ function modalClose() {
 	document.getElementsByClassName('overlay')[0].style.visibility = 'hidden';
 }
 
-function updateLobbySlot(quantity_player_ready) {
+function updateLobbySlot(quantity_player_ready=0) {
 	document.getElementsByClassName('lobby-space-counter')[0].innerHTML = quantity_player_ready + '/4 are ready';
 }
 
@@ -61,14 +72,14 @@ const sendPaddleMovement = async (e) => {
 	} else if (e.key === 'ArrowDown') {
 		direction = "down";
 	} else {
-		console.log('no such action: ', e.key);
+		console.warn('no such action: ', e.key);
 		return;
 	}
 	await ws.send(JSON.stringify({
 		'action': 'move_paddle',
 		'direction': direction,
 	}));
-	console.log("Paddle movement sent:", direction);
+	// console.log("Paddle movement sent:", direction);
 }
 
 function reqWsConnection(url="") {
@@ -89,15 +100,11 @@ function reqWsConnection(url="") {
 				} else if (response.type === 'ready') {
 					console.log('player is ready to play: ', data.n_client);
 					updateLobbySlot(data.quantity_player_ready);
-					document.getElementsByClassName('btn-game-start')[0].style.display = 'none';
-					document.getElementsByClassName('ready')[0].style.display = 'block';
 				} else if (response.type === 'unready') {
 					console.log('player is NOT ready to play: ', data.n_client);
 					updateLobbySlot(data.quantity_player_ready);
-					document.getElementsByClassName('btn-game-start')[0].style.display = 'block';
-					document.getElementsByClassName('ready')[0].style.display = 'none';
 				} else {
-					console.log('wrong player info type has been recieved: ', response.type);
+					console.warn('wrong player info type has been recieved: ', response.type);
 				}
 			} else if (response.info === 'game') {
 				if (response.type === 'position') {
@@ -123,7 +130,7 @@ function reqWsConnection(url="") {
 					console.log('finish the game');
 					document.removeEventListener('keydown', sendPaddleMovement);
 				} else {
-					console.log('wrong game info type has been recieved: ', response.type);
+					console.warn('wrong game info type has been recieved: ', response.type);
 				}
 			}
 		};
@@ -133,7 +140,7 @@ function reqWsConnection(url="") {
 			// setTimeout(reqWsConnection(url), 1000);
 		}
 		ws.onerror = (error) => {
-			console.log('websocket connection has error: calling reject');
+			console.error('websocket connection has error: calling reject');
 			reject(error);
 		};
 	});
@@ -149,12 +156,11 @@ async function multiConnectWs(url="", data={}) {
 				'n_client': data.n_client,
 			},
 		};
-		n_client = data.n_client[6] - 1;
 		ws = await reqWsConnection(url + data.room_id + '/');
 		ws.send(JSON.stringify(player_info));
 		return ws;
 	} catch (error) {
-		console.log('error on establishing websocket connection: ', error);
+		console.error('error on establishing websocket connection: ', error);
 	}
 }
 
@@ -163,6 +169,8 @@ async function multiPlayerSetReady(ws={}, data={}) {
 	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'none';
 	await ws.send(JSON.stringify(data));
 	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'visible';
+	document.getElementsByClassName('btn-game-start')[0].style.display = 'none';
+	document.getElementsByClassName('ready')[0].style.display = 'block';
 }
 
 async function multiPlayerUnsetReady(ws={}, data={}) {
@@ -170,6 +178,8 @@ async function multiPlayerUnsetReady(ws={}, data={}) {
 	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'none';
 	await ws.send(JSON.stringify(data));
 	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'visible';
+	document.getElementsByClassName('btn-game-start')[0].style.display = 'block';
+	document.getElementsByClassName('ready')[0].style.display = 'none';
 }
 
 async function reqCreateRoom(url="", data={}) {
@@ -187,7 +197,8 @@ async function reqCreateRoom(url="", data={}) {
 		const result = await response.json();
 		return result;
 	} catch (error) {
-		return {'Error':'POST ' + url + ' Failed'};
+		console.error('couldn\'t request to server to create a room: ', error);
+		return {'error': 'failed to load data from server'};
 	}
 }
 
@@ -203,23 +214,22 @@ function multiCreateRoom() {
 	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
 	reqCreateRoom(apiMakeroom, { "room_name": roomName }).then(async (data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
-		if (data && !data.Error) {
+		mainPart.innerHTML = '';
+		if (data && !data.error) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
 
 			ws = await multiConnectWs(wsBaseURL, data);
 
-			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
 			mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
 			mainPart.appendChild(lobbyListPlayersComponent(data));
 			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
 		} else {
 			console.groupCollapsed('server responded with error');
-				console.log('data: ', data);
+				console.error('data: ', data);
 			console.groupEnd();
-			
 			mainPart.innerHTML = multiDefaultPageComponent();
 		}
 	});
@@ -231,8 +241,8 @@ async function reqJoinRoom(url="", room_id="") {
 		const result = await response.json();
 		return result;
 	} catch (error) {
-		console.error('error while joining room: ', error);
-		return null;
+		console.error('couldn\'t request to server to join a room: ', error);
+		return {'error': 'failed to load data from server'};
 	}
 }
 
@@ -245,7 +255,8 @@ function multiJoinRoom() {
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
 	reqJoinRoom(apiJoinroom, room_id).then(async (data) => {
 		let mainPart = document.getElementsByClassName('main-part')[0];
-		if (data && !data.Error) {
+		mainPart.innerHTML = '';
+		if (data && !data.error) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -254,23 +265,22 @@ function multiJoinRoom() {
 			// first websocket connection establish here
 			ws = await multiConnectWs(wsBaseURL, data);
 
-			mainPart.innerHTML = '';
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
 			mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
 			mainPart.appendChild(lobbyListPlayersComponent(data));
 			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
 		} else {
 			console.groupCollapsed('server responded with error');
-				console.log('data: ', data);
+				console.error('data: ', data);
 			console.groupEnd();
-
-			mainPart.innerHTML = '';
-			mainPart.appendChild(responseMsgComponent(data.Error));
+			// need a server to send a status code to determine what error to display
+			mainPart.appendChild(responseMsgComponent(languagePack.error.lobbyFull));
+			// mainPart.appendChild(responseMsgComponent(data.error));
 		}
 	});
 }
 
-async function getListRoom(url = "") {
+async function getListRoom(url="") {
 	try {
 		const response = await fetch(url, {
 			method: 'GET',
@@ -278,8 +288,8 @@ async function getListRoom(url = "") {
 		const result = await response.json();
 		return result;
 	} catch (error) {
-		console.error('error while getting room list (GET): ', error);
-		return {'Error': 'couldn\'t get lobby data from the server'};
+		console.error('couldn\'t request to server to get list room: ', error);
+		return {'error': 'failed to load data from server'};
 	}
 }
 
@@ -296,7 +306,7 @@ function multiListRoom() {
 			console.groupEnd();
 			
 			mainPart.innerHTML = '';
-			mainPart.appendChild(responseMsgComponent(data.Error));
+			mainPart.appendChild(responseMsgComponent(data.error));
 		} else if (data && data.length > 0) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
@@ -306,11 +316,11 @@ function multiListRoom() {
 			mainPart.appendChild(lobbyListRoomComponent(data));
 		} else {
 			console.groupCollapsed('server responded with error');
-				console.log('data: ', data);
+				console.error('data: ', data);
 			console.groupEnd();
 
 			mainPart.innerHTML = '';
-			mainPart.appendChild(responseMsgComponent(data.Error));
+			mainPart.appendChild(responseMsgComponent(data.error));
 		}
 	});
 };
