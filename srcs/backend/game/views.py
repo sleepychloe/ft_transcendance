@@ -61,20 +61,22 @@ class GameRoomListView(View):
 
 class GameRoomJoinView(View):
 	def search_client_data(self, room, client_id):
+		print("search_client_data:", room)
+		print("serarch_client_id:",client_id)
 		if room.client1['client_id'] == client_id:
 			return room.client1['client_id']
 		elif room.client2['client_id'] == client_id:
-			return room.client1['client_id']
+			return room.client2['client_id']
 		elif room.client3['client_id'] == client_id:
-			return room.client1['client_id']
+			return room.client3['client_id']
 		elif room.client4['client_id'] == client_id:
-			return room.client1['client_id']
+			return room.client4['client_id']
 		return None
 
 	def get(self, request, game_id):
 		try:
 			room = MultiRoomInfo.objects.get(Roomid=game_id)
-			print("very first room", room)
+			print("very first room:", room)
 		except MultiRoomInfo.DoesNotExist:
 				return JsonResponse({'Error' : 'Game id URL is not exists'})
 		client_id = request.COOKIES.get('client_id')

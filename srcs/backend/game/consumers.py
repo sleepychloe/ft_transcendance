@@ -51,7 +51,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		game_id = self.scope["url_route"]["kwargs"]["game_id"]
 		self.game_id = game_id
 		await self.get_game_data()
-		print(self.game_data)
+		print("gamedata in ws:",self.game_data)
 		if self.game_data.GameStatus == True:
 			self.n_client = await self.search_client_data()
 			if self.n_client == None:
@@ -114,6 +114,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def remove_client_data(self):
+		self.get_game_data()
 		if self.game_data.GameStatus == False:
 			if self.game_data.client1['client_id'] == self.client_id:
 				self.game_data.client1 = {'client_id': None}
@@ -133,7 +134,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			elif self.number_paddle == 'paddle4':
 				self.game_data.paddle4 = None
 		self.game_data.QuantityPlayer -= 1
-		self.game_data.QuantityPlayerReady -= 1
+		if self.game_data.QuantityPlayerReady > 0:
+			self.game_data.QuantityPlayerReady -= 1
 		self.game_data.save()
 		self.get_game_data()
 
@@ -147,6 +149,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def init_game_value(self):
+		self.get_game_data()
 		self.vx = 2 + 1.5 * random.random()
 		self.vy = 2 + 1.5 * random.random()
 		self.game_state = {
@@ -164,6 +167,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		self.game_data.save()
 
 	def init_game_paddle_data(self):
+		self.get_game_data()
 		if self.number_paddle == 'paddle1':
 			self.game_data.paddle1 = {
 				'x': 0,
@@ -188,6 +192,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def init_game_paddle(self):
+		self.get_game_data()
 		if not self.game_data.paddle1:
 			self.number_paddle = 'paddle1'
 			self.game_data.client1['paddle'] = 'paddle1'
@@ -200,7 +205,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		elif not self.game_data.paddle4:
 			self.number_paddle = 'paddle4'
 			self.game_data.client4['paddle'] = 'paddle4'
-		print(self.number_paddle)
 		self.game_data.save()
 
 	async def initialize_game(self):
@@ -209,6 +213,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def player_ready(self, n_client):
+		self.get_game_data()
 		if n_client == 'client1':
 			self.game_data.client1['ready_status'] = "ready"
 		elif n_client == 'client2':
@@ -222,6 +227,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def player_unready(self, n_client):
+		self.get_game_data()
 		if n_client == 'client1':
 			self.game_data.client1['ready_status'] = "not ready"
 		elif n_client == 'client2':
@@ -250,6 +256,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
 	@database_sync_to_async
 	def save_game_start_status(self, status):
+		self.get_game_data()
 		self.game_data.GameStatus = status
 		self.game_data.save()
 
