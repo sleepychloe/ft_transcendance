@@ -12,22 +12,6 @@ function multiDefaultPageComponent() {
 		</div>`
 }
 
-function lobbyComponent() {
-	return `<div class="lobby-space-counter">1/4 are ready</div>
-                <div class="lobby-players-list">
-                        <div class="lobby-players-list-item">
-                                <div class="lobby-players-card" id="player1">
-                                        <div class="lobby-players-card-icon"><img class="img-player-icon" src="../../assets/img/user-person-single-id-account-player-male-female-512.webp" alt="playerIcon" /></div>
-                                        <div class="lobby-players-card-name">Player 1</div>
-                                        <div class="lobby-players-card-option"></div>
-                                </div>
-                        </div>
-                </div>
-                <div class="game-start">
-                        <button class="btn-game-start">Start Game</button>
-                </div>`
-};
-
 function multiGameScreenComponent() {
 	let gameCanvas = document.createElement('canvas');
 	gameCanvas.setAttribute('id', 'pongCanvas');
@@ -79,14 +63,10 @@ function lobbyPlayersReadyComponent(quantity_player_ready=0) {
 	return lobbySlot;
 }
 
-function lobbyPlayersListItemComponent(playerId=0) {
-	let lobbyPlayerList;
-	lobbyPlayerList = document.createElement('div');
-	lobbyPlayerList.classList.add('lobby-players-list');
-
+function lobbyPlayersListItemComponent(playerId="player") {
 	let listItem = document.createElement('div');
 	listItem.classList.add('lobby-players-list-item');
-	lobbyPlayerList.appendChild(listItem);
+	listItem.setAttribute("id", playerId);
 	
 	let playersCard = document.createElement('div');
 	playersCard.classList.add('lobby-players-card');
@@ -103,25 +83,24 @@ function lobbyPlayersListItemComponent(playerId=0) {
 
 	let playersName = document.createElement('div');
 	playersName.classList.add('lobby-players-card-name');
-	playersName.setAttribute("id", "player" + (playerId + 1));
-	playersName.innerHTML = "Player " + (playerId + 1);
+	playersName.innerHTML = playerId;
 	playersCard.appendChild(playersName);
 
 	let playerOption = document.createElement('div');
 	playerOption.classList.add('lobby-players-card-option');
 	playersCard.appendChild(playerOption);
 
-	return lobbyPlayerList;
+	return listItem;
 }
 
 function lobbyListPlayersComponent(room={}) {
-	let lobbyPlayerList;
-	lobbyPlayerList = document.createElement('div');
+	let lobbyPlayerList = document.createElement('div');
 	lobbyPlayerList.classList.add('lobby-players-list');
 	try {
-		for (let i = 0; i < room.quantity_player; i++) {
-			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent(i));
+		for (let i = 0; i < room.quantity_player - 1; i++) {
+			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent("client" + (i + 1)));
 		}
+		lobbyPlayerList.appendChild(lobbyPlayersListItemComponent(room.n_client));
 	} catch {
 		return responseMsgComponent('error while loading lobby');
 	}
@@ -170,20 +149,18 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 	return buttonDiv;
 }
 
-function lobbyPlayerComponent(n_client=0) {
-	let playerId = {
-		'client1': 0,
-		'client2': 1,
-		'client3': 2,
-		'client4': 3,
-	};
-	document.getElementsByClassName('lobby-players-list')[0].appendChild(lobbyPlayersListItemComponent(playerId[n_client]));
-}
-
 function responseMsgComponent(text="error") {
 	let msg = document.createElement('p');
 	msg.classList.add('list-room-status-msg');
 	msg.innerHTML = text;
 
 	return msg;
+}
+
+function loadingCircleComponent() {
+	let loader = document.createElement('div');
+	loader.classList.add('loading');
+	loader.style.visibility = 'visible';
+
+	return loader;
 }

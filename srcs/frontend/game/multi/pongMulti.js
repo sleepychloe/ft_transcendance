@@ -60,6 +60,18 @@ function modalClose() {
 	document.getElementsByClassName('overlay')[0].style.visibility = 'hidden';
 }
 
+function updateLobbyPlayerList(n_client="unknown", method="") {
+	if (method === "add") {
+		let newPlayer = lobbyPlayersListItemComponent(n_client);
+		document.getElementsByClassName('lobby-players-list')[0].appendChild(newPlayer);
+	} else if (method === "delete") {
+		let oldPlayer = document.getElementById(n_client);
+		document.getElementsByClassName('lobby-players-list')[0].removeChild(oldPlayer);
+	} else {
+		console.error('wrong method');
+	}
+}
+
 function updateLobbySlot(quantity_player_ready=0) {
 	document.getElementsByClassName('lobby-space-counter')[0].innerHTML = quantity_player_ready + '/4 are ready';
 }
@@ -95,8 +107,14 @@ function reqWsConnection(url="") {
 
 			if (response.info === 'player') {
 				if (response.type === 'join') {
-					console.log('new player joined lobby: ', data.n_client);
-					lobbyPlayerComponent(data.n_client);
+					console.log('player joined lobby: ', data.n_client);
+					updateLobbyPlayerList(data.n_client, 'add');
+				} else if (response.type === 'disconnect') {
+					console.log('player left lobby: ', data.n_client);
+					updateLobbyPlayerList(data.n_client, 'delete');
+				} else if (response.type === 'reconnect') {
+					console.log('player reconnected: ', data.n_client);
+					// updateLobbyPlayerList(data.n_client, 'add?');
 				} else if (response.type === 'ready') {
 					console.log('player is ready to play: ', data.n_client);
 					updateLobbySlot(data.quantity_player_ready);
@@ -210,12 +228,12 @@ function multiCreateRoom() {
 	}
 	modalClose();
 	console.log('sending request to create room...');
-	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
-	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
+	let mainPart = document.getElementsByClassName('main-part')[0];
+	mainPart.innerHTML = '';
+	mainPart.appendChild(loadingCircleComponent());
 	reqCreateRoom(apiMakeroom, { "room_name": roomName }).then(async (data) => {
-		let mainPart = document.getElementsByClassName('main-part')[0];
 		mainPart.innerHTML = '';
-		if (data && !data.error) {
+		if (data && !data.Error) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -249,14 +267,13 @@ async function reqJoinRoom(url="", room_id="") {
 function multiJoinRoom() {
 	deleteAllCookies();
 	console.log('sending request to join room...');
-	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
-	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
-
+	let mainPart = document.getElementsByClassName('main-part')[0];
+	mainPart.innerHTML = '';
+	mainPart.appendChild(loadingCircleComponent());
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
 	reqJoinRoom(apiJoinroom, room_id).then(async (data) => {
-		let mainPart = document.getElementsByClassName('main-part')[0];
 		mainPart.innerHTML = '';
-		if (data && !data.error) {
+		if (data && !data.Error) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
@@ -264,7 +281,8 @@ function multiJoinRoom() {
 			// server allows to join room === user has a token for ws
 			// first websocket connection establish here
 			ws = await multiConnectWs(wsBaseURL, data);
-
+			
+			// reconnect or join
 			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
 			mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
 			mainPart.appendChild(lobbyListPlayersComponent(data));
@@ -295,31 +313,26 @@ async function getListRoom(url="") {
 
 function multiListRoom() {
 	console.log('sending request to list room...');
-	document.getElementsByClassName('main-part')[0].innerHTML = `<div class="loading"></div>`;
-	document.getElementsByClassName('loading')[0].style.visibility = 'visible';
+	let mainPart = document.getElementsByClassName('main-part')[0];
+	// mainPart.innerHTML = '';
+	mainPart.parentNode.replaceChild(loadingCircleComponent(), mainPart);
+	// mainPart.appendChild(loadingCircleComponent());
 	getListRoom(apiListroom).then((data) => {
-		let mainPart = document.getElementsByClassName('main-part')[0];
-
+		mainPart.innerHTML = '';
 		if (data.length === 0) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
-			
-			mainPart.innerHTML = '';
-			mainPart.appendChild(responseMsgComponent(data.error));
+			mainPart.appendChild(responseMsgComponent(data.Error));
 		} else if (data && data.length > 0) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
-
-			mainPart.innerHTML = '';
 			mainPart.appendChild(lobbyListRoomComponent(data));
 		} else {
 			console.groupCollapsed('server responded with error');
 				console.error('data: ', data);
 			console.groupEnd();
-
-			mainPart.innerHTML = '';
 			mainPart.appendChild(responseMsgComponent(data.error));
 		}
 	});
