@@ -27,10 +27,15 @@ class GameRoomMakeView(View):
 			room_name = json.loads(request.body).get("room_name")
 		except json.JSONDecodeError:
 			return JsonResponse({'Error' : 'Roomname is not json.'})
-		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name, QuantityPlayer=quantity_player, QuantityPlayerReady=0, client1={'client_id':client_id, 'ready_status': 'not ready'}, client2={}, client3={}, client4={}) # why this is called on client1 ready
+		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name,
+										  QuantityPlayer=quantity_player, QuantityPlayerReady=0,
+										  client1={'online': True, 'paddle': None, 'client_id':client_id,
+					 					'ready_status': 'not ready'}, client2={}, client3={}, client4={}) # why this is called on client1 ready
 		new_data.save()
 		channel_layer.group_add(new_room_id, 'BACKEND')
-		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id, 'room_name' : room_name, 'quantity_player' : quantity_player, 'quantity_player_ready' : 0, 'n_client' : 'client1'})
+		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id,
+						   'room_name' : room_name, 'quantity_player' : quantity_player,
+						   'quantity_player_ready' : 0, 'n_client' : 'client1'})
 		response.set_cookie('client_id', client_id)
 		return response
 
@@ -61,8 +66,6 @@ class GameRoomListView(View):
 
 class GameRoomJoinView(View):
 	def search_client_data(self, room, client_id):
-		print("search_client_data:", room)
-		print("serarch_client_id:",client_id)
 		if room.client1['client_id'] == client_id:
 			return room.client1['client_id']
 		elif room.client2['client_id'] == client_id:
@@ -107,22 +110,22 @@ class GameRoomJoinView(View):
 		room = MultiRoomInfo.objects.get(Roomid=game_id)
 		if not room.client1:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client1 = {'client_id': client_id,  'ready_status':"not ready", 'paddle': None}
+			instance.client1 = {'client_id': client_id,  'ready_status':"not ready", 'paddle': None, 'online': True}
 			instance.save()
 			return "client1"
 		elif not room.client2:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None}
+			instance.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
 			instance.save()
 			return "client2"
 		elif not room.client3:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None}
+			instance.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
 			instance.save()
 			return "client3"
 		elif not room.client4:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None}
+			instance.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
 			instance.save()
 			return "client4"
 

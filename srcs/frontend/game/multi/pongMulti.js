@@ -26,7 +26,7 @@ const languagePack = {
 // }
 
 //////////////////////// for debugging ////////////////////////
-function deleteAllCookies() {
+function deleteAlls() {
 	const cookies = document.cookie.split(";");
 
 	for (let i = 0; i < cookies.length; i++) {
@@ -267,7 +267,7 @@ async function reqJoinRoom(url="", room_id="") {
 }
 
 function multiJoinRoom() {
-	deleteAllCookies();
+	// deleteAllCookies();
 	console.log('sending request to join room...');
 	let mainPart = document.getElementsByClassName('main-part')[0];
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
