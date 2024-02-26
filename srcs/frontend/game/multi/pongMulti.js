@@ -314,9 +314,8 @@ async function getListRoom(url="") {
 function multiListRoom() {
 	console.log('sending request to list room...');
 	let mainPart = document.getElementsByClassName('main-part')[0];
-	// mainPart.innerHTML = '';
-	mainPart.parentNode.replaceChild(loadingCircleComponent(), mainPart);
-	// mainPart.appendChild(loadingCircleComponent());
+	mainPart.innerHTML = '';
+	mainPart.appendChild(loadingCircleComponent());
 	getListRoom(apiListroom).then((data) => {
 		mainPart.innerHTML = '';
 		if (data.length === 0) {
