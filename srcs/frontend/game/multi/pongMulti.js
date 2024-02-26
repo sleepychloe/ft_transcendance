@@ -63,10 +63,12 @@ function modalClose() {
 function updateLobbyPlayerList(n_client="unknown", method="") {
 	if (method === "add") {
 		let newPlayer = lobbyPlayersListItemComponent(n_client);
-		document.getElementsByClassName('lobby-players-list')[0].appendChild(newPlayer);
+		if (newPlayer)
+			document.getElementsByClassName('lobby-players-list')[0].appendChild(newPlayer);
 	} else if (method === "delete") {
 		let oldPlayer = document.getElementById(n_client);
-		document.getElementsByClassName('lobby-players-list')[0].removeChild(oldPlayer);
+		if (oldPlayer)
+			document.getElementsByClassName('lobby-players-list')[0].removeChild(oldPlayer);
 	} else {
 		console.error('wrong method');
 	}
@@ -216,7 +218,7 @@ async function reqCreateRoom(url="", data={}) {
 		return result;
 	} catch (error) {
 		console.error('couldn\'t request to server to create a room: ', error);
-		return {'error': 'failed to load data from server'};
+		return {'Error': 'failed to load data from server'};
 	}
 }
 
@@ -260,7 +262,7 @@ async function reqJoinRoom(url="", room_id="") {
 		return result;
 	} catch (error) {
 		console.error('couldn\'t request to server to join a room: ', error);
-		return {'error': 'failed to load data from server'};
+		return {'Error': 'failed to load data from server'};
 	}
 }
 
@@ -268,9 +270,9 @@ function multiJoinRoom() {
 	// deleteAllCookies();
 	console.log('sending request to join room...');
 	let mainPart = document.getElementsByClassName('main-part')[0];
+	const room_id = document.getElementsByClassName('lobby-room-card-name')[0].id;
 	mainPart.innerHTML = '';
 	mainPart.appendChild(loadingCircleComponent());
-	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
 	reqJoinRoom(apiJoinroom, room_id).then(async (data) => {
 		mainPart.innerHTML = '';
 		if (data && !data.Error) {
@@ -292,8 +294,8 @@ function multiJoinRoom() {
 				console.error('data: ', data);
 			console.groupEnd();
 			// need a server to send a status code to determine what error to display
-			mainPart.appendChild(responseMsgComponent(languagePack.error.lobbyFull));
-			// mainPart.appendChild(responseMsgComponent(data.error));
+			// mainPart.appendChild(responseMsgComponent(languagePack.error.lobbyFull));
+			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
 	});
 }
@@ -307,7 +309,7 @@ async function getListRoom(url="") {
 		return result;
 	} catch (error) {
 		console.error('couldn\'t request to server to get list room: ', error);
-		return {'error': 'failed to load data from server'};
+		return {'Error': 'failed to load data from server'};
 	}
 }
 
@@ -322,7 +324,8 @@ function multiListRoom() {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
-			mainPart.appendChild(responseMsgComponent(data.Error));
+			// need server specific response: no lobby found
+			mainPart.appendChild(responseMsgComponent('no lobby found'));
 		} else if (data && data.length > 0) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
@@ -332,7 +335,7 @@ function multiListRoom() {
 			console.groupCollapsed('server responded with error');
 				console.error('data: ', data);
 			console.groupEnd();
-			mainPart.appendChild(responseMsgComponent(data.error));
+			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
 	});
 };
