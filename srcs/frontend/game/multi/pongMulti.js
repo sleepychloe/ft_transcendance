@@ -267,10 +267,10 @@ async function reqJoinRoom(url="", room_id="") {
 }
 
 function multiJoinRoom() {
-	// deleteAllCookies();
+	deleteAllCookies();
 	console.log('sending request to join room...');
 	let mainPart = document.getElementsByClassName('main-part')[0];
-	const room_id = document.getElementsByClassName('lobby-room-card-name')[0].id;
+	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
 	mainPart.innerHTML = '';
 	mainPart.appendChild(loadingCircleComponent());
 	reqJoinRoom(apiJoinroom, room_id).then(async (data) => {
