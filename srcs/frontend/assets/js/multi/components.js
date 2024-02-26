@@ -94,6 +94,8 @@ function lobbyPlayersListItemComponent(playerId="player") {
 }
 
 function lobbyListPlayersComponent(room={}) {
+	if (!room)
+		return responseMsgComponent('debug: fatal error!');
 	let lobbyPlayerList = document.createElement('div');
 	lobbyPlayerList.classList.add('lobby-players-list');
 	try {

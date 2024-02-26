@@ -49,33 +49,47 @@ const apiJoinroom = apiBaseURL + "";
 let ws;
 
 function modalShow() {
-	document.getElementsByClassName('overlay')[0].addEventListener('click', modalClose);
-	document.getElementsByClassName('modal')[0].style.visibility = 'visible';
-	document.getElementsByClassName('overlay')[0].style.visibility = 'visible';
-	document.getElementById('room-name-input').select();
+	let overlay = document.getElementsByClassName('overlay')[0];
+	let modal = document.getElementsByClassName('modal')[0];
+	let roomNameInput = document.getElementById('room-name-input');
+	if (overlay && modal && roomNameInput) {
+		overlay.addEventListener('click', modalClose);
+		modal.style.visibility = 'visible';
+		overlay.style.visibility = 'visible';
+		roomNameInput.select();
+	}
 }
 
 function modalClose() {
-	document.getElementsByClassName('modal')[0].style.visibility = 'hidden';
-	document.getElementsByClassName('overlay')[0].style.visibility = 'hidden';
+	let modal = document.getElementsByClassName('modal')[0];
+	let overlay = document.getElementsByClassName('overlay')[0];
+	if (modal && overlay) {
+		overlay.removeEventListener('click', modalClose);
+		modal.style.visibility = 'hidden';
+		overlay.style.visibility = 'hidden';
+	}
 }
 
 function updateLobbyPlayerList(n_client="unknown", method="") {
 	if (method === "add") {
 		let newPlayer = lobbyPlayersListItemComponent(n_client);
-		if (newPlayer)
-			document.getElementsByClassName('lobby-players-list')[0].appendChild(newPlayer);
+		let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
+		if (newPlayer && lobbyPlayerList)
+			lobbyPlayerList.appendChild(newPlayer);
 	} else if (method === "delete") {
 		let oldPlayer = document.getElementById(n_client);
-		if (oldPlayer)
-			document.getElementsByClassName('lobby-players-list')[0].removeChild(oldPlayer);
+		let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
+		if (oldPlayer && lobbyPlayerList)
+			lobbyPlayerList.removeChild(oldPlayer);
 	} else {
 		console.error('wrong method');
 	}
 }
 
 function updateLobbySlot(quantity_player_ready=0) {
-	document.getElementsByClassName('lobby-space-counter')[0].innerHTML = quantity_player_ready + '/4 are ready';
+	let lobbySlot = document.getElementsByClassName('lobby-space-counter')[0];
+	if (lobbySlot)
+		lobbySlot.innerHTML = quantity_player_ready + '/4 are ready';
 }
 
 const sendPaddleMovement = async (e) => {
@@ -96,6 +110,30 @@ const sendPaddleMovement = async (e) => {
 	// console.log("Paddle movement sent:", direction);
 }
 
+function multiStartGame() {
+	let mainPart = document.getElementsByClassName('main-part')[0];
+	if (mainPart) {
+		mainPart.innerHTML = '';
+		mainPart.appendChild(multiGameScreenComponent());
+		document.addEventListener('keydown', sendPaddleMovement);
+	}
+}
+
+function multiFinishGame() {
+	document.removeEventListener('keydown', sendPaddleMovement);
+}
+
+function multiDisplayLobby(ws={}, data={}) {
+	let mainPart = document.getElementsByClassName('main-part')[0];
+	let mainTitle = document.getElementsByClassName('main-title')[0];
+	if (mainPart && mainTitle) {
+		mainTitle.innerHTML = data.room_name;
+		mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
+		mainPart.appendChild(lobbyListPlayersComponent(data));
+		mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
+	}
+}
+
 function reqWsConnection(url="") {
 	return new Promise((resolve, reject) => {
 		ws = new WebSocket(url);
@@ -114,6 +152,7 @@ function reqWsConnection(url="") {
 				} else if (response.type === 'disconnect') {
 					console.log('player left lobby: ', data.n_client);
 					updateLobbyPlayerList(data.n_client, 'delete');
+					updateLobbySlot(data.quantity_player_ready);
 				} else if (response.type === 'reconnect') {
 					console.log('player reconnected: ', data.n_client);
 					// updateLobbyPlayerList(data.n_client, 'add?');
@@ -143,19 +182,17 @@ function reqWsConnection(url="") {
 					});
 				} else if (response.type === 'start') {
 					console.log('start the game');
-					document.getElementsByClassName('main-part')[0].innerHTML = '';
-					document.getElementsByClassName('main-part')[0].appendChild(multiGameScreenComponent());
-					document.addEventListener('keydown', sendPaddleMovement);
+					multiStartGame();
 				} else if (response.type === 'finish') {
 					console.log('finish the game');
-					document.removeEventListener('keydown', sendPaddleMovement);
+					multiFinishGame();
 				} else {
 					console.warn('wrong game info type has been recieved: ', response.type);
 				}
 			}
 		};
 		ws.onclose = (event) => {
-			console.log('websocket closed');
+			console.log('websocket closed: ', event);
 			// playerLobbyDisconnect(); // from lobbyPlayersList
 			// setTimeout(reqWsConnection(url), 1000);
 		}
@@ -242,10 +279,10 @@ function multiCreateRoom() {
 
 			ws = await multiConnectWs(wsBaseURL, data);
 
-			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
-			mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
-			mainPart.appendChild(lobbyListPlayersComponent(data));
-			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
+			// if (data.status === 'create')
+			let mainTitle = document.getElementsByClassName('main-title')[0];
+			mainTitle = data.room_name;
+			multiDisplayLobby(ws, data);
 		} else {
 			console.groupCollapsed('server responded with error');
 				console.error('data: ', data);
@@ -284,11 +321,14 @@ function multiJoinRoom() {
 			// first websocket connection establish here
 			ws = await multiConnectWs(wsBaseURL, data);
 			
+			let mainTitle = document.getElementsByClassName('main-title')[0];
+			mainTitle = data.room_name;
 			// reconnect or join
-			document.getElementsByClassName('main-title')[0].innerHTML = data.room_name;
-			mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
-			mainPart.appendChild(lobbyListPlayersComponent(data));
-			mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
+			if (data.status === 'join') {
+				multiDisplayLobby(ws, data);
+			} else if (data.status === 'reconnect') {
+				multiStartGame();
+			}
 		} else {
 			console.groupCollapsed('server responded with error');
 				console.error('data: ', data);
