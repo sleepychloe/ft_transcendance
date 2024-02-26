@@ -67,13 +67,13 @@ class GameRoomListView(View):
 class GameRoomJoinView(View):
 	def search_client_data(self, room, client_id):
 		if room.client1['client_id'] == client_id:
-			return room.client1['client_id']
+			return 'client1'
 		elif room.client2['client_id'] == client_id:
-			return room.client2['client_id']
+			return 'client2'
 		elif room.client3['client_id'] == client_id:
-			return room.client3['client_id']
+			return 'client3'
 		elif room.client4['client_id'] == client_id:
-			return room.client4['client_id']
+			return 'client4'
 		return None
 
 	def get(self, request, game_id):
@@ -84,12 +84,13 @@ class GameRoomJoinView(View):
 				return JsonResponse({'Error' : 'Game id URL is not exists'})
 		client_id = request.COOKIES.get('client_id')
 		if room.GameStatus == True:
-			if self.search_client_data(room, client_id) == None:
+			Nclient = self.search_client_data(room, client_id)
+			if Nclient == None:
 				print("error : RoomJoinView, GameStatus True, client_id None")
 				return JsonResponse({'Error' : 'You can not join another room !'})
 			else:
 				print('room_id', game_id, '\nroom_name', room.RoomName)
-				return JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})
+				return JsonResponse({'status': 'reconnect', 'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})
 		elif client_id:
 			print("error : RoomJoinView, Double client_id")
 			return JsonResponse({'Error' : 'Can not request several time in same browser'})
@@ -99,7 +100,7 @@ class GameRoomJoinView(View):
 			room.save()
 			client_id = create_new_uuid()
 			Nclient = self.check_client_id_for_data(game_id, client_id)
-			response = JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})			
+			response = JsonResponse({'status': 'join', 'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})			
 			response.set_cookie('client_id', client_id)
 			return response
 		print("error: RoomJoinView, quantity player exceeds")

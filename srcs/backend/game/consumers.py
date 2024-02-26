@@ -71,11 +71,13 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			paddle = await self.get_value_game_data(self.n_client)
 			self.reconnect_client_quantity()
 			if paddle['paddle'] == 'paddle1' or paddle['paddle'] == 'paddle2':
+				self.number_paddle = paddle['paddle']
 				await self.update_value_game_data(self.number_paddle, {
 					'x': 0,
 					'y': 150,
 				})
 			else:
+				self.number_paddle = paddle['paddle']
 				await self.update_value_game_data(self.number_paddle, {
 					'x': 790,
 					'y': 150,
@@ -147,13 +149,13 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				self.game_data.paddle4 = None
 		else:
 			if self.game_data.client1['client_id'] == self.client_id:
-				self.game_data.client1 = {'online': False}
+				self.game_data.client1['online'] = False
 			elif self.game_data.client2['client_id'] == self.client_id:
-				self.game_data.client2 = {'online': False}
+				self.game_data.client2['online'] = False
 			elif self.game_data.client3['client_id'] == self.client_id:
-				self.game_data.client3 = {'online': False}
+				self.game_data.client3['online'] = False
 			elif self.game_data.client4['client_id'] == self.client_id:
-				self.game_data.client4 = {'online': False}
+				self.game_data.client4['online'] = False
 		if self.game_data.QuantityPlayerReady > 0:
 			self.game_data.QuantityPlayerReady -= 1
 		self.game_data.QuantityPlayer -= 1
@@ -489,7 +491,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			self.game_state['ball']['x'] += self.vx
 			self.game_state['ball']['y'] += self.vy
 			await self.paddle_ball_collision()
-			if (self.game_state['ball']['x'] < 0 or self.game_state['ball']['x'] > 800):
+			if (self.game_state['ball']['x'] <= 0 or self.game_state['ball']['x'] >= 800):
 				if self.game_state['ball']['x'] <= 0:
 					self.score['score']['right'] += 1
 				else:
@@ -512,9 +514,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 						'y': 200,
 					}
 				}
-			if self.game_state['ball']['y'] < 0 or self.game_state['ball']['y'] > 400:
+			if self.game_state['ball']['y'] <= 0 or self.game_state['ball']['y'] >= 400:
 				self.vy = -self.vy
-			print(self.vx, self.vy)
 			paddle_position = {
 				'paddle1' : self.game_data.paddle1,
 				'paddle2' : self.game_data.paddle2,
@@ -553,8 +554,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		paddle_width = 10
 		paddle_height = 50
 		canvas_width = 800
-		if ((ball_x < paddle_width and ball_y > left_paddle1['y'] and ball_y < left_paddle1['y'] + paddle_height) or 
-			(ball_x < paddle_width and ball_y > left_paddle2['y'] and ball_y < left_paddle2['y'] + paddle_height) or
-			(ball_x > canvas_width - paddle_width and ball_y > right_paddle3['y'] and ball_y < right_paddle3['y'] + paddle_height) or
-			(ball_x > canvas_width - paddle_width and ball_y > right_paddle4['y'] and ball_y < right_paddle4['y'] + paddle_height)) :
+		if ((ball_x <= paddle_width and ball_y >= left_paddle1['y'] and ball_y <= left_paddle1['y'] + paddle_height) or 
+			(ball_x <= paddle_width and ball_y >= left_paddle2['y'] and ball_y <= left_paddle2['y'] + paddle_height) or
+			(ball_x >= canvas_width - paddle_width and ball_y >= right_paddle3['y'] and ball_y <= right_paddle3['y'] + paddle_height) or
+			(ball_x >= canvas_width - paddle_width and ball_y >= right_paddle4['y'] and ball_y <= right_paddle4['y'] + paddle_height)) :
 			self.vx = -self.vx
