@@ -52,7 +52,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		game_id = self.scope["url_route"]["kwargs"]["game_id"]
 		self.game_id = game_id
 		await self.get_game_data()
-		print("gamedata in ws:",self.game_data)
 		if self.game_data.GameStatus == True:
 			self.n_client = await self.search_client_data()
 			if self.n_client == None:
@@ -286,6 +285,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 														'sender_channel_name': self.channel_name,
 													})
 			await self.save_game_start_status(True)
+			print(self)
 			asyncio.create_task(self.ball_move_thread())
 
 	@database_sync_to_async
@@ -441,7 +441,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		self.game_data.save()
 
 	def remove_paddle_data(self, paddle):
-		self.get_game_data()
 		if 'paddle1' == paddle:
 			self.game_data.paddle1 = None
 		elif 'paddle2' == paddle:
@@ -450,40 +449,35 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			self.game_data.paddle3 = None
 		elif 'paddle4' == paddle:
 			self.game_data.paddle4 = None
-		self.game_data.save()
-
-	@database_sync_to_async
-	def player_unready_or_delete(self, client):
-		self.get_game_data()
-		value = self.get_value_game_data(client)
-		print(value)
-		if value['online'] == True:
-			self.player_unready(client)
-		else:
-			if 'client1' == client:
-				paddle = self.game_data.client1['paddle']
-				self.remove_paddle_data(paddle)
-				self.game_data.client1 = None
-			elif 'client2' == client:
-				paddle = self.game_data.client1['paddle']
-				self.remove_paddle_data(paddle)
-				self.game_data.client1 = None
-			elif 'client3' == client:
-				paddle = self.game_data.client1['paddle']
-				self.remove_paddle_data(paddle)
-				self.game_data.client1 = None
-			elif 'client4' == client:
-				paddle = self.game_data.client1['paddle']
-				self.remove_paddle_data(paddle)
-				self.game_data.client1 = None
-			self.game_data.save()
 
 	@database_sync_to_async
 	def player_status_check(self):
-		self.player_unready_or_delete('client1')
-		self.player_unready_or_delete('client2')
-		self.player_unready_or_delete('client3')
-		self.player_unready_or_delete('client4')
+		self.get_game_data()
+		client1 = self.game_data.client1
+		client2 = self.game_data.client2
+		client3 = self.game_data.client3
+		client4 = self.game_data.client4
+		if client1['online'] == True:
+			client1['ready_status'] = 'unready'
+		else:
+			self.remove_paddle_data(client1['paddle'])
+			client1 = None
+		if client2['online'] == True:
+			client2['ready_status'] = 'unready'
+		else:
+			self.remove_paddle_data(client2['paddle'])
+			client2 = None
+		if client3['online'] == True:
+			client3['ready_status'] = 'unready'
+		else:
+			self.remove_paddle_data(client3['paddle'])
+			client3 = None
+		if client4['online'] == True:
+			client4['ready_status'] = 'unready'
+		else:
+			self.remove_paddle_data(client4['paddle'])
+			client4 = None
+		self.game_data.save()
 
 	async def ball_move_thread(self):
 		await self.get_game_data()
@@ -496,9 +490,10 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 					self.score['score']['right'] += 1
 				else:
 					self.score['score']['left'] += 1
-				if (self.score['score']['right'] > 4 or self.score['score']['left'] > 4):
+				if (self.score['score']['right'] > 2 or self.score['score']['left'] > 2):
 					await self.player_status_check()
 					await self.save_game_start_status(False)
+					break
 				# await self.init_game_value(self)
 				self.ball_speed += 1
 				self.vx = self.ball_speed * random.uniform(-1, 1)

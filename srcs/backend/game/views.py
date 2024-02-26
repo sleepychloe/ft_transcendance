@@ -33,7 +33,7 @@ class GameRoomMakeView(View):
 					 					'ready_status': 'not ready'}, client2={}, client3={}, client4={}) # why this is called on client1 ready
 		new_data.save()
 		channel_layer.group_add(new_room_id, 'BACKEND')
-		response = JsonResponse({'room_id' : new_room_id, 'client_id' : client_id,
+		response = JsonResponse({'status': 'create', 'room_id' : new_room_id, 'client_id' : client_id,
 						   'room_name' : room_name, 'quantity_player' : quantity_player,
 						   'quantity_player_ready' : 0, 'n_client' : 'client1'})
 		response.set_cookie('client_id', client_id)
@@ -84,6 +84,8 @@ class GameRoomJoinView(View):
 				return JsonResponse({'Error' : 'Game id URL is not exists'})
 		client_id = request.COOKIES.get('client_id')
 		if room.GameStatus == True:
+			if client_id == None:
+				return JsonResponse({'Error': 'you can not join room after starting'})
 			Nclient = self.search_client_data(room, client_id)
 			if Nclient == None:
 				print("error : RoomJoinView, GameStatus True, client_id None")
@@ -103,8 +105,9 @@ class GameRoomJoinView(View):
 			response = JsonResponse({'status': 'join', 'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})			
 			response.set_cookie('client_id', client_id)
 			return response
-		print("error: RoomJoinView, quantity player exceeds")
-		return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})
+		else:
+			print("error: RoomJoinView, quantity player exceeds")
+			return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})
 	
 	@staticmethod
 	def check_client_id_for_data(game_id, client_id):
