@@ -1,5 +1,5 @@
 import { routes } from "./routes.js";
-import { initLogo } from "./3d.js";
+import { initLogo, start3dMode, stopAnimation } from "./3d.js";
 
 const app = async () => {
         const pageMatch = routes.map(route => {
@@ -31,10 +31,23 @@ const app = async () => {
                         initLogo();
                 });
         }
+        if (match.route.path === '/local_3d')
+        {
+                start3dMode();
+        }
 }
 
 // on user press forward
 const navigate = url => {
+        if (window.location.pathname === '/local_3d') {
+                stopAnimation();
+        }
+        if (window.location.pathname === '/local' || window.location.pathname === '/tournament') {
+                if (gameLoopId) {
+                        cancelAnimationFrame(gameLoopId);
+                        gameLoopId = 0;
+                }
+        }
         window.history.pushState({}, "", url);
         app();
 };
