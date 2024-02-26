@@ -60,16 +60,33 @@ class GameRoomListView(View):
 		return serialized_data
 
 class GameRoomJoinView(View):
+	def search_client_data(self, room, client_id):
+		if room.client1['client_id'] == client_id:
+			return room.client1['client_id']
+		elif room.client2['client_id'] == client_id:
+			return room.client1['client_id']
+		elif room.client3['client_id'] == client_id:
+			return room.client1['client_id']
+		elif room.client4['client_id'] == client_id:
+			return room.client1['client_id']
+		return None
 
 	def get(self, request, game_id):
 		try:
 			room = MultiRoomInfo.objects.get(Roomid=game_id)
+			print("very first room", room)
 		except MultiRoomInfo.DoesNotExist:
 				return JsonResponse({'Error' : 'Game id URL is not exists'})
 		client_id = request.COOKIES.get('client_id')
 		if room.GameStatus == True:
-			return JsonResponse({'reconnect': client_id})
+			if self.search_client_data(room, client_id) == None:
+				print("error : RoomJoinView, GameStatus True, client_id None")
+				return JsonResponse({'Error' : 'You can not join another room !'})
+			else:
+				print('room_id', game_id, '\nroom_name', room.RoomName)
+				return JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})
 		elif client_id:
+			print("error : RoomJoinView, Double client_id")
 			return JsonResponse({'Error' : 'Can not request several time in same browser'})
 
 		if room.QuantityPlayer < 4 and not client_id:
@@ -80,6 +97,7 @@ class GameRoomJoinView(View):
 			response = JsonResponse({'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})			
 			response.set_cookie('client_id', client_id)
 			return response
+		print("error: RoomJoinView, quantity player exceeds")
 		return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})
 	
 	@staticmethod
@@ -87,22 +105,22 @@ class GameRoomJoinView(View):
 		room = MultiRoomInfo.objects.get(Roomid=game_id)
 		if not room.client1:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client1 = {'client_id': client_id,  'ready_status':"not ready"}
+			instance.client1 = {'client_id': client_id,  'ready_status':"not ready", 'paddle': None}
 			instance.save()
 			return "client1"
 		elif not room.client2:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client2 = {'client_id': client_id, 'ready_status':"not ready"}
+			instance.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None}
 			instance.save()
 			return "client2"
 		elif not room.client3:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client3 = {'client_id': client_id, 'ready_status':"not ready"}
+			instance.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None}
 			instance.save()
 			return "client3"
 		elif not room.client4:
 			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client4 = {'client_id': client_id, 'ready_status':"not ready"}
+			instance.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None}
 			instance.save()
 			return "client4"
 

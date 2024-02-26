@@ -27,9 +27,19 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		ret = json.dumps(jsondata)
 		return ret
 
+	async def search_client_data(self):
+		if self.game_data.client1['client_id'] == self.client_id:
+			return self.game_data.client1['client_id']
+		elif self.game_data.client2['client_id'] == self.client_id:
+			return self.game_data.client1['client_id']
+		elif self.game_data.client3['client_id'] == self.client_id:
+			return self.game_data.client1['client_id']
+		elif self.game_data.client4['client_id'] == self.client_id:
+			return self.game_data.client1['client_id']
+		return None
+
 	async def connect(self):
 		await self.accept()
-		print(self.channel_name)
 		request_header = self.scope['headers']
 		cookie_header = next((header for header in request_header if header[0] == b'cookie'), None)
 		if cookie_header:
@@ -41,60 +51,91 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		game_id = self.scope["url_route"]["kwargs"]["game_id"]
 		self.game_id = game_id
 		await self.get_game_data()
+		print(self.game_data)
 		if self.game_data.GameStatus == True:
-			#client id check 진행중인 사람이였는지
+			self.n_client = await self.search_client_data()
+			if self.n_client == None:
+				await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
+				self.close()
 			await self.channel_layer.group_add(game_id, self.channel_name)
 			await self.channel_layer.group_send(self.game_id,
 													{
-														'type': 'game_status',
+														'type': 'room_inform',
 														'action': 'reconnect',
-														'client_id': self.client_id,
+														'quantity_player': self.game_data.QuantityPlayer,
+														'quantity_player_ready': self.game_data.QuantityPlayerReady,
+														'n_client': self.n_client,
 														'sender_channel_name': self.channel_name,
 													})
+			paddle = self.get_value_game_data(self.n_client)
+			if paddle['paddle'] == 'paddle1' or paddle['paddle'] == 'paddle2':
+				await self.update_value_game_data(self.number_paddle, {
+					'x': 0,
+					'y': 150,
+				})
+			else:
+				await self.update_value_game_data(self.number_paddle, {
+					'x': 790,
+					'y': 150,
+				})
 		else:
 			await self.initialize_game()
 			await self.channel_layer.group_add(game_id, self.channel_name)
-		# problem: game initializes only on connection
-		# so already initialized informations are not getting updated:
-		# 	first client has only information about 'first'
-		#	second has information about 'first' and 'second'
-		#	...
-		# have to update game_state on player join
+
+	@database_sync_to_async
+	def get_value_game_data(self, name):
+		value = getattr(self.game_data, name, None)
+		return value
+
+	@database_sync_to_async
+	def update_value_game_data(self, name, value):
+		setattr(self.game_data, name, value)
+		self.game_data.save()
 
 	async def disconnect(self, close_code):
+		if self.game_data.GameStatus == False:
+			await self.remove_client_data()
+		else:
+			await self.update_value_game_data(self.number_paddle, {
+				'x': -5000,
+				'y': -5000,
+			})
+			await self.remove_client_data()
 		await self.channel_layer.group_send(self.game_id,
 												{
 													'type': 'room_inform',
 													'action': 'disconnect',
-													'client_id': self.client_id,
+													'n_client': self.n_client,
+													'quantity_player': self.game_data.QuantityPlayer,
+													'quantity_player_ready': self.game_data.QuantityPlayerReady,
 													'sender_channel_name': self.channel_name,
 												})
-		await print(self.game_data.GameStatus)
-		if await self.game_data.GameStatus == False: #have to false for deploy
-			await self.remove_client_data()
 		await self.channel_layer.group_discard(self.game_id, self.channel_name)
 
 	@database_sync_to_async
 	def remove_client_data(self):
-		if self.game_data.client1['client_id'] == self.client_id:
-			self.game_data.client1 = None
-		elif self.game_data.client2['client_id'] == self.client_id:
-			self.game_data.client2 = None
-		elif self.game_data.client3['client_id'] == self.client_id:
-			self.game_data.client3 = None
-		elif self.game_data.client4['client_id'] == self.client_id:
-			self.game_data.client4 = None
+		if self.game_data.GameStatus == False:
+			if self.game_data.client1['client_id'] == self.client_id:
+				self.game_data.client1 = {'client_id': None}
+			elif self.game_data.client2['client_id'] == self.client_id:
+				self.game_data.client2 = {'client_id': None}
+			elif self.game_data.client3['client_id'] == self.client_id:
+				self.game_data.client3 = {'client_id': None}
+			elif self.game_data.client4['client_id'] == self.client_id:
+				self.game_data.client4 = {'client_id': None}
 
-		if self.number_paddle == 'paddle1':
-			self.game_data.paddle1 = None
-		elif self.number_paddle == 'paddle2':
-			self.game_data.paddle2 = None
-		elif self.number_paddle == 'paddle3':
-			self.game_data.paddle3 = None
-		elif self.number_paddle == 'paddle4':
-			self.game_data.paddle4 = None
+			if self.number_paddle == 'paddle1':
+				self.game_data.paddle1 = None
+			elif self.number_paddle == 'paddle2':
+				self.game_data.paddle2 = None
+			elif self.number_paddle == 'paddle3':
+				self.game_data.paddle3 = None
+			elif self.number_paddle == 'paddle4':
+				self.game_data.paddle4 = None
 		self.game_data.QuantityPlayer -= 1
+		self.game_data.QuantityPlayerReady -= 1
 		self.game_data.save()
+		self.get_game_data()
 
 	@database_sync_to_async
 	def get_game_data(self):
@@ -116,10 +157,11 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		}
 		self.init_game_paddle_data()
 		if self.game_data.GameStatus == False:
-			self.game_score = {
+			self.score = {
 				'left': 0,
 				'right': 0,
 			},
+		self.game_data.save()
 
 	def init_game_paddle_data(self):
 		if self.number_paddle == 'paddle1':
@@ -131,11 +173,11 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			self.game_data.paddle2 = {
 				'x': 0,
 				'y': 300,
-			}
+		 		}
 		elif self.number_paddle == 'paddle3':
 			self.game_data.paddle3 = {
 				'x': 790,
-				'y': 100,
+				'y': 100		
 			}
 		elif self.number_paddle == 'paddle4':
 			self.game_data.paddle4 = {
@@ -148,16 +190,21 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 	def init_game_paddle(self):
 		if not self.game_data.paddle1:
 			self.number_paddle = 'paddle1'
+			self.game_data.client1['paddle'] = 'paddle1'
 		elif not self.game_data.paddle2:
 			self.number_paddle = 'paddle2'
+			self.game_data.client2['paddle'] = 'paddle2'
 		elif not self.game_data.paddle3:
 			self.number_paddle = 'paddle3'
+			self.game_data.client3['paddle'] = 'paddle3'
 		elif not self.game_data.paddle4:
 			self.number_paddle = 'paddle4'
+			self.game_data.client4['paddle'] = 'paddle4'
+		print(self.number_paddle)
+		self.game_data.save()
 
 	async def initialize_game(self):
 		await self.init_game_paddle()
-		print(self.number_paddle)
 		await self.init_game_value()
 
 	@database_sync_to_async
@@ -222,6 +269,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 														'type': 'room_inform',
 														'action': 'ready',
 														'n_client': n_client,
+														'quantity_player': self.game_data.QuantityPlayer,
 														'quantity_player_ready': self.game_data.QuantityPlayerReady,
 														'sender_channel_name': self.channel_name,
 													})
@@ -234,16 +282,18 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 														'type': 'room_inform',
 														'action': 'unready',
 														'n_client': n_client,
+														'quantity_player': self.game_data.QuantityPlayer,
 														'quantity_player_ready': self.game_data.QuantityPlayerReady,
 														'sender_channel_name': self.channel_name,
 													})
 			elif type == 'player_info':
-				n_client = data['n_client']
+				self.n_client = data['n_client']
 				await self.channel_layer.group_send(self.game_id,
 													{
 														'type': 'room_inform',
 														'action': 'join',
-														'n_client': n_client,
+														'n_client': self.n_client,
+														'quantity_player': self.game_data.QuantityPlayer,
 														'quantity_player_ready': self.game_data.QuantityPlayerReady,
 														'sender_channel_name': self.channel_name,
 													})
@@ -252,13 +302,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		elif action == 'move_paddle':
 			direction = text_data_json.get('direction')
 			await self.move_paddle(direction)
-			# await self.channel_layer.group_send(self.game_id,
-			# 									{
-			# 										'type': 'game_status',
-			# 										'action': 'update',
-			# 										'data': self.paddle_state,
-			# 										'sender_channel_name': self.channel_name,
-			# 									})
 		else:
 			await self.send(await self.make_json_response('info', 'error', {'error': 'There is nothings to do!'}))
 
@@ -290,6 +333,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 	# broadcasting for room event: ex. join/ready
 	async def room_inform(self, event):
 		quantity_player_ready = event['quantity_player_ready']
+		quantity_player = event['quantity_player']
 		n_client = event['n_client']
 		action = event['action']
 		if self.channel_name != event['sender_channel_name']:
@@ -317,8 +361,18 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				'type': 'unready',
 				'data': {
 					'n_client': n_client,
+					'quantity_player': quantity_player,
 					'quantity_player_ready': quantity_player_ready,
 				},
+			}))
+		elif action == 'disconnect':
+			await self.send(text_data=json.dumps({
+				'info': 'player',
+				'type': 'disconnect',
+				'data': {
+					'n_client': n_client,
+					'quantity_player_ready': quantity_player_ready,
+				}
 			}))
 
 	@database_sync_to_async
@@ -348,16 +402,15 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 	async def ball_move_thread(self):
 		await self.get_game_data()
 		while self.game_data.GameStatus == True:
-			print("in the while")
 			self.game_state['ball']['x'] += self.vx
 			self.game_state['ball']['y'] += self.vy
 			await self.paddle_ball_collision()
 			if (self.game_state['ball']['x'] <= 0 or self.game_state['ball']['x'] >= 800):
 				if self.game_state['ball']['x'] <= 0:
-					self.game_score[0]['right'] += 1
+					self.score[0]['right'] += 1
 				else:
-					self.game_score[0]['left'] += 1
-				if (self.game_score[0]['right'] > 2 or self.game_score[0]['left'] > 2):
+					self.score[0]['left'] += 1
+				if (self.score[0]['right'] > 2 or self.score[0]['left'] > 2):
 					await self.save_game_start_status(False)
 					await self.player_unready('client1')
 					await self.player_unready('client2')
@@ -397,7 +450,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 											{
 												'type': 'game_status',
 												'action': 'finish',
-												'quantity palyer_ready': self.game_data.QuantityPlayerReady,
+												# 'quantity_player_ready': self.game_data.QuantityPlayerReady,
+												'data': {},
 												'sender_channel_name': self.channel_name,
 											})
 
