@@ -3,8 +3,9 @@ from .models import MultiRoomInfo
 from channels.db import database_sync_to_async
 import random
 import json
-import threading, asyncio
+import asyncio
 import time
+import re
 from asgiref.sync import sync_to_async, async_to_sync
 
 class MultiGameConsumer(AsyncWebsocketConsumer):
@@ -45,8 +46,10 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		cookie_header = next((header for header in request_header if header[0] == b'cookie'), None)
 		if cookie_header:
 			cookies = cookie_header[1].decode('utf-8')
-		self.client_id = cookies.lstrip("client_id=")
-		if self.client_id == cookies:
+		match = re.search(r'client_id=([^;]*)', cookies)
+		if match:
+			self.client_id = match.group(1)
+		else:
 			await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 			self.close()
 			return
