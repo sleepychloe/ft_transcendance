@@ -133,31 +133,31 @@ class GameRoomJoinView(View):
 			instance.save()
 			return "client4"
 
-	def delete(self, request, game_id):
-		try:
-			room = MultiRoomInfo.objects.get(Roomid=game_id)
-		except MultiRoomInfo.DoesNotExist:
-			return JsonResponse({'Error' : 'Room id does not exist.'})
-		room.QuantityPlayer -= 1
-		client_id = request.COOKIES.get('client_id')
-		self.delete_client_id_in_data(game_id, client_id)
-		if room.QuantityPlayer == 0:
-			room.delete()
-		response = JsonResponse({'Room id' : game_id, 'Status' : 'Ok'})
-		response.delete_cookie('client_id')
-		return response
+	# def delete(self, request, game_id):
+	# 	try:
+	# 		room = MultiRoomInfo.objects.get(Roomid=game_id)
+	# 	except MultiRoomInfo.DoesNotExist:
+	# 		return JsonResponse({'Error' : 'Room id does not exist.'})
+	# 	room.QuantityPlayer -= 1
+	# 	client_id = request.COOKIES.get('client_id')
+	# 	self.delete_client_id_in_data(game_id, client_id)
+	# 	if room.QuantityPlayer == 0:
+	# 		room.delete()
+	# 	response = JsonResponse({'Room id' : game_id, 'Status' : 'Ok'})
+	# 	response.delete_cookie('client_id')
+	# 	return response
 	
-	def delete_client_id_in_data(game_id, client_id):
-		room = MultiRoomInfo.objects.get(Roomid=game_id)
-		if room.client1['client_id'] == client_id:
-			room.client1 = None
-		elif room.client2['client_id'] == client_id:
-			room.client2 = None
-		elif room.client3['client_id'] == client_id:
-			room.client3 = None
-		elif room.client4['client_id'] == client_id:
-			room.client4 = None
-		room.save()
+	# def delete_client_id_in_data(game_id, client_id):
+	# 	room = MultiRoomInfo.objects.get(Roomid=game_id)
+	# 	if room.client1['client_id'] == client_id:
+	# 		room.client1 = None
+	# 	elif room.client2['client_id'] == client_id:
+	# 		room.client2 = None
+	# 	elif room.client3['client_id'] == client_id:
+	# 		room.client3 = None
+	# 	elif room.client4['client_id'] == client_id:
+	# 		room.client4 = None
+	# 	room.save()
 
 # class GameStartView(View):
 # 	def get(self, request, game_id):

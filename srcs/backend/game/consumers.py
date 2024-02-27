@@ -3,8 +3,9 @@ from .models import MultiRoomInfo
 from channels.db import database_sync_to_async
 import random
 import json
-import threading, asyncio
+import asyncio
 import time
+import re
 from asgiref.sync import sync_to_async, async_to_sync
 
 class MultiGameConsumer(AsyncWebsocketConsumer):
@@ -45,10 +46,13 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		cookie_header = next((header for header in request_header if header[0] == b'cookie'), None)
 		if cookie_header:
 			cookies = cookie_header[1].decode('utf-8')
-		self.client_id = cookies.lstrip("client_id=")
-		if self.client_id == cookies:
+		match = re.search(r'client_id=([^;]*)', cookies)
+		if match:
+			self.client_id = match.group(1)
+		else:
 			await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 			self.close()
+			return
 		game_id = self.scope["url_route"]["kwargs"]["game_id"]
 		self.game_id = game_id
 		await self.get_game_data()
@@ -57,6 +61,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			if self.n_client == None:
 				await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 				self.close()
+				return
 			await self.channel_layer.group_add(game_id, self.channel_name)
 			self.reconnect_client_quantity()
 			await self.channel_layer.group_send(self.game_id,
@@ -105,9 +110,15 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		setattr(self.game_data, name, value)
 		self.game_data.save()
 
+	@database_sync_to_async
+	def	remove_game_data(self):
+		self.game_data.delete()
+
 	async def disconnect(self, close_code):
 		if self.game_data.GameStatus == False:
 			await self.remove_client_data()
+			if self.game_data.QuantityPlayer == 0:
+				await self.remove_game_data()
 		else:
 			await self.update_value_game_data(self.number_paddle, {
 				'x': -5000,
@@ -130,22 +141,22 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		self.get_game_data()
 		if self.game_data.GameStatus == False:
 			if self.game_data.client1['client_id'] == self.client_id:
-				self.game_data.client1 = None
+				self.game_data.client1 = {}
 			elif self.game_data.client2['client_id'] == self.client_id:
-				self.game_data.client2 = None
+				self.game_data.client2 = {}
 			elif self.game_data.client3['client_id'] == self.client_id:
-				self.game_data.client3 = None
+				self.game_data.client3 = {}
 			elif self.game_data.client4['client_id'] == self.client_id:
-				self.game_data.client4 = None
+				self.game_data.client4 = {}
 
 			if self.number_paddle == 'paddle1':
-				self.game_data.paddle1 = None
+				self.game_data.paddle1 = {}
 			elif self.number_paddle == 'paddle2':
-				self.game_data.paddle2 = None
+				self.game_data.paddle2 = {}
 			elif self.number_paddle == 'paddle3':
-				self.game_data.paddle3 = None
+				self.game_data.paddle3 = {}
 			elif self.number_paddle == 'paddle4':
-				self.game_data.paddle4 = None
+				self.game_data.paddle4 = {}
 		else:
 			if self.game_data.client1['client_id'] == self.client_id:
 				self.game_data.client1['online'] = False

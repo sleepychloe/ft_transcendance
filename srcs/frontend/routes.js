@@ -16,24 +16,24 @@ export const routes = [
                 path: '/local',
                 name: 'LOCAL GAME',
                 template: localpvpPage(),
-                script: createScriptTag('./game/local_pvp/pongLocal.js')
+                script: createScriptTag('/static/game/local_pvp/pongLocal.js')
         },
         {
                 path: '/local_3d',
                 name: 'LOCAL 3D GAME',
                 template: local3dPage(),
-                script: createScriptTag('./game/local_3d/pongLocal3d.js')
+                script: createScriptTag('/static/game/local_3d/pongLocal3d.js')
         },
         {
                 path: '/tournament',
                 name: 'TOURNAMENT GAME',
                 template: tournamentPage(),
-                script: createScriptTag('./game/tournament/pongTour.js')
+                script: createScriptTag('/static/game/tournament/pongTour.js')
         },
         {
                 path: '/multi',
                 name: 'MULTI GAME',
                 template: multiPage(),
-                script: createScriptTag('./game/multi/pongMulti.js')
+                script: createScriptTag('/static/game/multi/pongMulti.js')
         },
 ];

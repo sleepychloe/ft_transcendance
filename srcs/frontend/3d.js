@@ -29,7 +29,7 @@ export function initLogo() {
         let logoMesh;
         // Model loading
         const loader = new GLTFLoader();
-        loader.load('./42_logo.glb', function(gltf) {
+        loader.load('static/42_logo.glb', function(gltf) {
             const model = gltf.scene;
             model.position.set(0, 0, 0); // Center the model within the scene
             model.scale.set(0.5, 0.5, 0.5); // Adjust scale if necessary
