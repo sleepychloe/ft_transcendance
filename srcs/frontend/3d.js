@@ -47,6 +47,7 @@ export function initLogo() {
             const controls = new OrbitControls(camera, renderer.domElement);
             controls.target.set(model.position.x, model.position.y, model.position.z);
             controls.update();
+            controls.enableKeys = false;
         }, undefined, function(error) {
             console.error('Error loading model:', error);
         });
@@ -101,7 +102,6 @@ export function initLogo() {
 export function start3dMode() {
 	document.getElementById("modeSelection").style.display = "block";
 	document.getElementById("startButton").style.display = "block";
-    document.getElementById("gameDashboard").style.display = "none";
 
 	const button = document.getElementById('3dMode');
 	button.addEventListener('click', handleButtonClick);
