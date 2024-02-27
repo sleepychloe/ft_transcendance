@@ -110,9 +110,15 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		setattr(self.game_data, name, value)
 		self.game_data.save()
 
+	@database_sync_to_async
+	def	remove_game_data(self):
+		self.game_data.delete()
+
 	async def disconnect(self, close_code):
 		if self.game_data.GameStatus == False:
 			await self.remove_client_data()
+			if self.game_data.QuantityPlayer == 0:
+				await self.remove_game_data()
 		else:
 			await self.update_value_game_data(self.number_paddle, {
 				'x': -5000,
