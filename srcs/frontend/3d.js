@@ -12,12 +12,13 @@ export function initLogo() {
         }
 
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setSize(500, 500);
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setClearColor(0xffffff, 0);
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(70, canvas.width / canvas.height, 0.1, 1000);
-        camera.position.set(0, 0, 500);
+        const camera = new THREE.PerspectiveCamera(70, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+	    camera.position.set(0, 0, 500);
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0x404040);
@@ -65,6 +66,17 @@ export function initLogo() {
                 renderer.render(scene, camera);
         }
         animate();
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', onWindowResize, false);
+
+        function onWindowResize() {
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+        }
     }
     
     // Function to adjust camera position based on model size
@@ -77,10 +89,11 @@ export function initLogo() {
         const cameraZ = Math.abs(maxSize / (2 * Math.tan(fov / 2)));
         
         camera.position.z = center.z + 3 * cameraZ;
-        const aspect = window.innerWidth / window.innerHeight;
+        const aspect = canvas.clientWidth / canvas.clientHeight;
         camera.aspect = aspect;
         camera.updateProjectionMatrix();
-        renderer.setSize(500, 500);
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
 }
 
 /* 3d game */
@@ -111,23 +124,31 @@ function startMatch() {
 }
 
 function init() {
+    const fixedWidth = 800;
+    const fixedHeight = 400;
+
     // Setup scene
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(75, fixedWidth / fixedHeight, 0.1, 1000);
     camera.position.y = 0;
     camera.position.z = 30;
+    // camera.aspect = fixedWidth / fixedHeight;
+    // camera.updateProjectionMatrix();
     cameraLeft = new THREE.PerspectiveCamera(75, 350 / 350, 0.1, 1000);
     cameraRight = new THREE.PerspectiveCamera(75, 350 / 350, 0.1, 1000);
 
-    cameraLeft.position.set(-30, 12, 0);
-    cameraLeft.lookAt(new THREE.Vector3(0, 10, 0));
+    cameraLeft.position.set(-45, 12, 0);
+    cameraLeft.lookAt(new THREE.Vector3(0, 50, 0));
 
-    cameraRight.position.set(30, 12, 0);
-    cameraRight.lookAt(new THREE.Vector3(0, 10, 0));
+    cameraRight.position.set(45, 12, 0);
+    cameraRight.lookAt(new THREE.Vector3(0, 50, 0));
 
     const canvas = document.getElementById('pong3dCanvas');
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    renderer.setSize(800, 400);
+    canvas.width = fixedWidth;
+    canvas.height = fixedHeight;
+    renderer.setSize(fixedWidth, fixedHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0x000000);
 
     rendererLeft = new THREE.WebGLRenderer({ canvas: document.getElementById('pong3dLeft') });
@@ -149,9 +170,9 @@ function init() {
     directionalLight3.position.set(-5, -5, 15);
 
     const directionalLight4 = new THREE.DirectionalLight(0xffffff, 0.4);
-    directionalLight4.position.set(-25, 0, 0);
+    directionalLight4.position.set(-35, 0, 0);
     const directionalLight5 = new THREE.DirectionalLight(0xffffff, 0.4);
-    directionalLight5.position.set(25, 0, 0);
+    directionalLight5.position.set(35, 0, 0);
     const directionalLight6 = new THREE.DirectionalLight(0xffffff, 0.4);
     directionalLight6.position.set(0, -10, 0);
     const directionalLight7 = new THREE.DirectionalLight(0xffffff, 0.4);
@@ -163,8 +184,8 @@ function init() {
 
     // Add boundaries
     const boundaryGeometryLR = new THREE.BoxGeometry(0.2, 20, 20);
-    const boundaryGeometryDU = new THREE.BoxGeometry(30, 0.2, 20);
-    const boundaryGeometryBF = new THREE.BoxGeometry(30, 20, 0.2);
+    const boundaryGeometryDU = new THREE.BoxGeometry(50, 0.2, 20);
+    const boundaryGeometryBF = new THREE.BoxGeometry(50, 20, 0.2);
 
     const boundaryMaterialLR = new THREE.MeshPhongMaterial({ 
         color: 0x555555,  
@@ -193,8 +214,8 @@ function init() {
     const boundaryB = new THREE.Mesh(boundaryGeometryBF, boundaryMaterialB);
     const boundaryF = new THREE.Mesh(boundaryGeometryBF, boundaryMaterialF);
 
-    boundaryL.position.x = -15;
-    boundaryR.position.x = 15;
+    boundaryL.position.x = -25;
+    boundaryR.position.x = 25;
     boundaryD.position.y = -10;
     boundaryU.position.y = 10;
     boundaryB.position.z = -10;
@@ -202,13 +223,13 @@ function init() {
     scene.add(boundaryL, boundaryR, boundaryD, boundaryU, boundaryB, boundaryF);
 
     // Add paddles and ball
-    const paddleGeometry = new THREE.BoxGeometry(0.5, 4, 4);
+    const paddleGeometry = new THREE.BoxGeometry(0.5, 3, 3);
     const paddleMaterial = new THREE.MeshPhongMaterial({ color: 0x999999});
     paddle1 = new THREE.Mesh(paddleGeometry, paddleMaterial);
     paddle2 = new THREE.Mesh(paddleGeometry, paddleMaterial);
     scene.add(paddle1, paddle2);
-    paddle1.position.x = -14.75;
-    paddle2.position.x = 14.75;
+    paddle1.position.x = -24.75;
+    paddle2.position.x = 24.75;
 
     const ballGeometry = new THREE.SphereGeometry(0.75, 32, 32);
     ball = new THREE.Mesh(ballGeometry, paddleMaterial); // Using the same Phong material for consistency
@@ -241,6 +262,23 @@ function init() {
     controlsRight.minDistance = 10; // Minimum zoom distance
     controlsRight.maxDistance = 50; // Maximum zoom distance
     controlsRight.enableKeys = false;
+
+    window.addEventListener('resize', onWindowResize, false);
+
+    function onWindowResize() {
+        camera.aspect = fixedWidth / fixedWidth;
+        camera.updateProjectionMatrix();
+        renderer.setSize(fixedWidth, fixedHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        cameraLeft.aspect = 350 / 350;
+        cameraLeft.updateProjectionMatrix();
+        rendererLeft.setSize(390, 390);
+
+        cameraRight.aspect = 350 / 350;
+        cameraRight.updateProjectionMatrix();
+        rendererRight.setSize(390, 390);
+    }
 }
 
 function animate() {
@@ -291,7 +329,7 @@ function checkPaddleCollision() {
             ball.position.z <= paddle1.position.z + 2 && ball.position.z >= paddle1.position.z - 2) {
                 ballSpeed.x = -ballSpeed.x; 
                 paddleHit = 1;
-                createBoundaryHitEffect(new THREE.Vector3(-15, ball.position.y, ball.position.z), 0x0000ff, 300);
+                createBoundaryHitEffect(new THREE.Vector3(-25, ball.position.y, ball.position.z), 0x0000ff, 300);
         }
     }
 
@@ -301,20 +339,20 @@ function checkPaddleCollision() {
             ball.position.z <= paddle2.position.z + 2 && ball.position.z >= paddle2.position.z - 2) {
                 ballSpeed.x = -ballSpeed.x;
                 paddleHit = 1;
-                createBoundaryHitEffect(new THREE.Vector3(15, ball.position.y, ball.position.z), 0x0000ff, 300);
+                createBoundaryHitEffect(new THREE.Vector3(25, ball.position.y, ball.position.z), 0x0000ff, 300);
         }
     }
 
-    if (ball.position.x < -9.5 && ballSpeed.x < 0)
-        createBoundaryHitEffect(new THREE.Vector3(-15, ball.position.y, ball.position.z), 0x000000, 1);
-    if (ball.position.x > 9.5 && ballSpeed.x > 0)
-        createBoundaryHitEffect(new THREE.Vector3(15, ball.position.y, ball.position.z), 0x000000, 1);
+    if (ball.position.x < -20 && ballSpeed.x < 0)
+        createBoundaryHitEffect(new THREE.Vector3(-25, ball.position.y, ball.position.z), 0x000000, 1);
+    if (ball.position.x > 20 && ballSpeed.x > 0)
+        createBoundaryHitEffect(new THREE.Vector3(25, ball.position.y, ball.position.z), 0x000000, 1);
 
-    if (ball.position.x < -14.3){
-        createBoundaryHitEffect(new THREE.Vector3(-15, ball.position.y, ball.position.z), 0xff0000, 300);
+    if (ball.position.x < -24.3){
+        createBoundaryHitEffect(new THREE.Vector3(-25, ball.position.y, ball.position.z), 0xff0000, 300);
     }
-    if (ball.position.x > 14.3) {
-        createBoundaryHitEffect(new THREE.Vector3(15, ball.position.y, ball.position.z), 0xff0000, 300);
+    if (ball.position.x > 24.3) {
+        createBoundaryHitEffect(new THREE.Vector3(25, ball.position.y, ball.position.z), 0xff0000, 300);
     }
 }
 
@@ -327,7 +365,7 @@ function checkBallBoundaries() {
         ballSpeed.z = -ballSpeed.z;
     }
 
-    if ((ball.position.x <= -14.5 || ball.position.x >= 14.5)
+    if ((ball.position.x <= -24.5 || ball.position.x >= 24.5)
             && paddleHit === 0) {
         let winner = ball.position.x > 0 ? 'Player 1' : 'Player 2';
         alert(`Winner: ${winner}`);
