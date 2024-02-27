@@ -11,7 +11,7 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r ./settings/requir
 
 RUN chmod 777 ./settings/wait_for_it.sh
 
-# COPY . ./backend
+COPY . ./backend
 
 WORKDIR /backend
 

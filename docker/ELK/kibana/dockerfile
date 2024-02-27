@@ -2,4 +2,4 @@ FROM kibana:7.17.16
 
 COPY ./config/kibana.yml /usr/share/kibana/config/kibana.yml
 
-# COPY ./certificat/elastic-certificates.p12 /usr/share/kibana/config/certs/elastic-certificates.p12
+COPY ./certificat/elastic-certificates.p12 /usr/share/kibana/config/certs/elastic-certificates.p12
