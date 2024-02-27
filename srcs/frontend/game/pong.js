@@ -77,9 +77,16 @@ function updatePaddlePosition() {
 }
 
 function paddleCollision() {
-    if ((ballX <= paddleWidth && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) ||
-        (ballX >= canvas.width - paddleWidth && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight)) {
+    if (ballX <= paddleWidth / 2 && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) {
         ballSpeedX = -ballSpeedX;
+        ballSpeedX += 0.001;
+        console.log(`${ballX}`);
+    }
+    if (ballX >= canvas.width - paddleWidth / 2 && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight)
+    {
+        ballSpeedX = -ballSpeedX;
+        ballSpeedX -= 0.001;
+        console.log(`${ballX}`);
     }
 }
 

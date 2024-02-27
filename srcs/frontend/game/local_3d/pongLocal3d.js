@@ -7,6 +7,7 @@ let controls;
 let animationFrameId;
 let gameInProgress;
 let local3dMode;
+let paddleHit;
 
 function checkPaddleBoundaries() {
 	// Paddle 1 boundaries

@@ -99,7 +99,8 @@ function handleButtonClick() {
 	document.getElementById("modeSelection").style.display = "block";
 	document.getElementById("startButton").style.display = "none";
 	gameInProgress = true;
-	local3dMode = true;;
+	local3dMode = true;
+    paddleHit = 0;
 	startMatch();
 }
 
@@ -206,12 +207,12 @@ function animate() {
     ball.position.y += ballSpeed.y;
     ball.position.z += ballSpeed.z;
 
+    paddleHit = 0;
     // Collision detection with paddles
     checkPaddleCollision();
 
     // Boundary constraints for ball movement
     checkBallBoundaries();
-
     // Update controls
     controls.update();
 
@@ -235,6 +236,7 @@ function checkPaddleCollision() {
             ball.position.z <= paddle1.position.z + 2 && ball.position.z >= paddle1.position.z - 2) { // Checking z boundaries
                 // createBoundaryHitEffect(new THREE.Vector3(ball.position.x, ball.position.y, ball.position.z));
                 ballSpeed.x = -ballSpeed.x; // Reverse X direction
+                paddleHit = 1;
             // Optionally, reverse y or z direction based on the game's physics
         }
     }
@@ -245,17 +247,9 @@ function checkPaddleCollision() {
             ball.position.z <= paddle2.position.z + 2 && ball.position.z >= paddle2.position.z - 2) { // Adjusting for paddle's depth
                 // createBoundaryHitEffect(new THREE.Vector3(ball.position.x, ball.position.y, ball.position.z));
                 ballSpeed.x = -ballSpeed.x; // Reverse X direction
+                paddleHit = 1;
             // Optionally, adjust y or z direction based on collision logic
         }
-    }
-
-	if (ball.position.x <= -14.5 || ball.position.x >= 14.5) {
-        let winner = ball.position.x < 0 ? 'Player 1' : 'Player 2';
-        alert(`Winner: ${winner}`);
-        gameInProgress = false;
-        local3dMode = false;
-        stopAnimation();
-        start3dMode();
     }
 }
 
@@ -287,5 +281,15 @@ function checkBallBoundaries() {
     if (ball.position.z <= -9.5|| ball.position.z >= 9.5) {
         createBoundaryHitEffect(new THREE.Vector3(ball.position.x, ball.position.y, ball.position.z <= -9.5 ? -10 : 10));
         ballSpeed.z = -ballSpeed.z; // Reverse Z direction
+    }
+
+    if ((ball.position.x <= -14.5 || ball.position.x >= 14.5)
+            && paddleHit === 0) {
+        let winner = ball.position.x > 0 ? 'Player 1' : 'Player 2';
+        alert(`Winner: ${winner}`);
+        gameInProgress = false;
+        local3dMode = false;
+        stopAnimation();
+        start3dMode();
     }
 }
