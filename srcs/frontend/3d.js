@@ -141,9 +141,25 @@ function init() {
     // lighting
     const ambientLight = new THREE.AmbientLight(0x656565);
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
-    directionalLight.position.set(0, 5, 10);
-    scene.add(directionalLight);
+    const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight1.position.set(0, 0, 0);
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight2.position.set(5, 5, 15);
+    const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight3.position.set(-5, -5, 15);
+
+    const directionalLight4 = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight4.position.set(-25, 0, 0);
+    const directionalLight5 = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight5.position.set(25, 0, 0);
+    const directionalLight6 = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight6.position.set(0, -10, 0);
+    const directionalLight7 = new THREE.DirectionalLight(0xffffff, 0.4);
+    directionalLight7.position.set(0, 10, 0);
+    
+    
+    scene.add(directionalLight1, directionalLight2, directionalLight3,
+        directionalLight4, directionalLight5, directionalLight6, directionalLight7);
 
     // Add boundaries
     const boundaryGeometryLR = new THREE.BoxGeometry(0.2, 20, 20);
@@ -151,26 +167,22 @@ function init() {
     const boundaryGeometryBF = new THREE.BoxGeometry(30, 20, 0.2);
 
     const boundaryMaterialLR = new THREE.MeshPhongMaterial({ 
-        color: 0x00ffff, 
-        wireframe: false, 
+        color: 0x555555,  
         transparent: true,
-        opacity: 0.3
+        opacity: 0.2
     });
     const boundaryMaterialUD = new THREE.MeshPhongMaterial({ 
-        color: 0xffff00, 
-        wireframe: false, 
+        color: 0x555555, 
         transparent: true,
-        opacity: 0.3
+        opacity: 0.2
     });
     const boundaryMaterialB = new THREE.MeshPhongMaterial({ 
-        color: 0xff00ff, 
-        wireframe: false, 
+        color: 0x555555, 
         transparent: true, 
-        opacity: 0.3
+        opacity: 0.15
     });
     const boundaryMaterialF = new THREE.MeshPhongMaterial({ 
-        color: 0xff00ff, 
-        wireframe: false, 
+        color: 0x000000, 
         transparent: true, 
         opacity: 0
     });
@@ -191,7 +203,7 @@ function init() {
 
     // Add paddles and ball
     const paddleGeometry = new THREE.BoxGeometry(0.5, 4, 4);
-    const paddleMaterial = new THREE.MeshPhongMaterial({ color: 0x555555, specular: 0x555555, shininess: 30 });
+    const paddleMaterial = new THREE.MeshPhongMaterial({ color: 0x999999});
     paddle1 = new THREE.Mesh(paddleGeometry, paddleMaterial);
     paddle2 = new THREE.Mesh(paddleGeometry, paddleMaterial);
     scene.add(paddle1, paddle2);
@@ -255,6 +267,23 @@ export function stopAnimation() {
         }
 }
 
+function createBoundaryHitEffect(position, color, time) {
+    // Define the geometry and material for the hit effect sphere
+    const effectGeometry = new THREE.SphereGeometry(0.75, 16, 16);
+    const effectMaterial = new THREE.MeshBasicMaterial({ color: color });
+    const hitEffect = new THREE.Mesh(effectGeometry, effectMaterial);
+
+    // Set the position of the hit effect sphere
+    hitEffect.position.set(position.x, position.y, position.z);
+
+    // Add the hit effect sphere to the scene
+    scene.add(hitEffect);
+    // Remove the hit effect sphere after 0.5 seconds
+    setTimeout(() => {
+        scene.remove(hitEffect);
+    }, time);
+}
+
 function checkPaddleCollision() {
     // Paddle2
     if (ball.position.x <= paddle1.position.x + 0.25 + 0.375 && ball.position.x >= paddle1.position.x - 0.25 - 0.375) {
@@ -262,6 +291,7 @@ function checkPaddleCollision() {
             ball.position.z <= paddle1.position.z + 2 && ball.position.z >= paddle1.position.z - 2) {
                 ballSpeed.x = -ballSpeed.x; 
                 paddleHit = 1;
+                createBoundaryHitEffect(new THREE.Vector3(-15, ball.position.y, ball.position.z), 0x0000ff, 300);
         }
     }
 
@@ -271,7 +301,20 @@ function checkPaddleCollision() {
             ball.position.z <= paddle2.position.z + 2 && ball.position.z >= paddle2.position.z - 2) {
                 ballSpeed.x = -ballSpeed.x;
                 paddleHit = 1;
+                createBoundaryHitEffect(new THREE.Vector3(15, ball.position.y, ball.position.z), 0x0000ff, 300);
         }
+    }
+
+    if (ball.position.x < -9.5 && ballSpeed.x < 0)
+        createBoundaryHitEffect(new THREE.Vector3(-15, ball.position.y, ball.position.z), 0x000000, 1);
+    if (ball.position.x > 9.5 && ballSpeed.x > 0)
+        createBoundaryHitEffect(new THREE.Vector3(15, ball.position.y, ball.position.z), 0x000000, 1);
+
+    if (ball.position.x < -14.3){
+        createBoundaryHitEffect(new THREE.Vector3(-15, ball.position.y, ball.position.z), 0xff0000, 300);
+    }
+    if (ball.position.x > 14.3) {
+        createBoundaryHitEffect(new THREE.Vector3(15, ball.position.y, ball.position.z), 0xff0000, 300);
     }
 }
 
