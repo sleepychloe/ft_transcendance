@@ -8,21 +8,21 @@ export function initLogo() {
         const canvas = document.getElementById('threejs-canvas');
         if (!canvas) {
                 console.error('Canvas element not found');
-                return; // Stop execution if canvas is not found
+                return;
         }
 
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setSize(500, 500); // Set the size of the canvas
-        renderer.setClearColor(0xffffff, 0); // Transparent background
+        renderer.setSize(500, 500);
+        renderer.setClearColor(0xffffff, 0);
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(70, canvas.width / canvas.height, 0.1, 1000);
         camera.position.set(0, 0, 500);
 
         // Lighting
-        const ambientLight = new THREE.AmbientLight(0x404040); // Soft white light
+        const ambientLight = new THREE.AmbientLight(0x404040);
         scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Bright white light
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(-5, 6, 7);
         scene.add(directionalLight);
         
@@ -31,8 +31,8 @@ export function initLogo() {
         const loader = new GLTFLoader();
         loader.load('static/42_logo.glb', function(gltf) {
             const model = gltf.scene;
-            model.position.set(0, 0, 0); // Center the model within the scene
-            model.scale.set(0.5, 0.5, 0.5); // Adjust scale if necessary
+            model.position.set(0, 0, 0);
+            model.scale.set(0.5, 0.5, 0.5);
             model.rotation.x = Math.PI / 2;
             model.rotation.y = Math.PI / 2;
             scene.add(model);
@@ -52,14 +52,13 @@ export function initLogo() {
 
         function animate() {
                 requestAnimationFrame(animate);
-        
-                // Assume the text mesh is the second object added to the scene
+
                 if (logoMesh) {
                         const time = Date.now() * 0.001;
-                        logoMesh.rotation.y = Math.sin(time) * 0.3; // This will continuously rotate the logo around the Y-axis.
+                        logoMesh.rotation.y = Math.sin(time) * 0.3; 
                         logoMesh.rotation.z = Math.sin(time) * 0.04;
-                        logoMesh.position.x = Math.sin(time * 0.5) * 0.02; // This will move the logo left and right.
-                        logoMesh.position.y = Math.sin(time * 0.3) * 0.02; // This will move the logo up and down.
+                        logoMesh.position.x = Math.sin(time * 0.5) * 0.02;
+                        logoMesh.position.y = Math.sin(time * 0.3) * 0.02;
                 
                 }
         
@@ -117,16 +116,31 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.y = 0;
     camera.position.z = 30;
+    cameraLeft = new THREE.PerspectiveCamera(75, 350 / 350, 0.1, 1000);
+    cameraRight = new THREE.PerspectiveCamera(75, 350 / 350, 0.1, 1000);
+
+    cameraLeft.position.set(-30, 12, 0);
+    cameraLeft.lookAt(new THREE.Vector3(0, 10, 0));
+
+    cameraRight.position.set(30, 12, 0);
+    cameraRight.lookAt(new THREE.Vector3(0, 10, 0));
 
     const canvas = document.getElementById('pong3dCanvas');
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     renderer.setSize(800, 400);
-    renderer.setClearColor(0x000000); // Set background color
+    renderer.setClearColor(0x000000);
 
-    // Add Phong lighting
-    const ambientLight = new THREE.AmbientLight(0x656565); // Soft white light
+    rendererLeft = new THREE.WebGLRenderer({ canvas: document.getElementById('pong3dLeft') });
+    rendererLeft.setSize(390, 390);
+    rendererLeft.setClearColor(0x000000);
+
+    rendererRight = new THREE.WebGLRenderer({ canvas: document.getElementById('pong3dRight') });
+    rendererRight.setSize(390, 390);
+    rendererRight.setClearColor(0x000000);
+
+    // lighting
+    const ambientLight = new THREE.AmbientLight(0x656565);
     scene.add(ambientLight);
-
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
     directionalLight.position.set(0, 5, 10);
     scene.add(directionalLight);
@@ -175,7 +189,7 @@ function init() {
     boundaryF.position.z = 10;
     scene.add(boundaryL, boundaryR, boundaryD, boundaryU, boundaryB, boundaryF);
 
-    // Add paddles and ball with Phong material
+    // Add paddles and ball
     const paddleGeometry = new THREE.BoxGeometry(0.5, 4, 4);
     const paddleMaterial = new THREE.MeshPhongMaterial({ color: 0x555555, specular: 0x555555, shininess: 30 });
     paddle1 = new THREE.Mesh(paddleGeometry, paddleMaterial);
@@ -190,97 +204,84 @@ function init() {
 
     // Initialize OrbitControls
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; // Optional, but this gives a nice inertia feel
+    controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.screenSpacePanning = false;
     controls.maxPolarAngle = Math.PI / 2; // Limit the camera to 180 degrees vertical movement
     controls.minDistance = 10; // Minimum zoom distance
     controls.maxDistance = 50; // Maximum zoom distance
-    // Disable keys
     controls.enableKeys = false;
+
+    controlsLeft = new OrbitControls(cameraLeft, rendererLeft.domElement);
+    controlsLeft.enableDamping = true;
+    controlsLeft.dampingFactor = 0.05;
+    controlsLeft.screenSpacePanning = false;
+    controlsLeft.maxPolarAngle = Math.PI / 2;
+    controlsLeft.minDistance = 10; // Minimum zoom distance
+    controlsLeft.maxDistance = 50; // Maximum zoom distance
+    controlsLeft.enableKeys = false;
+
+    controlsRight = new OrbitControls(cameraRight, rendererRight.domElement);
+    controlsRight.enableDamping = true;
+    controlsRight.dampingFactor = 0.05;
+    controlsRight.screenSpacePanning = false;
+    controlsRight.maxPolarAngle = Math.PI / 2;
+    controlsRight.minDistance = 10; // Minimum zoom distance
+    controlsRight.maxDistance = 50; // Maximum zoom distance
+    controlsRight.enableKeys = false;
 }
 
 function animate() {
     animationFrameId = requestAnimationFrame(animate);
-    // Update objects' positions here
     ball.position.x += ballSpeed.x;
     ball.position.y += ballSpeed.y;
     ball.position.z += ballSpeed.z;
 
     paddleHit = 0;
-    // Collision detection with paddles
     checkPaddleCollision();
-
-    // Boundary constraints for ball movement
     checkBallBoundaries();
-    // Update controls
+
     controls.update();
 
-    // Collision detection and game logic
-    renderer.render(scene, camera); // Now renderer is accessible here
+    renderer.render(scene, camera);
+    rendererLeft.render(scene, cameraLeft);
+    rendererRight.render(scene, cameraRight);
 }
 
 export function stopAnimation() {
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
-            animationFrameId = undefined; // Reset the ID
+            animationFrameId = undefined;
         }
 }
 
 function checkPaddleCollision() {
-    // Adjusting collision checks to account for updated paddle size: 0.5 (x), 4 (y), and 4 (z)
-
-    // Check collision with paddle1
-    if (ball.position.x <= paddle1.position.x + 0.25 && ball.position.x >= paddle1.position.x - 0.25) { // Assuming the ball's x position is within the paddle's width
-        if (ball.position.y <= paddle1.position.y + 2 && ball.position.y >= paddle1.position.y - 2 && // Checking y boundaries
-            ball.position.z <= paddle1.position.z + 2 && ball.position.z >= paddle1.position.z - 2) { // Checking z boundaries
-                // createBoundaryHitEffect(new THREE.Vector3(ball.position.x, ball.position.y, ball.position.z));
-                ballSpeed.x = -ballSpeed.x; // Reverse X direction
+    // Paddle2
+    if (ball.position.x <= paddle1.position.x + 0.25 + 0.375 && ball.position.x >= paddle1.position.x - 0.25 - 0.375) {
+        if (ball.position.y <= paddle1.position.y + 2 && ball.position.y >= paddle1.position.y - 2 &&
+            ball.position.z <= paddle1.position.z + 2 && ball.position.z >= paddle1.position.z - 2) {
+                ballSpeed.x = -ballSpeed.x; 
                 paddleHit = 1;
-            // Optionally, reverse y or z direction based on the game's physics
         }
     }
 
-    // Check collision with paddle2
-    if (ball.position.x <= paddle2.position.x + 0.25 && ball.position.x >= paddle2.position.x - 0.25) { // Adjusting x check for paddle's width
-        if (ball.position.y <= paddle2.position.y + 2 && ball.position.y >= paddle2.position.y - 2 && // Adjusting for paddle's height
-            ball.position.z <= paddle2.position.z + 2 && ball.position.z >= paddle2.position.z - 2) { // Adjusting for paddle's depth
-                // createBoundaryHitEffect(new THREE.Vector3(ball.position.x, ball.position.y, ball.position.z));
-                ballSpeed.x = -ballSpeed.x; // Reverse X direction
+    // Paddle2
+    if (ball.position.x <= paddle2.position.x + 0.25 + 0.375 && ball.position.x >= paddle2.position.x - 0.25 - 0.375) {
+        if (ball.position.y <= paddle2.position.y + 2 && ball.position.y >= paddle2.position.y - 2 &&
+            ball.position.z <= paddle2.position.z + 2 && ball.position.z >= paddle2.position.z - 2) {
+                ballSpeed.x = -ballSpeed.x;
                 paddleHit = 1;
-            // Optionally, adjust y or z direction based on collision logic
         }
     }
-}
-
-function createBoundaryHitEffect(position) {
-    // Define the geometry and material for the hit effect sphere
-    const effectGeometry = new THREE.SphereGeometry(0.5, 16, 16);
-    const effectMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    const hitEffect = new THREE.Mesh(effectGeometry, effectMaterial);
-
-    // Set the position of the hit effect sphere
-    hitEffect.position.set(position.x, position.y, position.z);
-
-    // Add the hit effect sphere to the scene
-    scene.add(hitEffect);
-    // Remove the hit effect sphere after 0.5 seconds
-    setTimeout(() => {
-        scene.remove(hitEffect);
-    }, 500);
 }
 
 function checkBallBoundaries() {
-    // Check Y boundaries (assuming a vertical playfield)
-    if (ball.position.y <= -9.5 || ball.position.y >= 9.5) {
-        createBoundaryHitEffect(new THREE.Vector3(ball.position.x, ball.position.y <= -9.5 ? -10 : 10, ball.position.z));
-        ballSpeed.y = -ballSpeed.y; // Reverse Y direction
+    if (ball.position.y <= -9.5 - 0.375 || ball.position.y >= 9.5 - 0.375) {
+        ballSpeed.y = -ballSpeed.y;
     }
 
-    // Check Z boundaries
-    if (ball.position.z <= -9.5|| ball.position.z >= 9.5) {
-        createBoundaryHitEffect(new THREE.Vector3(ball.position.x, ball.position.y, ball.position.z <= -9.5 ? -10 : 10));
-        ballSpeed.z = -ballSpeed.z; // Reverse Z direction
+    if (ball.position.z <= -9.5 - 0.375 || ball.position.z >= 9.5 - 0.375) {
+        ballSpeed.z = -ballSpeed.z;
     }
 
     if ((ball.position.x <= -14.5 || ball.position.x >= 14.5)

@@ -1,9 +1,10 @@
-let scene, camera, renderer; // Declare renderer here to make it accessible globally in this script
+let scene, camera, renderer
+let cameraLeft, cameraRight, rendererLeft, rendererRight;
 let paddle1, paddle2, ball;
 let ballSpeed = { x: Math.random() < 0.5 ? (Math.random() + 0.3) * 0.06 :(Math.random() + 0.3) * -0.06,
                     y: Math.random() < 0.5 ? (Math.random() + 0.1) * 0.08 : (Math.random() + 0.1) * -0.08,
                     z: Math.random() < 0.5 ? (Math.random() + 0.1) * 0.035 : (Math.random() + 0.1) * -0.035 };
-let controls;
+let controls, controlsLeft, controlsRight;
 let animationFrameId;
 let gameInProgress;
 let local3dMode;
@@ -24,12 +25,12 @@ document.addEventListener('keydown', event => {
 		switch(event.key) {
 		case 'w': paddle1.position.y += 2; break;
 		case 's': paddle1.position.y -= 2; break;
-		case 'a': paddle1.position.z += 2; break; // Corrected direction for consistent movement
-		case 'd': paddle1.position.z -= 2; break; // Corrected direction for consistent movement
+		case 'a': paddle1.position.z -= 2; break; // Corrected direction for consistent movement
+		case 'd': paddle1.position.z += 2; break; // Corrected direction for consistent movement
 		case 'ArrowUp': paddle2.position.y += 2; break;
 		case 'ArrowDown': paddle2.position.y -= 2; break;
-		case 'ArrowLeft': paddle2.position.z -= 2; break; // Corrected direction for consistent movement
-		case 'ArrowRight': paddle2.position.z += 2; break; // Corrected direction for consistent movement
+		case 'ArrowLeft': paddle2.position.z += 2; break; // Corrected direction for consistent movement
+		case 'ArrowRight': paddle2.position.z -= 2; break; // Corrected direction for consistent movement
 		}
 		checkPaddleBoundaries();
 	}
