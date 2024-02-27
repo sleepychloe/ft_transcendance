@@ -18,11 +18,11 @@ const app = async () => {
         // insert pong.js script inside HTML head on game page load
         if ((match.route.path !== '/'
                 && match.route.path !== '/multi'
-                && match.route.path !== '/local_3d') && !document.getElementById('script-path-./game/pong.js'))
+                && match.route.path !== '/local_3d') && !document.getElementById('script-path-/static/game/pong.js'))
         {
                 var tag = document.createElement("script");
                 tag.src = "/static/game/pong.js";
-                tag.id = "script-path-./game/pong.js";
+                tag.id = "script-path-/static/game/pong.js";
                 document.getElementsByTagName("head")[0].appendChild(tag);
         }
         if (match.route.path === '/') {

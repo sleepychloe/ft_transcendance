@@ -49,6 +49,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		if self.client_id == cookies:
 			await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 			self.close()
+			return
 		game_id = self.scope["url_route"]["kwargs"]["game_id"]
 		self.game_id = game_id
 		await self.get_game_data()
@@ -57,6 +58,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			if self.n_client == None:
 				await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 				self.close()
+				return
 			await self.channel_layer.group_add(game_id, self.channel_name)
 			await self.channel_layer.group_send(self.game_id,
 													{
@@ -130,22 +132,22 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		self.get_game_data()
 		if self.game_data.GameStatus == False:
 			if self.game_data.client1['client_id'] == self.client_id:
-				self.game_data.client1 = None
+				self.game_data.client1 = {}
 			elif self.game_data.client2['client_id'] == self.client_id:
-				self.game_data.client2 = None
+				self.game_data.client2 = {}
 			elif self.game_data.client3['client_id'] == self.client_id:
-				self.game_data.client3 = None
+				self.game_data.client3 = {}
 			elif self.game_data.client4['client_id'] == self.client_id:
-				self.game_data.client4 = None
+				self.game_data.client4 = {}
 
 			if self.number_paddle == 'paddle1':
-				self.game_data.paddle1 = None
+				self.game_data.paddle1 = {}
 			elif self.number_paddle == 'paddle2':
-				self.game_data.paddle2 = None
+				self.game_data.paddle2 = {}
 			elif self.number_paddle == 'paddle3':
-				self.game_data.paddle3 = None
+				self.game_data.paddle3 = {}
 			elif self.number_paddle == 'paddle4':
-				self.game_data.paddle4 = None
+				self.game_data.paddle4 = {}
 		else:
 			if self.game_data.client1['client_id'] == self.client_id:
 				self.game_data.client1['online'] = False

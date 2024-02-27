@@ -77,7 +77,7 @@ function lobbyPlayersListItemComponent(playerId="player") {
 
 	let iconImage = document.createElement('img');
 	iconImage.classList.add('img-player-icon');
-	iconImage.src = '../../assets/img/user-person-single-id-account-player-male-female-512.webp';
+	iconImage.src = '/static/assets/img/user-person-single-id-account-player-male-female-512.webp';
 	iconImage.alt = 'playerIcon';
 	playerIcon.appendChild(iconImage);
 
