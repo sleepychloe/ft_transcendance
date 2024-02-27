@@ -21,7 +21,7 @@ const app = async () => {
                 && match.route.path !== '/local_3d') && !document.getElementById('script-path-./game/pong.js'))
         {
                 var tag = document.createElement("script");
-                tag.src = "./game/pong.js";
+                tag.src = "/static/game/pong.js";
                 tag.id = "script-path-./game/pong.js";
                 document.getElementsByTagName("head")[0].appendChild(tag);
         }
