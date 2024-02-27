@@ -41,7 +41,7 @@ export function initLogo() {
             logoMesh = model;
 
             // Adjust camera to fit model
-            adjustCameraToFitModel(camera, model, renderer);
+            adjustCameraToFitModel(camera, model, renderer, canvas);
     
             // Controls for interactive viewing
             const controls = new OrbitControls(camera, renderer.domElement);
@@ -80,7 +80,7 @@ export function initLogo() {
     }
     
     // Function to adjust camera position based on model size
-    function adjustCameraToFitModel(camera, model, renderer) {
+    function adjustCameraToFitModel(camera, model, renderer, canvas) {
         const box = new THREE.Box3().setFromObject(model);
         const size = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
