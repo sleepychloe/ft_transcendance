@@ -58,6 +58,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 				self.close()
 			await self.channel_layer.group_add(game_id, self.channel_name)
+			self.reconnect_client_quantity()
 			await self.channel_layer.group_send(self.game_id,
 													{
 														'type': 'room_inform',
@@ -68,7 +69,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 														'sender_channel_name': self.channel_name,
 													})
 			paddle = await self.get_value_game_data(self.n_client)
-			self.reconnect_client_quantity()
 			if paddle['paddle'] == 'paddle1' or paddle['paddle'] == 'paddle2':
 				self.number_paddle = paddle['paddle']
 				await self.update_value_game_data(self.number_paddle, {
@@ -384,6 +384,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 					'type': 'join',
 					'data': {
 						'n_client': n_client,
+						'quantity_player': quantity_player,
 						'quantity_player_ready': quantity_player_ready,
 					},
 				}))
@@ -393,6 +394,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				'type': 'ready',
 				'data': {
 					'n_client': n_client,
+					'quantity_player': quantity_player,
 					'quantity_player_ready': quantity_player_ready,
 				},
 			}))
@@ -412,6 +414,17 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				'type': 'disconnect',
 				'data': {
 					'n_client': n_client,
+					'quantity_player': quantity_player,
+					'quantity_player_ready': quantity_player_ready,
+				}
+			}))
+		elif action == 'reconnect':
+			await self.send(text_data=json.dumps({
+				'info': 'player',
+				'type': 'reconnect',
+				'data': {
+					'n_client': n_client,
+					'quantity_player': quantity_player,
 					'quantity_player_ready': quantity_player_ready,
 				}
 			}))
@@ -520,24 +533,26 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			paddle_position.update(self.game_state)
 			paddle_position.update(self.score)
 			await self.channel_layer.group_send(self.game_id,
-														{
-															'type': 'game_status',
-															'action': 'update',
-															'data': paddle_position,
-															'sender_channel_name': self.channel_name,
-														})
+													{
+														'type': 'game_status',
+														'action': 'update',
+														'data': paddle_position,
+														'sender_channel_name': self.channel_name,
+													})
 			await asyncio.sleep(0.03)
 			await self.get_game_data()
 		#out of scope while
 		print("out of while")
 		await self.channel_layer.group_send(self.game_id,
-											{
-												'type': 'game_status',
-												'action': 'finish',
-												# 'quantity_player_ready': self.game_data.QuantityPlayerReady,
-												'data': {},
-												'sender_channel_name': self.channel_name,
-											})
+												{
+													'type': 'game_status',
+													'action': 'finish',
+													'data': {
+														'quantity_player': self.game_data.QuantityPlayer,
+														'quantity_player_ready': self.game_data.QuantityPlayerReady,
+													},
+													'sender_channel_name': self.channel_name,
+												})
 
 	async def paddle_ball_collision(self):
 		left_paddle1 = self.game_data.paddle1

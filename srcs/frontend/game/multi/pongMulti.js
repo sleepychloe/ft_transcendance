@@ -70,21 +70,26 @@ function modalClose() {
 	}
 }
 
-function updateLobbyPlayerList(n_client="unknown", method="") {
-	if (method === "add") {
-		let newPlayer = lobbyPlayersListItemComponent(n_client);
-		let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
-		if (newPlayer && lobbyPlayerList)
-			lobbyPlayerList.appendChild(newPlayer);
-	} else if (method === "delete") {
-		let oldPlayer = document.getElementById(n_client);
-		let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
-		if (oldPlayer && lobbyPlayerList)
-			lobbyPlayerList.removeChild(oldPlayer);
-	} else {
-		console.error('wrong method');
-	}
+function updateLobbyPlayerList(data={}) {
+	let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
+	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player));
 }
+
+// function updateLobbyPlayerList(n_client="unknown", method="") {
+// 	if (method === "add") {
+// 		let newPlayer = lobbyPlayersListItemComponent(n_client);
+// 		let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
+// 		if (newPlayer && lobbyPlayerList)
+// 			lobbyPlayerList.appendChild(newPlayer);
+// 	} else if (method === "delete") {
+// 		let oldPlayer = document.getElementById(n_client);
+// 		let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
+// 		if (oldPlayer && lobbyPlayerList)
+// 			lobbyPlayerList.removeChild(oldPlayer);
+// 	} else {
+// 		console.error('wrong method');
+// 	}
+// }
 
 function updateLobbySlot(quantity_player_ready=0) {
 	let lobbySlot = document.getElementsByClassName('lobby-space-counter')[0];
@@ -112,25 +117,31 @@ const sendPaddleMovement = async (e) => {
 
 function multiStartGame() {
 	let mainPart = document.getElementsByClassName('main-part')[0];
-	if (mainPart) {
-		mainPart.innerHTML = '';
+	let lobby = document.getElementsByClassName('lobby')[0];
+	let game = document.getElementsByClassName('game')[0];
+	lobby.style.display = 'none';
+	if (game) {
+		game.style.display = 'flex';
+	} else {
 		mainPart.appendChild(multiGameScreenComponent());
-		document.addEventListener('keydown', sendPaddleMovement);
 	}
+	document.addEventListener('keydown', sendPaddleMovement);
 }
 
 function multiFinishGame() {
+	let lobby = document.getElementsByClassName('lobby')[0];
+	let game = document.getElementsByClassName('game')[0];
+	lobby.style.display = 'flex';
+	game.style.display = 'none';
 	document.removeEventListener('keydown', sendPaddleMovement);
 }
 
 function multiDisplayLobby(ws={}, data={}) {
 	let mainPart = document.getElementsByClassName('main-part')[0];
-	let mainTitle = document.getElementsByClassName('main-title')[0];
-	if (mainPart && mainTitle) {
-		mainTitle.innerHTML = data.room_name;
+	if (mainPart) {
 		mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
-		mainPart.appendChild(lobbyListPlayersComponent(data));
-		mainPart.appendChild(lobbyReadyButtonComponent(ws, data));
+		mainPart.appendChild(lobbyListPlayersComponent(data.quantity_player));
+		mainPart.appendChild(lobbyReadyButtonComponent(ws, data.n_client));
 	}
 }
 
@@ -148,14 +159,15 @@ function reqWsConnection(url="") {
 			if (response.info === 'player') {
 				if (response.type === 'join') {
 					console.log('player joined lobby: ', data.n_client);
-					updateLobbyPlayerList(data.n_client, 'add');
+					updateLobbyPlayerList(data);
 				} else if (response.type === 'disconnect') {
 					console.log('player left lobby: ', data.n_client);
-					updateLobbyPlayerList(data.n_client, 'delete');
+					updateLobbyPlayerList(data);
 					updateLobbySlot(data.quantity_player_ready);
 				} else if (response.type === 'reconnect') {
 					console.log('player reconnected: ', data.n_client);
-					// updateLobbyPlayerList(data.n_client, 'add?');
+					updateLobbyPlayerList(data);
+					updateLobbySlot(data.quantity_player_ready);
 				} else if (response.type === 'ready') {
 					console.log('player is ready to play: ', data.n_client);
 					updateLobbySlot(data.quantity_player_ready);
@@ -185,6 +197,7 @@ function reqWsConnection(url="") {
 					multiStartGame();
 				} else if (response.type === 'finish') {
 					console.log('finish the game');
+					updateLobbySlot(data.quantity_player_ready);
 					multiFinishGame();
 				} else {
 					console.warn('wrong game info type has been recieved: ', response.type);
@@ -279,15 +292,17 @@ function multiCreateRoom() {
 
 			ws = await multiConnectWs(wsBaseURL, data);
 
-			// if (data.status === 'create')
 			let mainTitle = document.getElementsByClassName('main-title')[0];
-			mainTitle = data.room_name;
-			multiDisplayLobby(ws, data);
+			mainTitle.innerHTML = data.room_name;
+
+			if (data.status === 'create') {
+				mainPart.appendChild(lobbyComponent(ws, data));
+			}
 		} else {
 			console.groupCollapsed('server responded with error');
 				console.error('data: ', data);
 			console.groupEnd();
-			mainPart.innerHTML = multiDefaultPageComponent();
+			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
 	});
 };
@@ -322,11 +337,12 @@ function multiJoinRoom() {
 			ws = await multiConnectWs(wsBaseURL, data);
 			
 			let mainTitle = document.getElementsByClassName('main-title')[0];
-			mainTitle = data.room_name;
+			mainTitle.innerHTML = data.room_name;
 			// reconnect or join
 			if (data.status === 'join') {
-				multiDisplayLobby(ws, data);
+				mainPart.appendChild(lobbyComponent(ws, data));
 			} else if (data.status === 'reconnect') {
+				mainPart.appendChild(lobbyComponent(ws, data));
 				multiStartGame();
 			}
 		} else {

@@ -1,3 +1,13 @@
+.lobby {
+        display: flex;
+        flex-direction: column;
+}
+
+.game {
+        display: flex;
+        flex-direction: column;
+}
+
 .lobby-space-counter {
         color: rgb(245, 37, 37);
         margin: 5px auto 5px auto;

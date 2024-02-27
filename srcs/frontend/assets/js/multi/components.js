@@ -1,23 +1,23 @@
-function multiDefaultPageComponent() {
-	return `<div class="modal">
-			<div class="modal-content">
-				<input type="text" id="room-name-input" placeholder="Lobby Name" minlength="1" maxlength="16" required />
-				<button class="btn-modal-input-submit" onClick="multiCreateRoom()">Create</button>
-			</div>
-		</div>
-		<div class="overlay"></div>
-		<div class="multi-room-choice-list">
-			<div class="multi-room-choice-list-item"><button class="btn-multi-room-select" onClick="modalShow()">Create Game</button></div>
-			<div class="multi-room-choice-list-item"><button class="btn-multi-room-select" onClick="multiJoinRoom()">Join Game</button></div>
-		</div>`
-}
-
 function multiGameScreenComponent() {
+	let container = document.createElement('div');
+	container.classList.add('game');
+
 	let gameCanvas = document.createElement('canvas');
 	gameCanvas.setAttribute('id', 'pongCanvas');
 	gameCanvas.setAttribute('width', '800');
 	gameCanvas.setAttribute('height', '400');
-	return gameCanvas;
+	
+	container.appendChild(gameCanvas);
+	return container;
+}
+
+function lobbyComponent(ws={}, data={}) {
+	let lobby = document.createElement('div');
+	lobby.classList.add('lobby');
+	lobby.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
+	lobby.appendChild(lobbyListPlayersComponent(data.quantity_player));
+	lobby.appendChild(lobbyReadyButtonComponent(ws, data.n_client));
+	return lobby;
 }
 
 function lobbyListRoomComponent(data={}) {
@@ -93,16 +93,13 @@ function lobbyPlayersListItemComponent(playerId="player") {
 	return listItem;
 }
 
-function lobbyListPlayersComponent(room={}) {
-	if (!room)
-		return responseMsgComponent('debug: fatal error!');
+function lobbyListPlayersComponent(quantity_player=0) {
 	let lobbyPlayerList = document.createElement('div');
 	lobbyPlayerList.classList.add('lobby-players-list');
 	try {
-		for (let i = 0; i < room.quantity_player - 1; i++) {
+		for (let i = 0; i < quantity_player; i++) {
 			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent("client" + (i + 1)));
 		}
-		lobbyPlayerList.appendChild(lobbyPlayersListItemComponent(room.n_client));
 	} catch {
 		return responseMsgComponent('error while loading lobby');
 	}
@@ -110,7 +107,7 @@ function lobbyListPlayersComponent(room={}) {
 	return lobbyPlayerList;
 }
 
-function lobbyReadyButtonComponent(ws={}, data={}) {
+function lobbyReadyButtonComponent(ws={}, n_client="client") {
 	let buttonDiv = document.createElement('div');
 	buttonDiv.classList.add('game-start');
 
@@ -124,7 +121,7 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 				'action': 'update',
 				'type': 'ready_status',
 				'data': {
-					'n_client': data.n_client,
+					'n_client': n_client,
 				},
 			},
 		);
@@ -140,7 +137,7 @@ function lobbyReadyButtonComponent(ws={}, data={}) {
 				'action': 'update',
 				'type': 'unready_status',
 				'data': {
-					'n_client': data.n_client,
+					'n_client': n_client,
 				},
 			},
 		);
