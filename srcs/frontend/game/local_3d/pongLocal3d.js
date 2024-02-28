@@ -1,9 +1,9 @@
 let scene, camera, renderer
 let cameraLeft, cameraRight, rendererLeft, rendererRight;
 let paddle1, paddle2, ball;
-let ballSpeed = { x: Math.random() < 0.5 ? (Math.random() + 0.3) * 0.6 * 1 / 4 :(Math.random() + 0.3) * -0.6 * 1 / 4,
-                    y: Math.random() < 0.5 ? (Math.random() + 0.1) * 0.8 * 1 / 4 : (Math.random() + 0.1) * -0.8 * 1 / 4,
-                    z: Math.random() < 0.5 ? (Math.random() + 0.1) * 0.35 * 1 / 4 : (Math.random() + 0.1) * -0.35 * 1 / 4 };
+let ballSpeed = { x: Math.random() < 0.5 ? (Math.random() + 0.3) * 0.6 * 1 / 5 :(Math.random() + 0.3) * -0.6 * 1 / 5,
+                    y: Math.random() < 0.5 ? (Math.random() + 0.1) * 0.8 * 1 / 5 : (Math.random() + 0.1) * -0.8 * 1 / 5,
+                    z: Math.random() < 0.5 ? (Math.random() + 0.1) * 0.35 * 1 / 5 : (Math.random() + 0.1) * -0.35 * 1 / 5 };
 let controls, controlsLeft, controlsRight;
 let animationFrameId;
 let gameInProgress;
