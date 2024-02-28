@@ -1,6 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import MultiRoomInfo
 from channels.db import database_sync_to_async
+from django.db import transaction
 import random
 import json
 import asyncio
@@ -91,20 +92,21 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			await self.channel_layer.group_add(game_id, self.channel_name)
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def reconnect_client_quantity(self):
-		self.get_game_data()
-		self.game_data.QuantityPlayer += 1
-		self.game_data.QuantityPlayerReady += 1
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		game_data.QuantityPlayer += 1
+		game_data.QuantityPlayerReady += 1
 		print("reconnect_client:", self.n_client)
 		if self.n_client == 'client1':
-			self.game_data.client1['online'] = True
+			game_data.client1['online'] = True
 		elif self.n_client == 'client2':
-			self.game_data.client2['online'] = True
+			game_data.client2['online'] = True
 		elif self.n_client == 'client3':
-			self.game_data.client3['online'] = True
+			game_data.client3['online'] = True
 		elif self.n_client == 'client4':
-			self.game_data.client4['online'] = True
-		self.game_data.save()
+			game_data.client4['online'] = True
+		game_data.save()
 
 	@database_sync_to_async
 	def get_value_game_data(self, name):
@@ -112,10 +114,11 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		return value
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def update_value_game_data(self, name, value):
-		self.get_game_data()
-		setattr(self.game_data, name, value)
-		self.game_data.save()
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		setattr(game_data, name, value)
+		game_data.save()
 
 	@database_sync_to_async
 	def	remove_game_data(self):
@@ -132,7 +135,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				'x': -5000,
 				'y': -5000,
 			})
-			print('disconnect paddle value changed')
 			await self.remove_client_data()
 		await self.get_game_data()
 		await self.channel_layer.group_send(self.game_id,
@@ -144,59 +146,56 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 													'quantity_player_ready': self.game_data.QuantityPlayerReady,
 													'sender_channel_name': self.channel_name,
 												})
-		print("after quntity player:", self.game_data.QuantityPlayer)
-		print("after quntity player mready:", self.game_data.QuantityPlayerReady)
 		await self.channel_layer.group_discard(self.game_id, self.channel_name)
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def remove_client_data(self):
-		self.get_game_data()
-		print("remove_client_data client ID:", self.client_id)
-		if self.game_data.GameStatus == False:
-			if self.game_data.client1['client_id'] == self.client_id:
-				if self.game_data.client1['ready_status'] == 'ready':
-					self.game_data.QuantityPlayerReady -= 1
-				self.game_data.client1 = {}
-			elif self.game_data.client2['client_id'] == self.client_id:
-				if self.game_data.client2['ready_status'] == 'ready':
-					self.game_data.QuantityPlayerReady -= 1
-				self.game_data.client2 = {}
-			elif self.game_data.client3['client_id'] == self.client_id:
-				if self.game_data.client3['ready_status'] == 'ready':
-					self.game_data.QuantityPlayerReady -= 1
-				self.game_data.client3 = {}
-			elif self.game_data.client4['client_id'] == self.client_id:
-				if self.game_data.client4['ready_status'] == 'ready':
-					self.game_data.QuantityPlayerReady -= 1
-				self.game_data.client4 = {}
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		if game_data.GameStatus == False:
+			if game_data.client1['client_id'] == self.client_id:
+				if game_data.client1['ready_status'] == 'ready':
+					game_data.QuantityPlayerReady -= 1
+				game_data.client1 = {}
+			elif game_data.client2['client_id'] == self.client_id:
+				if game_data.client2['ready_status'] == 'ready':
+					game_data.QuantityPlayerReady -= 1
+				game_data.client2 = {}
+			elif game_data.client3['client_id'] == self.client_id:
+				if game_data.client3['ready_status'] == 'ready':
+					game_data.QuantityPlayerReady -= 1
+				game_data.client3 = {}
+			elif game_data.client4['client_id'] == self.client_id:
+				if game_data.client4['ready_status'] == 'ready':
+					game_data.QuantityPlayerReady -= 1
+				game_data.client4 = {}
 
 			if self.number_paddle == 'paddle1':
-				self.game_data.paddle1 = {}
+				game_data.paddle1 = {}
 			elif self.number_paddle == 'paddle2':
-				self.game_data.paddle2 = {}
+				game_data.paddle2 = {}
 			elif self.number_paddle == 'paddle3':
-				self.game_data.paddle3 = {}
+				game_data.paddle3 = {}
 			elif self.number_paddle == 'paddle4':
-				self.game_data.paddle4 = {}
+				game_data.paddle4 = {}
 		else:
-			self.game_data.QuantityPlayerReady -= 1
-			if self.game_data.client1['client_id'] == self.client_id:
-				self.game_data.client1['online'] = False
-			elif self.game_data.client2['client_id'] == self.client_id:
-				self.game_data.client2['online'] = False
-			elif self.game_data.client3['client_id'] == self.client_id:
-				self.game_data.client3['online'] = False
-			elif self.game_data.client4['client_id'] == self.client_id:
-				self.game_data.client4['online'] = False
-		self.game_data.QuantityPlayer -= 1
-		self.game_data.save()
-		print("remove client data quntity player:", self.game_data.QuantityPlayer)
-		print("remove client data quntity player mready:", self.game_data.QuantityPlayerReady)
+			game_data.QuantityPlayerReady -= 1
+			if game_data.client1['client_id'] == self.client_id:
+				game_data.client1['online'] = False
+			elif game_data.client2['client_id'] == self.client_id:
+				game_data.client2['online'] = False
+			elif game_data.client3['client_id'] == self.client_id:
+				game_data.client3['online'] = False
+			elif game_data.client4['client_id'] == self.client_id:
+				game_data.client4['online'] = False
+		game_data.QuantityPlayer -= 1
+		game_data.save()
 
 	@database_sync_to_async
 	def get_game_data(self):
 		try :
-			self.game_data = MultiRoomInfo.objects.get(Roomid=self.game_id)
+			with transaction.atomic():
+				self.game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
 		except MultiRoomInfo.DoesNotExist:
 			self.send(self.make_json_response('info', 'error', {'error': 'Wrong Url ! (can not match game id)'}))
 			self.close()
@@ -229,80 +228,83 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				'right': 0,
 			}
 		}
-		self.game_data.save()
 
+	@transaction.atomic()
 	def init_game_paddle_data(self):
-		self.get_game_data()
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
 		if self.number_paddle == 'paddle1':
-			self.game_data.paddle1 = {
+			game_data.paddle1 = {
 				'x': 0,
 				'y': 100,
 			}
 		elif self.number_paddle == 'paddle2':
-			self.game_data.paddle2 = {
+			game_data.paddle2 = {
 				'x': 0,
 				'y': 300,
 		 		}
 		elif self.number_paddle == 'paddle3':
-			self.game_data.paddle3 = {
+			game_data.paddle3 = {
 				'x': 790,
 				'y': 100		
 			}
 		elif self.number_paddle == 'paddle4':
-			self.game_data.paddle4 = {
+			game_data.paddle4 = {
 				'x': 790,
 				'y': 300,
 			}
-		self.game_data.save()
+		game_data.save()
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def init_game_paddle(self):
-		self.get_game_data()
-		if not self.game_data.paddle1:
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		if not game_data.paddle1:
 			self.number_paddle = 'paddle1'
-			self.game_data.client1['paddle'] = 'paddle1'
-		elif not self.game_data.paddle2:
+			game_data.client1['paddle'] = 'paddle1'
+		elif not game_data.paddle2:
 			self.number_paddle = 'paddle2'
-			self.game_data.client2['paddle'] = 'paddle2'
-		elif not self.game_data.paddle3:
+			game_data.client2['paddle'] = 'paddle2'
+		elif not game_data.paddle3:
 			self.number_paddle = 'paddle3'
-			self.game_data.client3['paddle'] = 'paddle3'
-		elif not self.game_data.paddle4:
+			game_data.client3['paddle'] = 'paddle3'
+		elif not game_data.paddle4:
 			self.number_paddle = 'paddle4'
-			self.game_data.client4['paddle'] = 'paddle4'
-		self.game_data.save()
+			game_data.client4['paddle'] = 'paddle4'
+		game_data.save()
 
 	async def initialize_game(self):
 		await self.init_game_paddle()
 		await self.init_game_value()
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def player_ready(self, n_client):
-		self.get_game_data()
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
 		if n_client == 'client1':
-			self.game_data.client1['ready_status'] = "ready"
+			game_data.client1['ready_status'] = "ready"
 		elif n_client == 'client2':
-			self.game_data.client2['ready_status'] = "ready"
+			game_data.client2['ready_status'] = "ready"
 		elif n_client == 'client3':
-			self.game_data.client3['ready_status'] = "ready"
+			game_data.client3['ready_status'] = "ready"
 		elif n_client == 'client4':
-			self.game_data.client4['ready_status'] = "ready"
-		self.game_data.QuantityPlayerReady += 1
-		self.game_data.save()
+			game_data.client4['ready_status'] = "ready"
+		game_data.QuantityPlayerReady += 1
+		game_data.save()
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def player_unready(self, n_client):
-		self.get_game_data()
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
 		if n_client == 'client1':
-			self.game_data.client1['ready_status'] = "not ready"
+			game_data.client1['ready_status'] = "not ready"
 		elif n_client == 'client2':
-			self.game_data.client2['ready_status'] = "not ready"
+			game_data.client2['ready_status'] = "not ready"
 		elif n_client == 'client3':
-			self.game_data.client3['ready_status'] = "not ready"
+			game_data.client3['ready_status'] = "not ready"
 		elif n_client == 'client4':
-			self.game_data.client4['ready_status'] = "not ready"
-		self.game_data.QuantityPlayerReady -= 1
-		self.game_data.save()
+			game_data.client4['ready_status'] = "not ready"
+		game_data.QuantityPlayerReady -= 1
+		game_data.save()
 
 	async def check_user_all_ready(self):
 		if not (self.game_data.client1 and self.game_data.client2 and self.game_data.client3 and self.game_data.client4):
@@ -320,10 +322,11 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			asyncio.create_task(self.ball_move_thread())
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def save_game_start_status(self, status):
-		self.get_game_data()
-		self.game_data.GameStatus = status
-		self.game_data.save()
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		game_data.GameStatus = status
+		game_data.save()
 
 	async def receive(self, text_data=None, bytes_data=None):
 		await self.get_game_data()
@@ -336,6 +339,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			if type == 'ready_status':
 				n_client = data['n_client']
 				await self.player_ready(n_client)
+				await self.get_game_data()
 				await self.channel_layer.group_send(self.game_id,
 													{
 														'type': 'room_inform',
@@ -349,6 +353,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			elif type == 'unready_status':
 				n_client = data['n_client']
 				await self.player_unready(n_client)
+				await self.get_game_data()
 				await self.channel_layer.group_send(self.game_id,
 													{
 														'type': 'room_inform',
@@ -485,86 +490,88 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		self.game_data.save()
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def remove_paddle_data(self):
-		self.get_game_data()
-		client1 = self.game_data.client1
-		client2 = self.game_data.client2
-		client3 = self.game_data.client3
-		client4 = self.game_data.client4
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		client1 = game_data.client1
+		client2 = game_data.client2
+		client3 = game_data.client3
+		client4 = game_data.client4
 		if client1['online'] == False:
 			paddle = client1['paddle']
 			if 'paddle1' == paddle:
-				self.game_data.paddle1 = None
+				game_data.paddle1 = None
 			elif 'paddle2' == paddle:
-				self.game_data.paddle2 = None
+				game_data.paddle2 = None
 			elif 'paddle3' == paddle:
-				self.game_data.paddle3 = None
+				game_data.paddle3 = None
 			elif 'paddle4' == paddle:
-				self.game_data.paddle4 = None
+				game_data.paddle4 = None
 		if client2['online'] == False:
 			paddle = client2['paddle']
 			if 'paddle1' == paddle:
-				self.game_data.paddle1 = None
+				game_data.paddle1 = None
 			elif 'paddle2' == paddle:
-				self.game_data.paddle2 = None
+				game_data.paddle2 = None
 			elif 'paddle3' == paddle:
-				self.game_data.paddle3 = None
+				game_data.paddle3 = None
 			elif 'paddle4' == paddle:
-				self.game_data.paddle4 = None
+				game_data.paddle4 = None
 		if client3['online'] == False:
 			paddle = client3['paddle']
 			if 'paddle1' == paddle:
-				self.game_data.paddle1 = None
+				game_data.paddle1 = None
 			elif 'paddle2' == paddle:
-				self.game_data.paddle2 = None
+				game_data.paddle2 = None
 			elif 'paddle3' == paddle:
-				self.game_data.paddle3 = None
+				game_data.paddle3 = None
 			elif 'paddle4' == paddle:
-				self.game_data.paddle4 = None
+				game_data.paddle4 = None
 		if client4['online'] == False:
 			paddle = client4['paddle']
 			if 'paddle1' == paddle:
-				self.game_data.paddle1 = None
+				game_data.paddle1 = None
 			elif 'paddle2' == paddle:
-				self.game_data.paddle2 = None
+				game_data.paddle2 = None
 			elif 'paddle3' == paddle:
-				self.game_data.paddle3 = None
+				game_data.paddle3 = None
 			elif 'paddle4' == paddle:
-				self.game_data.paddle4 = None
-		self.game_data.save()
+				game_data.paddle4 = None
+		game_data.save()
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def player_status_check(self):
-		self.get_game_data()
-		client1 = self.game_data.client1
-		client2 = self.game_data.client2
-		client3 = self.game_data.client3
-		client4 = self.game_data.client4
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		client1 = game_data.client1
+		client2 = game_data.client2
+		client3 = game_data.client3
+		client4 = game_data.client4
 		if client1['online'] == True:
 			client1['ready_status'] = 'unready'
-			self.game_data.QuantityPlayerReady -= 1
+			game_data.QuantityPlayerReady -= 1
 		else:
 			client1 = None
 
 		if client2['online'] == True:
 			client2['ready_status'] = 'unready'
-			self.game_data.QuantityPlayerReady -= 1
+			game_data.QuantityPlayerReady -= 1
 		else:
 			client2 = None
 
 		if client3['online'] == True:
 			client3['ready_status'] = 'unready'
-			self.game_data.QuantityPlayerReady -= 1
+			game_data.QuantityPlayerReady -= 1
 		else:
 			client3 = None
 
 		if client4['online'] == True:
 			client4['ready_status'] = 'unready'
-			self.game_data.QuantityPlayerReady -= 1
+			game_data.QuantityPlayerReady -= 1
 		else:
 			client4 = None
 
-		self.game_data.save()
+		game_data.save()
 
 	async def ball_move_thread(self):
 		await self.get_game_data()
@@ -648,3 +655,4 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			(ball_x >= canvas_width - paddle_width and ball_y >= right_paddle3['y'] and ball_y <= right_paddle3['y'] + paddle_height) or
 			(ball_x >= canvas_width - paddle_width and ball_y >= right_paddle4['y'] and ball_y <= right_paddle4['y'] + paddle_height)) :
 			self.vx = -self.vx
+			self.vx -= 0.001

@@ -81,7 +81,7 @@ class GameRoomJoinView(View):
 	@transaction.atomic
 	def get(self, request, game_id):
 		try:
-			room = MultiRoomInfo.objects.get(Roomid=game_id)
+			room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 			print("very first room:", room)
 		except MultiRoomInfo.DoesNotExist:
 				return JsonResponse({'Error' : 'Game id URL is not exists'})
@@ -101,6 +101,8 @@ class GameRoomJoinView(View):
 		# 	return JsonResponse({'Error' : 'Can not request several time in same browser'})
 
 		if room.QuantityPlayer < 4:
+			if self.search_client_data(room, client_id) != None:
+				return JsonResponse({'Error' : 'it is impossible shadow clone jutsu'})
 			room.QuantityPlayer += 1
 			room.save()
 			if not client_id:
