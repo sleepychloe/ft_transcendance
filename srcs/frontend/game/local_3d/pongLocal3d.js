@@ -25,12 +25,12 @@ document.addEventListener('keydown', event => {
 		switch(event.key) {
 		case 'w': paddle1.position.y += 2; break;
 		case 's': paddle1.position.y -= 2; break;
-		case 'a': paddle1.position.z -= 2; break; // Corrected direction for consistent movement
-		case 'd': paddle1.position.z += 2; break; // Corrected direction for consistent movement
-		case 'ArrowUp': paddle2.position.y += 2; break;
-		case 'ArrowDown': paddle2.position.y -= 2; break;
-		case 'ArrowLeft': paddle2.position.z += 2; break; // Corrected direction for consistent movement
-		case 'ArrowRight': paddle2.position.z -= 2; break; // Corrected direction for consistent movement
+		case 'a': paddle1.position.z -= 2; break;
+		case 'd': paddle1.position.z += 2; break;
+		case 'i': paddle2.position.y += 2; break;
+		case 'k': paddle2.position.y -= 2; break;
+		case 'j': paddle2.position.z += 2; break;
+		case 'l': paddle2.position.z -= 2; break;
 		}
 		checkPaddleBoundaries();
 	}
