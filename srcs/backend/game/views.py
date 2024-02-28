@@ -4,7 +4,7 @@ from django.views import View
 from django.http import JsonResponse
 from .models import MultiRoomInfo
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 from django.db import transaction
 from channels.layers import get_channel_layer
 # Create your views here.
@@ -13,10 +13,11 @@ def create_new_uuid():
 	import uuid
 	return str(uuid.uuid4()).replace("-", "")
 
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class GameRoomMakeView(View):
 
 	@transaction.atomic
+	@requires_csrf_token
 	def post(self, request):
 		new_room_id = create_new_uuid()
 		client_id = create_new_uuid()
@@ -117,27 +118,24 @@ class GameRoomJoinView(View):
 			return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})
 	
 	@staticmethod
+	@transaction.atomic
 	def check_client_id_for_data(game_id, client_id):
-		room = MultiRoomInfo.objects.get(Roomid=game_id)
+		room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 		if not room.client1:
-			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client1 = {'client_id': client_id,  'ready_status':"not ready", 'paddle': None, 'online': True}
-			instance.save()
+			room.client1 = {'client_id': client_id,  'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.save()
 			return "client1"
 		elif not room.client2:
-			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
-			instance.save()
+			room.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.save()
 			return "client2"
 		elif not room.client3:
-			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
-			instance.save()
+			room.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.save()
 			return "client3"
 		elif not room.client4:
-			instance = MultiRoomInfo.objects.get(Roomid=game_id)
-			instance.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
-			instance.save()
+			room.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.save()
 			return "client4"
 
 	# def delete(self, request, game_id):
