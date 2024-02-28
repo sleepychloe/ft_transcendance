@@ -1,3 +1,20 @@
+const translations = {
+	en: {
+		ready: "are ready",
+		errorFailToLoad: "failed to load data from server",
+	},
+	fr: {
+		ready: "sont prêts",
+		errorFailToLoad: "échec du chargement des données depuis le serveur",
+	},
+	ko: {
+		ready: "준비됨",
+		errorFailToLoad: "서버에서 데이터를 로드하는 데 실패했습니다",
+	},
+};
+
+const lan = translations[currentLanguage];
+
 
 // global variables
 let ws;
@@ -24,18 +41,18 @@ const languagePack = {
 
 // CSRF
 function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
+	var cookieValue = null;
+	if (document.cookie && document.cookie !== '') {
+		var cookies = document.cookie.split(';');
+		for (var i = 0; i < cookies.length; i++) {
+			var cookie = cookies[i].trim();
+			if (cookie.substring(0, name.length + 1) === (name + '=')) {
+				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+				break;
+			}
+		}
+	}
+	return cookieValue;
 }
 
 // on press Enter while input lobby name
@@ -67,7 +84,7 @@ function modalClose() {
 	}
 }
 
-async function multiPlayerSetReady(ws={}, data={}) {
+async function multiPlayerSetReady(ws = {}, data = {}) {
 	// console.log('player send ready to server: ', data);
 	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'none';
 	await ws.send(JSON.stringify(data));
@@ -75,7 +92,7 @@ async function multiPlayerSetReady(ws={}, data={}) {
 	document.getElementsByClassName('ready')[0].style.display = 'block';
 }
 
-async function multiPlayerUnsetReady(ws={}, data={}) {
+async function multiPlayerUnsetReady(ws = {}, data = {}) {
 	// console.log('player send unready to server: ', data);
 	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'none';
 	await ws.send(JSON.stringify(data));
@@ -83,12 +100,12 @@ async function multiPlayerUnsetReady(ws={}, data={}) {
 	document.getElementsByClassName('ready')[0].style.display = 'none';
 }
 
-function updateLobbyPlayerList(data={}) {
+function updateLobbyPlayerList(data = {}) {
 	let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
 	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player));
 }
 
-function updateReadyButton(ready=false) {
+function updateReadyButton(ready = false) {
 	let btnUndo = document.getElementsByClassName('ready')[0];
 	let btnReady = document.getElementsByClassName('btn-game-start')[0];
 	if (ready) {
@@ -98,10 +115,10 @@ function updateReadyButton(ready=false) {
 	}
 }
 
-function updateLobbySlot(quantity_player_ready=0) {
+function updateLobbySlot(quantity_player_ready = 0) {
 	let lobbySlot = document.getElementsByClassName('lobby-space-counter')[0];
 	if (lobbySlot)
-		lobbySlot.innerHTML = quantity_player_ready + '/4 are ready';
+		lobbySlot.innerHTML = quantity_player_ready + '/4 ' + `${lan.ready}`;
 }
 
 const sendPaddleMovement = async (e) => {
@@ -143,7 +160,7 @@ function multiFinishGame() {
 	document.removeEventListener('keydown', sendPaddleMovement);
 }
 
-function reqWsConnection(url="") {
+function reqWsConnection(url = "") {
 	return new Promise((resolve, reject) => {
 		ws = new WebSocket(url);
 		ws.onopen = () => {
@@ -217,7 +234,7 @@ function reqWsConnection(url="") {
 	});
 }
 
-async function multiConnectWs(url="", data={}) {
+async function multiConnectWs(url = "", data = {}) {
 	try {
 		let player_info = {
 			'action': 'update',
@@ -235,7 +252,7 @@ async function multiConnectWs(url="", data={}) {
 	}
 }
 
-async function reqCreateRoom(url="", data={}) {
+async function reqCreateRoom(url = "", data = {}) {
 	try {
 		const response = await fetch(url, {
 			method: "POST",
@@ -251,7 +268,7 @@ async function reqCreateRoom(url="", data={}) {
 		return result;
 	} catch (error) {
 		console.error('couldn\'t request to server to create a room: ', error);
-		return {'Error': 'failed to load data from server'};
+		return { 'Error': `${errorFailToLoad}` };
 	}
 }
 
@@ -270,7 +287,7 @@ function multiCreateRoom() {
 		mainPart.innerHTML = '';
 		if (data && !data.Error) {
 			console.groupCollapsed('server responded successfully');
-				console.log('data: ', data);
+			console.log('data: ', data);
 			console.groupEnd();
 
 			ws = await multiConnectWs(wsBaseURL, data);
@@ -283,14 +300,14 @@ function multiCreateRoom() {
 			}
 		} else {
 			console.groupCollapsed('server responded with error');
-				console.error('data: ', data);
+			console.error('data: ', data);
 			console.groupEnd();
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
 	});
 };
-	
-async function reqJoinRoom(url="", room_id="") {
+
+async function reqJoinRoom(url = "", room_id = "") {
 	try {
 		const response = await fetch(url + room_id + '/', {
 			method: "PUT",
@@ -305,7 +322,7 @@ async function reqJoinRoom(url="", room_id="") {
 		return result;
 	} catch (error) {
 		console.error('couldn\'t request to server to join a room: ', error);
-		return {'Error': 'failed to load data from server'};
+		return { 'Error': `${lan.errorFailToLoad}` };
 	}
 }
 
@@ -319,13 +336,13 @@ function multiJoinRoom() {
 		mainPart.innerHTML = '';
 		if (data && !data.Error) {
 			console.groupCollapsed('server responded successfully');
-				console.log('data: ', data);
+			console.log('data: ', data);
 			console.groupEnd();
 
 			// server allows to join room === user has a token for ws
 			// first websocket connection establish here
 			ws = await multiConnectWs(wsBaseURL, data);
-			
+
 			let mainTitle = document.getElementsByClassName('main-title')[0];
 			mainTitle.innerHTML = data.room_name;
 			// reconnect or join
@@ -337,7 +354,7 @@ function multiJoinRoom() {
 			}
 		} else {
 			console.groupCollapsed('server responded with error');
-				console.error('data: ', data);
+			console.error('data: ', data);
 			console.groupEnd();
 			// need a server to send a status code to determine what error to display
 			// mainPart.appendChild(responseMsgComponent(languagePack.error.lobbyFull));
@@ -346,7 +363,7 @@ function multiJoinRoom() {
 	});
 }
 
-async function getListRoom(url="") {
+async function getListRoom(url = "") {
 	try {
 		const response = await fetch(url, {
 			method: 'GET',
@@ -355,7 +372,7 @@ async function getListRoom(url="") {
 		return result;
 	} catch (error) {
 		console.error('couldn\'t request to server to get list room: ', error);
-		return {'Error': 'failed to load data from server'};
+		return { 'Error': `${lan.errorFailToLoad}` };
 	}
 }
 
@@ -368,20 +385,20 @@ function multiListRoom() {
 		mainPart.innerHTML = '';
 		if (data.length === 0) {
 			console.groupCollapsed('server responded successfully');
-				console.log('data: ', data);
+			console.log('data: ', data);
 			console.groupEnd();
 			// need server specific response: no lobby found
 			mainPart.appendChild(responseMsgComponent('no lobby found'));
 			mainPart.appendChild(lobbyRefreshButtonComponent());
 		} else if (data && data.length > 0) {
 			console.groupCollapsed('server responded successfully');
-				console.log('data: ', data);
+			console.log('data: ', data);
 			console.groupEnd();
 			mainPart.appendChild(lobbyListRoomComponent(data));
 			mainPart.appendChild(lobbyRefreshButtonComponent());
 		} else {
 			console.groupCollapsed('server responded with error');
-				console.error('data: ', data);
+			console.error('data: ', data);
 			console.groupEnd();
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		}

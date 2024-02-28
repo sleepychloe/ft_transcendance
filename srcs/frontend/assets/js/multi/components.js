@@ -1,3 +1,29 @@
+const t = {
+	en: {
+		areReady: "are ready",
+		ready: "Ready",
+		undo: "Undo",
+		client: "Client",
+		errorSearchingLobby: "error while searching lobby",
+		errorLoadingLobby: "error while loading lobby",
+
+	},
+	fr: {
+		areReady: "sont prêts",
+		ready: "Prêt",
+        undo: "Annuler",
+		client: "Client",
+	},
+	ko: {
+		areReady: "준비됨",
+		ready: "준비됨",
+        undo: "실행 취소",
+		client: "클라이언트",
+	},
+};
+
+const l = t[currentLanguage];
+
 function multiGameScreenComponent() {
 	let container = document.createElement('div');
 	container.classList.add('game');
@@ -51,7 +77,7 @@ function lobbyListRoomComponent(data={}) {
 			roomCard.appendChild(roomSlot);
 		}
 	} catch {
-		return responseMsgComponent('error while searching lobby');
+		return responseMsgComponent(`${l.errorSearchingLobby}`);
 	}
 	return lobbyRoomList;
 }
@@ -59,7 +85,7 @@ function lobbyListRoomComponent(data={}) {
 function lobbyPlayersReadyComponent(quantity_player_ready=0) {
 	let lobbySlot = document.createElement('div');
 	lobbySlot.classList.add('lobby-space-counter');
-	lobbySlot.innerHTML = quantity_player_ready + '/4 are ready';
+	lobbySlot.innerHTML = quantity_player_ready + '/4 ' + `${l.areReady}`;
 	return lobbySlot;
 }
 
@@ -98,10 +124,10 @@ function lobbyListPlayersComponent(quantity_player=0) {
 	lobbyPlayerList.classList.add('lobby-players-list');
 	try {
 		for (let i = 0; i < quantity_player; i++) {
-			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent("client" + (i + 1)));
+			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent(`${l.client}` + ' '+ (i + 1)));
 		}
 	} catch {
-		return responseMsgComponent('error while loading lobby');
+		return responseMsgComponent(`${l.errorLoadingLobby}`);
 	}
 	// console.log("lobbyPlayerList: ", lobbyPlayerList);
 	return lobbyPlayerList;
@@ -113,7 +139,7 @@ function lobbyReadyButtonComponent(ws={}, n_client="client") {
 
 	let btnReady = document.createElement('button');
 	btnReady.classList.add('btn-game-start');
-	btnReady.innerHTML = 'Ready';
+	btnReady.innerHTML = `${l.ready}`;
 	btnReady.addEventListener('click', () => {
 		multiPlayerSetReady(
 			ws,
@@ -129,7 +155,7 @@ function lobbyReadyButtonComponent(ws={}, n_client="client") {
 	let btnUnready = document.createElement('button');
 	btnUnready.classList.add('btn-game-start');
 	btnUnready.classList.add('ready');
-	btnUnready.innerHTML = 'Undo';
+	btnUnready.innerHTML = `${l.undo}`;
 	btnUnready.addEventListener('click', () => {
 		multiPlayerUnsetReady(
 			ws,

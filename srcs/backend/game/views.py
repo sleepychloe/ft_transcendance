@@ -8,6 +8,30 @@ from django.db import transaction
 from channels.layers import get_channel_layer
 # Create your views here.
 
+from django.utils.translation import get_language
+
+
+translations = {
+    'en': {
+        'errUrlNotExists': "Game id URL is not exists",
+        'errJoinAfterStart': "you can not join room after starting",
+        'errShadowCloneJutsu': "it is impossible shadow clone jutsu",
+        'errQuantityPlayerExceed': "Quantity of player exceeds the limit",
+    },
+    'fr': {
+        'errUrlNotExists': "L'URL de l'identifiant du jeu n'existe pas",
+        'errJoinAfterStart': "Vous ne pouvez pas rejoindre la salle après le début",
+        'errShadowCloneJutsu': "Il est impossible de faire le jutsu du clone d'ombre",
+        'errQuantityPlayerExceed': "Le nombre de joueurs dépasse la limite",
+    },
+    'ko': {
+        'errUrlNotExists': "게임 ID URL이 존재하지 않습니다",
+        'errJoinAfterStart': "시작한 후에는 방에 참여할 수 없습니다",
+        'errShadowCloneJutsu': "그림자 복제술을 사용하는 것은 불가능합니다",
+        'errQuantityPlayerExceed': "플레이어 수가 제한을 초과하였습니다",
+    },
+}
+
 def create_new_uuid():
 	import uuid
 	return str(uuid.uuid4()).replace("-", "")
@@ -82,19 +106,27 @@ class GameRoomJoinView(View):
 
 	@transaction.atomic
 	def put(self, request, game_id):
+         
+		current_language = get_language()
 		try:
 			room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 			print("very first room:", room)
 		except MultiRoomInfo.DoesNotExist:
-				return JsonResponse({'Error' : 'Game id URL is not exists'})
+				error_message = translations.get(current_language)['errUrlNotExists']
+				return JsonResponse({'Error': error_message})
+				# return JsonResponse({'Error' : 'Game id URL is not exists'})
 		client_id = request.COOKIES.get('client_id')
 		if room.GameStatus == True:
 			if client_id == None:
-				return JsonResponse({'Error': 'you can not join room after starting'})
+				error_message = translations.get(current_language)['errJoinAfterStart']
+				return JsonResponse({'Error': error_message})
+				# return JsonResponse({'Error': 'you can not join room after starting'})
 			Nclient = self.search_client_data(room, client_id)
 			if Nclient == None:
 				print("error : RoomJoinView, GameStatus True, client_id None")
-				return JsonResponse({'Error' : 'You can not join room after starting !'})
+				error_message = translations.get(current_language)['errJoinAfterStart']
+				return JsonResponse({'Error': error_message})
+				# return JsonResponse({'Error' : 'You can not join room after starting !'})
 			else:
 				print('room_id', game_id, '\nroom_name', room.RoomName)
 				return JsonResponse({'status': 'reconnect', 'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})
@@ -104,7 +136,9 @@ class GameRoomJoinView(View):
 
 		if room.QuantityPlayer < 4:
 			if self.search_client_data(room, client_id) != None:
-				return JsonResponse({'Error' : 'it is impossible shadow clone jutsu'})
+				error_message = translations.get(current_language)['errShadowCloneJutsu']
+				return JsonResponse({'Error': error_message})
+				# return JsonResponse({'Error' : 'it is impossible shadow clone jutsu'})
 			room.QuantityPlayer += 1
 			room.save()
 			if not client_id:
@@ -116,7 +150,9 @@ class GameRoomJoinView(View):
 			return response
 		else:
 			print("error: RoomJoinView, quantity player exceeds")
-			return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})
+			error_message = translations.get(current_language)['errQuantityPlayerExceed']
+			return JsonResponse({'Error': error_message})
+			# return JsonResponse({'Error' : 'Quantity player exceeds the limit.'})
 	
 	@staticmethod
 	@transaction.atomic
