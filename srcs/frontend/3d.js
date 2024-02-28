@@ -99,6 +99,23 @@ export function initLogo() {
 
 /* 3d game */
 
+const translations = {
+    en: {
+        player: "Player",
+        winner: "Winner",
+    },
+    fr: {
+        player: "Joueur",
+        winner: "Vainqueur",
+    },
+    ko: {
+        player: "플레이어",
+        winner: "우승자",
+    },
+};
+
+const t = translations[currentLanguage];
+
 export function start3dMode() {
 	document.getElementById("modeSelection").style.display = "block";
 	document.getElementById("startButton").style.display = "block";
@@ -367,8 +384,8 @@ function checkBallBoundaries() {
 
     if ((ball.position.x <= -24.5 || ball.position.x >= 24.5)
             && paddleHit === 0) {
-        let winner = ball.position.x > 0 ? 'Player 1' : 'Player 2';
-        alert(`Winner: ${winner}`);
+        let winner = ball.position.x > 0 ? `${t.player}` + ' 1' : `${t.player}` + ' 2' ;
+        alert(`${t.winner}: ${winner}`);
         gameInProgress = false;
         local3dMode = false;
         stopAnimation();

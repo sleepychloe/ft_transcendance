@@ -10,14 +10,14 @@ function startNormalMode() {
 
 function endNormalGame() {
     if (isGameInProgress) {
-        let winner = score1 > score2 ? 'Player 1' : 'Player 2';
+        let winner = score1 > score2 ? `${t.player}` + ' 1' : `${t.player}` + ' 2' ;
 
         isGameInProgress = false;
         if (gameLoopId) {
             cancelAnimationFrame(gameLoopId);
             gameLoopId = null;
         }
-        alert(`Winner: ${winner}`);
+        alert(`${t.alertWinner}: ${winner}`);
         normalCount++;
         resetToHomeScreen();
     }

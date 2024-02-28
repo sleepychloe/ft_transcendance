@@ -1,3 +1,36 @@
+const translations = {
+    en: {
+        player: "Player",
+        vs: "vs",
+        alartPlayerNum: "At least 3 players required !",
+        alertTournamentWinner: "Tournament Winner",
+        alertWinner: "Winner",
+        waiting: "Waiting for players",
+        next: "next opponent",
+    },
+    fr: {
+        player: "Joueur",
+        vs: "contre",
+        alertPlayerNum: "Au moins 3 joueurs requis !",
+        alertTournamentWinner: "Vainqueur du tournoi",
+        alertWinner: "Vainqueur",
+        waiting: "En attente des joueurs",
+        next: "prochain adversaire",
+    },
+    ko: {
+        player: "플레이어",
+        vs: "대",
+        alertPlayerNum: "최소 3명의 플레이어가 필요합니다!",
+        alertTournamentWinner: "토너먼트 우승자",
+        alertWinner: "우승자",
+        waiting: "플레이어를 기다리는 중",
+        next: "다음 상대",
+    },
+};
+
+const t = translations[currentLanguage];
+
+
 var canvas = document.getElementById("pongCanvas");
 var ctx = canvas.getContext("2d");
 

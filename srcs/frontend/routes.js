@@ -99,4 +99,3 @@ export const routes = [
             script: createScriptTag('/static/game/multi/pongMulti.js')
         },
     ];
-    

@@ -1,25 +1,59 @@
+const translations = {
+        en: {
+            tournament: "Tournament",
+            start: "Start",
+            tournamentRegistration: "Tournament Registration",
+            numberOfPlayers: "Number of Players",
+            setPlayers: "Set Players",
+            registerPlayers: "Register Players",
+            currentMatch: "Current Match",
+            upcomingMatches: "Upcoming Matches",
+        },
+        fr: {
+            tournament: "Tournoi",
+            start: "Commencer",
+            tournamentRegistration: "Inscription au Tournoi",
+            numberOfPlayers: "Nombre de Joueurs",
+            setPlayers: "Définir les Joueurs",
+            registerPlayers: "Inscrire les Joueurs",
+            currentMatch: "Match Actuel",
+            upcomingMatches: "Prochains Matchs",
+        },
+        ko: {
+            tournament: "토너먼트",
+            start: "시작",
+            tournamentRegistration: "토너먼트 등록",
+            numberOfPlayers: "플레이어 수",
+            setPlayers: "플레이어 설정",
+            registerPlayers: "플레이어 등록",
+            currentMatch: "현재 경기",
+            upcomingMatches: "다음 경기",
+        },
+    };
+
 export function tournamentPage() {
+        const t = translations[currentLanguage];
         // console.log("tournament/page.js : tournamentPage function called");
         return `<div id="modeSelection">
-                        <h2>Tournament</h2>
-                        <button id="tournamentMode" onClick="startTournamentMode()">Start</button>
+                        <h2>${t.tournament}</h2>
+                        <button id="tournamentMode" onClick="startTournamentMode()">${t.start}</button>
                 </div>
                 <div id="registration" class="hidden">
-                        <h2>Tournament Registration</h2>
-                        <input type="number" id="numPlayers" placeholder="Number of Players">
-                        <button onclick="createPlayerInputs()">Set Players</button>
+                        <h2>${t.tournamentRegistration}</h2>
+                        <input type="number" id="numPlayers" placeholder="${t.numberOfPlayers}">
+                        <button onclick="createPlayerInputs()">${t.setPlayers}</button>
                         <div id="playerInputs"></div>
-                        <button onclick="registerPlayers()" class="hidden" id="registerPlayersButton">Register Players</button>
+                        <button onclick="registerPlayers()" class="hidden" id="registerPlayersButton">${t.registerPlayers}</button>
                 </div>
                 <div id="gameDashboard" class="hidden">
-                        <h2>Score</h2>
-                        <p>Player 1: <span id="score1">0</span></p>
-                        <p>Player 2: <span id="score2">0</span></p>
+                        <h2>${t.score}</h2>
+                        <p>${t.player1}: <span id="score1">0</span></p>
+                        <p>${t.player2}: <span id="score2">0</span></p>
                 </div>
                 <div id="tournamentInfo" class="hidden">
-                        <h2>Current Match</h2>
+                        <h2>${t.currentMatch}</h2>
                         <p id="currentMatch"></p>
-                        <h3>Upcoming Matches</h3>
+                        <h3>${t.upcomingMatches}</h3>
                         <ul id="upcomingMatches"></ul>
                 </div>
                 <canvas id="pongCanvas" width="800" height="400" class="hidden"></canvas>`

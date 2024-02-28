@@ -14,14 +14,14 @@ function createPlayerInputs() {
         for (let i = 1; i <= numPlayers; i++) {
             const input = document.createElement("input");
             input.type = "text";
-            input.placeholder = `Player ${i}`;
+            input.placeholder = `${t.player} ${i}`;
             input.id = `player${i}`;
             playerInputs.appendChild(input);
         }
         document.getElementById("registerPlayersButton").classList.remove("hidden");
     }
     else {
-        alert(`At least 3 players required !`);
+        alert(`${t.alartPlayerNum}`);
         document.getElementById("registerPlayersButton").classList.add("hidden");
     }
 }
@@ -34,12 +34,12 @@ function registerPlayers() {
         for (let i = 1; i <= numPlayers; i++) {
             let playerName = document.getElementById(`player${i}`).value.trim();
             if (!playerName) {
-                playerName = "Player " + i.toString();
+                playerName = `${t.player}`+ " " + i.toString();
             }
             while (usedNames.has(playerName) || /^\d+$/.test(playerName)) {
                 playerName = prompt(`Please enter a new name for Player ${i}:`).trim();
                 if (!playerName) {
-                    playerName = "Player " + i.toString();
+                    playerName = `${t.player}`+ " " + i.toString();
                 }
             }
             usedNames.add(playerName);
@@ -69,7 +69,7 @@ function endMatch() {
         startMatch();
     } else {
         if (isGameInProgress === true) {
-            alert(`Tournament Winner: ${winner}`);
+            alert(`${t.alertTournamentWinner}: ${winner}`);
             isGameInProgress = false;
             if (gameLoopId) {
                 cancelAnimationFrame(gameLoopId);
@@ -85,14 +85,14 @@ function displayMatchups() {
     const upcomingMatchesDisplay = document.getElementById("upcomingMatches");
 
     if (players.length >= 2) {
-        currentMatchDisplay.textContent = `${players[0]} vs ${players[1]}`;
+        currentMatchDisplay.textContent = `${players[0]} ${t.vs} ${players[1]}`;
     } else {
-        currentMatchDisplay.textContent = "Waiting for players";
+        currentMatchDisplay.textContent = `${t.waiting}`;
     }
     upcomingMatchesDisplay.innerHTML = '';
     for (let i = 2; i < players.length; i++) {
         const matchInfo = document.createElement("div");
-        matchInfo.textContent = `${players[i]} (next opponent)`;
+        matchInfo.textContent = `${players[i]} (${t.next})`;
         upcomingMatchesDisplay.appendChild(matchInfo);
     }
 }
