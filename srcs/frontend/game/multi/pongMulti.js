@@ -253,14 +253,16 @@ async function multiPlayerUnsetReady(ws={}, data={}) {
 }
 
 async function reqCreateRoom(url="", data={}) {
+	const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 	try {
 		// console.log('cookie: ', getCookie('csrftoken'));
 		const response = await fetch(url, {
 			method: "POST",
-			mode: 'same-origin',
+			mode: 'cors',
+			credentials: 'include',
 			headers: {
 				"Content-Type": "application/json",
-				"X-CSRFToken": getCookie('csrftoken'),
+				"X-CSRFToken": csrftoken,
 			},
 			body: JSON.stringify(data),
 		});
