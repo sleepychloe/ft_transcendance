@@ -51,6 +51,8 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
+
+CSRF_TRUSTED_ORIGINS = ["https://localhost:4243"]
 # CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
@@ -123,7 +125,6 @@ TEMPLATES = [
     },
 ]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhsot:4243"]
 WSGI_APPLICATION = 'transcendence.wsgi.application'
 ASGI_APPLICATION = 'transcendence.asgi.application'
 

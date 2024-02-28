@@ -4,7 +4,6 @@ from django.views import View
 from django.http import JsonResponse
 from .models import MultiRoomInfo
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 from django.db import transaction
 from channels.layers import get_channel_layer
 # Create your views here.
@@ -13,11 +12,9 @@ def create_new_uuid():
 	import uuid
 	return str(uuid.uuid4()).replace("-", "")
 
-# @method_decorator(csrf_exempt, name='dispatch')
 class GameRoomMakeView(View):
 
 	@transaction.atomic
-	@requires_csrf_token
 	def post(self, request):
 		new_room_id = create_new_uuid()
 		client_id = create_new_uuid()
@@ -69,18 +66,22 @@ class GameRoomListView(View):
 
 class GameRoomJoinView(View):
 	def search_client_data(self, room, client_id):
-		if room.client1['client_id'] == client_id:
-			return 'client1'
-		elif room.client2['client_id'] == client_id:
-			return 'client2'
-		elif room.client3['client_id'] == client_id:
-			return 'client3'
-		elif room.client4['client_id'] == client_id:
-			return 'client4'
+		if room.client1:
+			if room.client1['client_id'] == client_id:
+				return 'client1'
+		if room.clinet2:
+			if room.client2['client_id'] == client_id:
+				return 'client2'
+		if room.client3:
+			if room.client3['client_id'] == client_id:
+				return 'client3'
+		if room.client4:
+			if room.client4['client_id'] == client_id:
+				return 'client4'
 		return None
 
 	@transaction.atomic
-	def get(self, request, game_id):
+	def put(self, request, game_id):
 		try:
 			room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 			print("very first room:", room)

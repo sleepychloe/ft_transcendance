@@ -236,16 +236,14 @@ async function multiConnectWs(url="", data={}) {
 }
 
 async function reqCreateRoom(url="", data={}) {
-	const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 	try {
-		// console.log('cookie: ', getCookie('csrftoken'));
 		const response = await fetch(url, {
 			method: "POST",
-			mode: 'cors',
-			credentials: 'include',
+			mode: "cors",
+			credentials: "include",
 			headers: {
 				"Content-Type": "application/json",
-				"X-CSRFToken": csrftoken,
+				"X-CSRFToken": getCookie('csrftoken'),
 			},
 			body: JSON.stringify(data),
 		});
@@ -291,10 +289,18 @@ function multiCreateRoom() {
 		}
 	});
 };
-
+	
 async function reqJoinRoom(url="", room_id="") {
 	try {
-		const response = await fetch(url + room_id + '/', {});
+		const response = await fetch(url + room_id + '/', {
+			method: "PUT",
+			mode: "cors",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRFToken": getCookie('csrftoken'),
+			},
+		});
 		const result = await response.json();
 		return result;
 	} catch (error) {
