@@ -47,6 +47,7 @@
         height: 80px;
         padding: 10px;
         border: 10px;
+        user-select: none;
 }
 
 .img-player-icon {
@@ -78,16 +79,18 @@
         font-size: 18px;
         color: rgb(29, 29, 29);
         background-color: rgb(59, 165, 30);
+        user-select: none;
+}
+
+.btn-game-start:hover {
+        background-color: rgb(63, 197, 26);
 }
 
 .ready {
         display: none;
         color: #f3f3f3;
         background-color: #313131;
-}
-
-.btn-game-start:hover {
-        background-color: rgb(63, 197, 26);
+        user-select: none;
 }
 
 .ready:hover {
@@ -118,6 +121,7 @@
         font-size: 18px;
         color: rgb(14, 14, 14);
         background-color: rgb(155, 155, 155);
+        user-select: none;
 }
 
 .btn-multi-room-select:hover {
@@ -133,6 +137,7 @@
         margin: auto;
         visibility: hidden;
         animation: spin 1s infinite linear;
+        user-select: none;
 }
 
 @keyframes spin {
@@ -186,6 +191,7 @@
         border-radius: 5px;
         text-align: center;
         font-size: 1em;
+        user-select: none;
 }
 
 .overlay {
@@ -259,6 +265,18 @@
         font-size: 24px;
         margin: auto;
         margin-top: 200px;
+}
+
+.lobby-refresh {
+        display: flex;
+        margin: 20px auto auto auto;
+        user-select: none;
+}
+
+.img-refresh-icon {
+        width: 32px;
+        height: 32px;
+        margin: auto;
 }
 
 #gameDashboard {

@@ -163,3 +163,18 @@ function loadingCircleComponent() {
 
 	return loader;
 }
+
+function lobbyRefreshButtonComponent() {
+	let refresh = document.createElement('div');
+	refresh.classList.add('lobby-refresh');
+	refresh.style.cursor = 'pointer';
+	refresh.addEventListener('click', multiListRoom);
+
+	let refreshImage = document.createElement('img');
+	refreshImage.classList.add('img-refresh-icon');
+	refreshImage.src = '/static/assets/img/refresh.png';
+	refreshImage.alt = 'refreshIcon';
+
+	refresh.appendChild(refreshImage);
+	return refresh;
+}

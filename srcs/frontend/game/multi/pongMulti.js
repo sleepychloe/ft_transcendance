@@ -1,4 +1,16 @@
 
+// global variables
+let ws;
+
+// websocket base URL
+const wsBaseURL = "wss://" + window.location.host + "/ws/";
+
+// api endpoint URLs
+const apiBaseURL = "/api/game/";
+const apiMakeroom = apiBaseURL + "makeroom/";
+const apiListroom = apiBaseURL + "listroom/";
+const apiJoinroom = apiBaseURL + "";
+
 // language
 // task: have to put in external .json file and fetch from api server
 // depending on user language setting
@@ -10,6 +22,7 @@ const languagePack = {
 	},
 };
 
+// CSRF
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -25,28 +38,12 @@ function getCookie(name) {
     return cookieValue;
 }
 
-//////////////////////// for debugging ////////////////////////
-function deleteAlls() {
-	const cookies = document.cookie.split(";");
-
-	for (let i = 0; i < cookies.length; i++) {
-		const cookie = cookies[i];
-		const eqPos = cookie.indexOf("=");
-		const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-		document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+// on press Enter while input lobby name
+document.getElementById('room-name-input').addEventListener('keydown', (e) => {
+	if (e.key === 'Enter') {
+		multiCreateRoom();
 	}
-}
-///////////////////////////////////////////////////////////////
-
-// websocket base URL
-const wsBaseURL = "wss://localhost:4243/ws/";
-// api endpoint URLs
-const apiBaseURL = "/api/game/";
-const apiMakeroom = apiBaseURL + "makeroom/";
-const apiListroom = apiBaseURL + "listroom/";
-const apiJoinroom = apiBaseURL + "";
-
-let ws;
+});
 
 function modalShow() {
 	let overlay = document.getElementsByClassName('overlay')[0];
@@ -70,26 +67,36 @@ function modalClose() {
 	}
 }
 
+async function multiPlayerSetReady(ws={}, data={}) {
+	// console.log('player send ready to server: ', data);
+	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'none';
+	await ws.send(JSON.stringify(data));
+	document.getElementsByClassName('btn-game-start')[0].style.display = 'none';
+	document.getElementsByClassName('ready')[0].style.display = 'block';
+}
+
+async function multiPlayerUnsetReady(ws={}, data={}) {
+	// console.log('player send unready to server: ', data);
+	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'none';
+	await ws.send(JSON.stringify(data));
+	document.getElementsByClassName('btn-game-start')[0].style.display = 'block';
+	document.getElementsByClassName('ready')[0].style.display = 'none';
+}
+
 function updateLobbyPlayerList(data={}) {
 	let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
 	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player));
 }
 
-// function updateLobbyPlayerList(n_client="unknown", method="") {
-// 	if (method === "add") {
-// 		let newPlayer = lobbyPlayersListItemComponent(n_client);
-// 		let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
-// 		if (newPlayer && lobbyPlayerList)
-// 			lobbyPlayerList.appendChild(newPlayer);
-// 	} else if (method === "delete") {
-// 		let oldPlayer = document.getElementById(n_client);
-// 		let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
-// 		if (oldPlayer && lobbyPlayerList)
-// 			lobbyPlayerList.removeChild(oldPlayer);
-// 	} else {
-// 		console.error('wrong method');
-// 	}
-// }
+function updateReadyButton(ready=false) {
+	let btnUndo = document.getElementsByClassName('ready')[0];
+	let btnReady = document.getElementsByClassName('btn-game-start')[0];
+	if (ready) {
+		btnUndo.style['pointer-events'] = 'visible';
+	} else {
+		btnReady.style['pointer-events'] = 'visible';
+	}
+}
 
 function updateLobbySlot(quantity_player_ready=0) {
 	let lobbySlot = document.getElementsByClassName('lobby-space-counter')[0];
@@ -98,20 +105,20 @@ function updateLobbySlot(quantity_player_ready=0) {
 }
 
 const sendPaddleMovement = async (e) => {
-	let direction = undefined;
-
 	if (e.key === 'ArrowUp') {
-		direction = "up";
+		await ws.send(JSON.stringify({
+			'action': 'move_paddle',
+			'direction': "up",
+		}));
 	} else if (e.key === 'ArrowDown') {
-		direction = "down";
+		await ws.send(JSON.stringify({
+			'action': 'move_paddle',
+			'direction': "down",
+		}));
 	} else {
 		console.warn('no such action: ', e.key);
 		return;
 	}
-	await ws.send(JSON.stringify({
-		'action': 'move_paddle',
-		'direction': direction,
-	}));
 	// console.log("Paddle movement sent:", direction);
 }
 
@@ -136,15 +143,6 @@ function multiFinishGame() {
 	document.removeEventListener('keydown', sendPaddleMovement);
 }
 
-function multiDisplayLobby(ws={}, data={}) {
-	let mainPart = document.getElementsByClassName('main-part')[0];
-	if (mainPart) {
-		mainPart.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
-		mainPart.appendChild(lobbyListPlayersComponent(data.quantity_player));
-		mainPart.appendChild(lobbyReadyButtonComponent(ws, data.n_client));
-	}
-}
-
 function reqWsConnection(url="") {
 	return new Promise((resolve, reject) => {
 		ws = new WebSocket(url);
@@ -162,17 +160,19 @@ function reqWsConnection(url="") {
 					updateLobbyPlayerList(data);
 				} else if (response.type === 'disconnect') {
 					console.log('player left lobby: ', data.n_client);
-					updateLobbyPlayerList(data);
 					updateLobbySlot(data.quantity_player_ready);
+					updateLobbyPlayerList(data);
 				} else if (response.type === 'reconnect') {
 					console.log('player reconnected: ', data.n_client);
-					updateLobbyPlayerList(data);
 					updateLobbySlot(data.quantity_player_ready);
+					updateLobbyPlayerList(data);
 				} else if (response.type === 'ready') {
 					console.log('player is ready to play: ', data.n_client);
+					updateReadyButton(true);
 					updateLobbySlot(data.quantity_player_ready);
 				} else if (response.type === 'unready') {
 					console.log('player is NOT ready to play: ', data.n_client);
+					updateReadyButton(false);
 					updateLobbySlot(data.quantity_player_ready);
 				} else {
 					console.warn('wrong player info type has been recieved: ', response.type);
@@ -197,6 +197,8 @@ function reqWsConnection(url="") {
 					multiStartGame();
 				} else if (response.type === 'finish') {
 					console.log('finish the game');
+					multiPlayerUnsetReady(ws, data);
+					updateReadyButton(false);
 					updateLobbySlot(data.quantity_player_ready);
 					multiFinishGame();
 				} else {
@@ -206,8 +208,7 @@ function reqWsConnection(url="") {
 		};
 		ws.onclose = (event) => {
 			console.log('websocket closed: ', event);
-			// playerLobbyDisconnect(); // from lobbyPlayersList
-			// setTimeout(reqWsConnection(url), 1000);
+			multiFinishGame();
 		}
 		ws.onerror = (error) => {
 			console.error('websocket connection has error: calling reject');
@@ -232,24 +233,6 @@ async function multiConnectWs(url="", data={}) {
 	} catch (error) {
 		console.error('error on establishing websocket connection: ', error);
 	}
-}
-
-async function multiPlayerSetReady(ws={}, data={}) {
-	// console.log('player send ready to server: ', data);
-	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'none';
-	await ws.send(JSON.stringify(data));
-	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'visible';
-	document.getElementsByClassName('btn-game-start')[0].style.display = 'none';
-	document.getElementsByClassName('ready')[0].style.display = 'block';
-}
-
-async function multiPlayerUnsetReady(ws={}, data={}) {
-	// console.log('player send unready to server: ', data);
-	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'none';
-	await ws.send(JSON.stringify(data));
-	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'visible';
-	document.getElementsByClassName('btn-game-start')[0].style.display = 'block';
-	document.getElementsByClassName('ready')[0].style.display = 'none';
 }
 
 async function reqCreateRoom(url="", data={}) {
@@ -319,7 +302,6 @@ async function reqJoinRoom(url="", room_id="") {
 }
 
 function multiJoinRoom() {
-	// deleteAllCookies();
 	console.log('sending request to join room...');
 	let mainPart = document.getElementsByClassName('main-part')[0];
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
@@ -382,11 +364,13 @@ function multiListRoom() {
 			console.groupEnd();
 			// need server specific response: no lobby found
 			mainPart.appendChild(responseMsgComponent('no lobby found'));
+			mainPart.appendChild(lobbyRefreshButtonComponent());
 		} else if (data && data.length > 0) {
 			console.groupCollapsed('server responded successfully');
 				console.log('data: ', data);
 			console.groupEnd();
 			mainPart.appendChild(lobbyListRoomComponent(data));
+			mainPart.appendChild(lobbyRefreshButtonComponent());
 		} else {
 			console.groupCollapsed('server responded with error');
 				console.error('data: ', data);
@@ -395,3 +379,16 @@ function multiListRoom() {
 		}
 	});
 };
+
+//////////////////////// for debugging ////////////////////////
+function deleteAllCookies() {
+	const cookies = document.cookie.split(";");
+
+	for (let i = 0; i < cookies.length; i++) {
+		const cookie = cookies[i];
+		const eqPos = cookie.indexOf("=");
+		const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+		document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+	}
+}
+///////////////////////////////////////////////////////////////
