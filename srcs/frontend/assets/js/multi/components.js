@@ -87,7 +87,7 @@ function lobbyPlayersReadyComponent(quantity_player_ready=0) {
 	return lobbySlot;
 }
 
-function lobbyPlayersListItemComponent(playerId="client") {
+function lobbyPlayersListItemComponent(playerId="client", n=0) {
 	let listItem = document.createElement('div');
 	listItem.classList.add('lobby-players-list-item');
 	listItem.setAttribute("id", playerId);
@@ -107,7 +107,7 @@ function lobbyPlayersListItemComponent(playerId="client") {
 
 	let playersName = document.createElement('div');
 	playersName.classList.add('lobby-players-card-name');
-	playersName.innerHTML = `${l.client}`;
+	playersName.innerHTML = `${l.client}` + n;
 	playersCard.appendChild(playersName);
 
 	let playerOption = document.createElement('div');
@@ -122,7 +122,7 @@ function lobbyListPlayersComponent(quantity_player=0) {
 	lobbyPlayerList.classList.add('lobby-players-list');
 	try {
 		for (let i = 0; i < quantity_player; i++) {
-			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent('client' + (i + 1)));
+			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent('client' + (i + 1), i));
 		}
 	} catch {
 		return responseMsgComponent(`${l.errorLoadingLobby}`);
