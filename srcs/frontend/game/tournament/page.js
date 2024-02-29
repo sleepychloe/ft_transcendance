@@ -41,7 +41,7 @@ export function tournamentPage() {
                         <h2>${t.tournamentRegistration}</h2>
                         <input type="number" id="numPlayers" placeholder="${t.numberOfPlayers}">
                         <button id="playerInputs">${t.setPlayers}</button>
-                        <div id="playerInputs"></div>
+                        <div id="playerInputsContainer"></div>
                         <button class="hidden" id="registerPlayersButton">${t.registerPlayers}</button>
                 </div>
                 <div id="gameDashboard" class="hidden">
@@ -57,3 +57,4 @@ export function tournamentPage() {
                 </div>
                 <canvas id="pongCanvas" width="800" height="400" class="hidden"></canvas>`
 };
+

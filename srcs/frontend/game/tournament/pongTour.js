@@ -33,7 +33,7 @@ export function startTournamentMode() {
 
 export function createPlayerInputs() {
     const numPlayers = parseInt(document.getElementById("numPlayers").value);
-    const playerInputs = document.getElementById("playerInputs");
+    const playerInputs = document.getElementById("playerInputsContainer");
     playerInputs.innerHTML = '';
     if (3 <= numPlayers && numPlayers <= 6 ) {
         for (let i = 1; i <= numPlayers; i++) {
@@ -44,10 +44,6 @@ export function createPlayerInputs() {
             playerInputs.appendChild(input);
         }
         document.getElementById("registerPlayersButton").classList.remove("hidden");
-    }
-    else if (numPlayers > 6) {
-        alert(`${t.alertPlayerNum}`);
-        document.getElementById("registerPlayersButton").classList.add("hidden");
     }
     else {
         alert(`${t.alertPlayerNum}`);
@@ -66,7 +62,7 @@ export function registerPlayers() {
                 playerName = `${t.player}` + " " + i.toString();
             }
             while (usedNames.has(playerName) || /^\d+$/.test(playerName)) {
-                playerName = prompt(`Please enter a new name for Player ${i}:`).trim();
+                playerName = prompt(`${t.alertPlayerName} ${i}:`).trim();
                 if (!playerName) {
                     playerName = `${t.player}` + " " + i.toString();
                 }
@@ -86,5 +82,3 @@ export function registerPlayers() {
         game_data['isGameInProgress'] = true;
     }
 }
-
-
