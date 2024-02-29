@@ -151,12 +151,19 @@ function multiStartGame() {
 	document.addEventListener('keydown', sendPaddleMovement);
 }
 
-function multiFinishGame() {
+export function multiFinishGame() {
 	let lobby = document.getElementsByClassName('lobby')[0];
 	let game = document.getElementsByClassName('game')[0];
-	lobby.style.display = 'flex';
-	game.style.display = 'none';
+	if (lobby)
+		lobby.style.display = 'flex';
+	if (game)
+		game.style.display = 'none';
 	document.removeEventListener('keydown', sendPaddleMovement);
+}
+
+export function disconnectGame() {
+	if (ws && ws.readyState === WebSocket.OPEN)
+		ws.close();
 }
 
 function reqWsConnection(url = "") {
@@ -224,9 +231,13 @@ function reqWsConnection(url = "") {
 		};
 		ws.onclose = (event) => {
 			console.log('websocket closed: ', event);
+			multiFinishGame();
+			disconnectGame();
 		}
 		ws.onerror = (error) => {
 			console.error('websocket connection has error: calling reject');
+			multiFinishGame();
+			disconnectGame();
 			reject(error);
 		};
 	});

@@ -8,6 +8,7 @@ import { registerPlayers } from '/static/game/tournament/pongTour.js';
 import { multiCreateRoom, modalShow, multiListRoom } from '/static/game/multi/pongMulti.js';
 import { resetGame } from '/static/game/pong.js';
 import { get_data } from '/static/game/pong.js';
+import { disconnectGame, multiFinishGame } from '/static/game/multi/pongMulti.js';
 
 let game_data = get_data();
 
@@ -43,32 +44,38 @@ const app = async () => {
         }
 }
 
-// on user press forward
-const navigate = url => {
-        if (window.location.pathname === '/local_3d') {
-                stopAnimation();
-        }
-        if (window.location.pathname === '/local' || window.location.pathname === '/tournament') {
+let oldUrl;
+let history = [];
+
+function gc(url="") {
+        if (url === '/') {
+                // do nothing
+        } else if (url === '/local') {
+                console.log('reset game for local');
                 resetGame(game_data);
+        } else if (url === '/local_3d') {
+                console.log('reset game for local 3d');
+                stopAnimation();
+        } else if (url === '/tournament') {
+                console.log('reset game for tournament');
+                resetGame(game_data);
+        } else if (url === '/multi') {
+                console.log('reset game for multi');
+                multiFinishGame();
+                disconnectGame();
         }
+}
+
+const navigate = url => {
+        gc(oldUrl);
         window.history.pushState({}, "", url);
         app();
 };
 
-// on user press back
 document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('popstate', function (event) {
-                // stop pong.js
-                // will try to find another way to avoid try catch block
-                // if (window.location.pathname === '/')
-                console.log('ref: ', document.referrer);
-                try {
-                        resetToHomeScreen();
-                } catch {
-                        console.log("Failed to Reset the Game (game was not loaded)");
-                }
-                // stop multi page
-                //
+                gc(history[history.length - 1]);
+                history.pop();
                 app();
         });
         // prevent default behaviour for all HTML <a> tags
@@ -78,7 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!(target instanceof HTMLAnchorElement))
                         return;
                 event.preventDefault();
-                navigate(target.href);
+                if (window.location.href != target.href) {
+                        oldUrl = window.location.pathname
+                        history.push(target.pathname);
+                        navigate(target.href);
+                }
         });
 
         app();

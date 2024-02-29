@@ -10,7 +10,8 @@
 
 header {
         grid-area: head;
-        margin: 30px auto 80px auto;
+        margin: 30px auto 150px auto;
+        height: 100px;
 }
 
 nav {
