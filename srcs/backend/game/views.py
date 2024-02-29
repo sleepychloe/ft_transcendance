@@ -93,7 +93,7 @@ class GameRoomJoinView(View):
 		if room.client1:
 			if room.client1['client_id'] == client_id:
 				return 'client1'
-		if room.clinet2:
+		if room.client2:
 			if room.client2['client_id'] == client_id:
 				return 'client2'
 		if room.client3:
