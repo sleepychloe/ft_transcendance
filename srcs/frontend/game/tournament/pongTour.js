@@ -62,9 +62,16 @@ export function registerPlayers() {
                 playerName = `${t.player}` + " " + i.toString();
             }
             while (usedNames.has(playerName) || /^\d+$/.test(playerName)) {
-                playerName = prompt(`${t.alertPlayerName} ${i}:`).trim();
-                if (!playerName) {
-                    playerName = `${t.player}` + " " + i.toString();
+                let newName = prompt(`${t.alertPlayerName} ${i}:`);
+                if (newName === null) {
+                    playerName = `${t.player} ${i}`;
+                    break;
+                } else {
+                    newName = newName.trim();
+                    if (!newName) {
+                        newName = `${t.player} ${i}`;
+                    }
+                playerName = newName;
                 }
             }
             usedNames.add(playerName);
