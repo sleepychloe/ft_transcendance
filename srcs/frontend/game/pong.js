@@ -3,6 +3,7 @@ const translations = {
         player: "Player",
         vs: "vs",
         alertPlayerNum: "3 to 6 players required !",
+        alertPlayerName: "Player name should not consist of only numbers or be duplicates of other player names.\nPleas enter a different name: Player",
         alertTournamentWinner: "Tournament Winner",
         alertWinner: "Winner",
         waiting: "Waiting for players",
@@ -12,6 +13,7 @@ const translations = {
         player: "Joueur",
         vs: "contre",
         alertPlayerNum: "De 3 à 6 joueurs requis !",
+        alertPlayerName: "Le nom du joueur ne doit pas être composé uniquement de chiffres ou être un doublon d'un autre nom de joueur.\nVeuillez entrer un nom différent: le Joueur",
         alertTournamentWinner: "Vainqueur du tournoi",
         alertWinner: "Vainqueur",
         waiting: "En attente des joueurs",
@@ -21,6 +23,7 @@ const translations = {
         player: "플레이어",
         vs: "대",
         alertPlayerNum: "3명에서 6명의 플레이어가 필요합니다 !",
+        alertPlayerName: "플레이어 이름은 숫자만으로 구성되어서는 안되며 다른 플레이어 이름과 중복되어서는 안됩니다.\n다른 이름을 입력해주세요: 플레이어",
         alertTournamentWinner: "토너먼트 우승자",
         alertWinner: "우승자",
         waiting: "플레이어를 기다리는 중",
@@ -183,8 +186,8 @@ export function resetGame(game_data={}) {
         for (let i = 1; i <= document.getElementById("numPlayers").value; i++) {
             document.getElementById(`player${i}`).value = "";
         }
-        document.getElementById("numPlayers").value = "empty";
-        document.getElementById("playerInputs").innerHTML = '';
+        document.getElementById("numPlayers").value = "";
+        document.getElementById("playerInputsContainer").innerHTML = '';
         game_data['players'] = [];
     }
     game_data['currentMatchIndex'] = 0;
