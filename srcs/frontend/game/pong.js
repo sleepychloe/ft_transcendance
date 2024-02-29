@@ -2,7 +2,7 @@ const translations = {
     en: {
         player: "Player",
         vs: "vs",
-        alartPlayerNum: "At least 3 players required !",
+        alertPlayerNum: "3 to 6 players required !",
         alertTournamentWinner: "Tournament Winner",
         alertWinner: "Winner",
         waiting: "Waiting for players",
@@ -11,7 +11,7 @@ const translations = {
     fr: {
         player: "Joueur",
         vs: "contre",
-        alertPlayerNum: "Au moins 3 joueurs requis !",
+        alertPlayerNum: "De 3 à 6 joueurs requis !",
         alertTournamentWinner: "Vainqueur du tournoi",
         alertWinner: "Vainqueur",
         waiting: "En attente des joueurs",
@@ -20,7 +20,7 @@ const translations = {
     ko: {
         player: "플레이어",
         vs: "대",
-        alertPlayerNum: "최소 3명의 플레이어가 필요합니다!",
+        alertPlayerNum: "3명에서 6명의 플레이어가 필요합니다 !",
         alertTournamentWinner: "토너먼트 우승자",
         alertWinner: "우승자",
         waiting: "플레이어를 기다리는 중",

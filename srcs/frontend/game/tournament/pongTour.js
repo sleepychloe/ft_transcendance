@@ -10,7 +10,7 @@ function createPlayerInputs() {
     const numPlayers = parseInt(document.getElementById("numPlayers").value);
     const playerInputs = document.getElementById("playerInputs");
     playerInputs.innerHTML = '';
-    if (numPlayers >= 3) {
+    if (3 <= numPlayers && numPlayers <= 6 ) {
         for (let i = 1; i <= numPlayers; i++) {
             const input = document.createElement("input");
             input.type = "text";
@@ -20,8 +20,12 @@ function createPlayerInputs() {
         }
         document.getElementById("registerPlayersButton").classList.remove("hidden");
     }
+    else if (numPlayers > 6) {
+        alert(`${t.alertPlayerNum}`);
+        document.getElementById("registerPlayersButton").classList.add("hidden");
+    }
     else {
-        alert(`${t.alartPlayerNum}`);
+        alert(`${t.alertPlayerNum}`);
         document.getElementById("registerPlayersButton").classList.add("hidden");
     }
 }
