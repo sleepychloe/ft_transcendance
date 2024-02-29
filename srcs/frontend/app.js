@@ -6,6 +6,7 @@ import { startTournamentMode } from '/static/game/tournament/pongTour.js';
 import { createPlayerInputs } from '/static/game/tournament/pongTour.js';
 import { registerPlayers } from '/static/game/tournament/pongTour.js';
 import { multiCreateRoom, modalShow, multiListRoom } from '/static/game/multi/pongMulti.js';
+import { resetGame } from '/static/game/pong.js';
 import { get_data } from '/static/game/pong.js';
 
 let game_data = get_data();
@@ -48,10 +49,7 @@ const navigate = url => {
                 stopAnimation();
         }
         if (window.location.pathname === '/local' || window.location.pathname === '/tournament') {
-                if (game_data['gameLoopId']) {
-                        cancelAnimationFrame(game_data['gameLoopId']);
-                        game_data['gameLoopId'] = 0;
-                }
+                resetGame(game_data);
         }
         window.history.pushState({}, "", url);
         app();
