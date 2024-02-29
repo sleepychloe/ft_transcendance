@@ -27,9 +27,20 @@ const app = async () => {
         }
         if (match.route.path === '/') {
                 // Ensure the DOM update has been processed
+                var languageSelection = document.querySelector('.language-selection');
+                languageSelection.style.display = 'block';
+
                 requestAnimationFrame(() => {
                         initLogo();
                 });
+        }
+        else
+        {
+                var languageSelection = document.querySelector('.language-selection');
+                if (languageSelection) {
+                languageSelection.style.display = 'none';
+        }
+
         }
         if (match.route.path === '/local_3d')
         {

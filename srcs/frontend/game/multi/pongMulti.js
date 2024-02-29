@@ -1,4 +1,4 @@
-const translations = {
+const tr = {
 	en: {
 		ready: "are ready",
 		errorFailToLoad: "failed to load data from server",
@@ -13,7 +13,7 @@ const translations = {
 	},
 };
 
-const lan = translations[currentLanguage];
+const lan = tr[currentLanguage];
 
 
 // global variables
