@@ -11,13 +11,13 @@ const t = {
 	fr: {
 		areReady: "sont prêts",
 		ready: "Prêt",
-        undo: "Annuler",
+        	undo: "Annuler",
 		client: "Client",
 	},
 	ko: {
 		areReady: "준비됨",
 		ready: "준비됨",
-        undo: "실행 취소",
+        	undo: "실행 취소",
 		client: "클라이언트",
 	},
 };
@@ -50,12 +50,10 @@ function lobbyListRoomComponent(data={}) {
 	let lobbyRoomList;
 	var i = 0;
 	try {
-		// single element - top (parent)
 		lobbyRoomList = document.createElement('div');
 		lobbyRoomList.classList.add('lobby-room-list');
 		for (i in data)
 		{
-			// generated elements depending on server response (children)
 			let listItem = document.createElement('div');
 			listItem.classList.add('lobby-room-list-item');
 			listItem.addEventListener('click', multiJoinRoom);
@@ -89,7 +87,7 @@ function lobbyPlayersReadyComponent(quantity_player_ready=0) {
 	return lobbySlot;
 }
 
-function lobbyPlayersListItemComponent(playerId="player") {
+function lobbyPlayersListItemComponent(playerId="client") {
 	let listItem = document.createElement('div');
 	listItem.classList.add('lobby-players-list-item');
 	listItem.setAttribute("id", playerId);
@@ -109,7 +107,7 @@ function lobbyPlayersListItemComponent(playerId="player") {
 
 	let playersName = document.createElement('div');
 	playersName.classList.add('lobby-players-card-name');
-	playersName.innerHTML = playerId;
+	playersName.innerHTML = `${l.client}`;
 	playersCard.appendChild(playersName);
 
 	let playerOption = document.createElement('div');
@@ -124,7 +122,7 @@ function lobbyListPlayersComponent(quantity_player=0) {
 	lobbyPlayerList.classList.add('lobby-players-list');
 	try {
 		for (let i = 0; i < quantity_player; i++) {
-			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent(`${l.client}` + ' '+ (i + 1)));
+			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent('client' + (i + 1)));
 		}
 	} catch {
 		return responseMsgComponent(`${l.errorLoadingLobby}`);

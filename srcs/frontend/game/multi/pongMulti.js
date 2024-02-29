@@ -28,17 +28,6 @@ const apiMakeroom = apiBaseURL + "makeroom/";
 const apiListroom = apiBaseURL + "listroom/";
 const apiJoinroom = apiBaseURL + "";
 
-// language
-// task: have to put in external .json file and fetch from api server
-// depending on user language setting
-
-// problem: how to change language after loading first one
-const languagePack = {
-	'error': {
-		'lobbyFull': 'lobby is full!',
-	},
-};
-
 // CSRF
 function getCookie(name) {
 	var cookieValue = null;
@@ -339,13 +328,10 @@ function multiJoinRoom() {
 			console.log('data: ', data);
 			console.groupEnd();
 
-			// server allows to join room === user has a token for ws
-			// first websocket connection establish here
 			ws = await multiConnectWs(wsBaseURL, data);
 
 			let mainTitle = document.getElementsByClassName('main-title')[0];
 			mainTitle.innerHTML = data.room_name;
-			// reconnect or join
 			if (data.status === 'join') {
 				mainPart.appendChild(lobbyComponent(ws, data));
 			} else if (data.status === 'reconnect') {
@@ -356,8 +342,6 @@ function multiJoinRoom() {
 			console.groupCollapsed('server responded with error');
 			console.error('data: ', data);
 			console.groupEnd();
-			// need a server to send a status code to determine what error to display
-			// mainPart.appendChild(responseMsgComponent(languagePack.error.lobbyFull));
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
 	});
@@ -387,7 +371,6 @@ function multiListRoom() {
 			console.groupCollapsed('server responded successfully');
 			console.log('data: ', data);
 			console.groupEnd();
-			// need server specific response: no lobby found
 			mainPart.appendChild(responseMsgComponent('no lobby found'));
 			mainPart.appendChild(lobbyRefreshButtonComponent());
 		} else if (data && data.length > 0) {
