@@ -5,9 +5,6 @@ import { lobbyComponent } from '/static/assets/js/multi/components.js';
 import { lobbyListPlayersComponent } from '/static/assets/js/multi/components.js';
 import { multiGameScreenComponent } from '/static/assets/js/multi/components.js';
 import { lobbyListRoomComponent } from '/static/assets/js/multi/components.js';
-import { websocket } from '/static/app.js';
-
-let ws = websocket.ws;
 
 const tr = {
 	en: {
@@ -28,7 +25,7 @@ const lan = tr[currentLanguage];
 
 
 // global variables
-// let ws;
+let ws;
 
 // websocket base URL
 const wsBaseURL = "wss://" + window.location.host + "/ws/";

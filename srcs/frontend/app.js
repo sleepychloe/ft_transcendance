@@ -7,10 +7,6 @@ import { createPlayerInputs } from '/static/game/tournament/pongTour.js';
 import { registerPlayers } from '/static/game/tournament/pongTour.js';
 import { multiCreateRoom, modalShow, multiListRoom } from '/static/game/multi/pongMulti.js';
 
-export let websocket = {
-        ws: undefined,
-};
-
 const app = async () => {
         const pageMatch = routes.map(route => {
                 return {
