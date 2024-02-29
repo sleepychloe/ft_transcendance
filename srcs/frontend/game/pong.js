@@ -183,11 +183,20 @@ export function resetGame(game_data={}) {
     document.getElementById("score1").textContent = game_data['score1'];
     document.getElementById("score2").textContent = game_data['score2'];
     if (game_data['tournamentModeFlag'] === 1) {
-        for (let i = 1; i <= document.getElementById("numPlayers").value; i++) {
-            document.getElementById(`player${i}`).value = "";
+        const numPlayersElement = document.getElementById("numPlayers");
+        if (numPlayersElement) {
+            for (let i = 1; i <= numPlayersElement.value; i++) {
+                const playerElement = document.getElementById(`player${i}`);
+                if (playerElement) {
+                    playerElement.value = "";
+                }
+            }
+            numPlayersElement.value = "";
         }
-        document.getElementById("numPlayers").value = "";
-        document.getElementById("playerInputsContainer").innerHTML = '';
+        const playerInputsContainer = document.getElementById("playerInputsContainer");
+        if (playerInputsContainer) {
+            playerInputsContainer.innerHTML = '';
+        }
         game_data['players'] = [];
     }
     game_data['currentMatchIndex'] = 0;
