@@ -1,3 +1,5 @@
+import { endNormalGame } from "/static/game/local_pvp/pongLocal.js";
+
 const translations = {
     en: {
         player: "Player",
@@ -28,194 +30,173 @@ const translations = {
     },
 };
 
-const t = translations[currentLanguage];
+export const t = translations[currentLanguage];
 
+let game_data = {
+    canvas : undefined,
+    ctx : undefined,
+    normalCount : 0,
+    random : 0,
+    leftPaddleY : 0,
+    rightPaddleY : 0,
+    paddleWidth : 10,
+    paddleHeight : 100,
+    paddleSpeed : 14,
+    ballX : 0,
+    ballY : 0,
+    ballSpeedX : 0,
+    ballSpeedY : 0,
+    ballSize : 10,
+    score1 : 0,
+    score2 : 0,
+    players : [],
+    currentMatchIndex : 0,
+    gameLoopId : 0,
+    normalModeGamesPlayed : 0,
+    isGameInProgress : false,
+    tournamentModeFlag : 0,
+};
 
-var canvas = document.getElementById("pongCanvas");
-var ctx = canvas.getContext("2d");
-
-let normalCount = 0;
-let random = 0;
-
-let leftPaddleY = canvas.height / 2;
-let rightPaddleY = canvas.height / 2;
-const paddleWidth = 10, paddleHeight = 100, paddleSpeed = 14;
-let ballX = canvas.width / 2, ballY = canvas.height / 2;
-let ballSpeedX = 2 + 1.5 * Math.random();
-let ballSpeedY = 2 + 1.5 * Math.random();
-
-const ballSize = 10;
-let score1 = 0, score2 = 0;
-let players = [];
-let currentMatchIndex = 0;
-let gameLoopId = 0;
-let normalModeGamesPlayed = 0;
-let isGameInProgress = false;
-let tournamentModeFlag = 0;
-
-function canvasInit() {
-    canvas = document.getElementById("pongCanvas");
-    ctx = canvas.getContext("2d");
+export function get_data() {
+    return game_data;
 }
 
-document.addEventListener('keydown', event => {
-        if (isGameInProgress && event.key === 'w') {
-        leftPaddleY -= paddleSpeed;
-        const data = {
-            "PaddleY": leftPaddleY,
-            "ballX": ballX,
-            "ballY": ballY
-        };
-    }
-    if (isGameInProgress && event.key === 's') {
-        leftPaddleY += paddleSpeed;
-        const data = {
-            "PaddleY": leftPaddleY,
-            "ballX": ballX,
-            "ballY": ballY
-        };
-    }
-    if (isGameInProgress && event.key === 'ArrowUp') {
-        rightPaddleY -= paddleSpeed;
-        const data = {
-            "PaddleY": leftPaddleY,
-            "ballX": ballX,
-            "ballY": ballY
-        };
-    }
-    if (isGameInProgress && event.key === 'ArrowDown') {
-        rightPaddleY += paddleSpeed;
-        const data = {
-            "PaddleY": leftPaddleY,
-            "ballX": ballX,
-            "ballY": ballY
-        };
-    }
-});
-
-function resetBall() {
-    ballX = canvas.width / 2, ballY = canvas.height / 2;
-    ballSpeedX = 2 + 1.5 * Math.random();
-    ballSpeedY = 2 + 1.5 * Math.random();
-
-    leftPaddleY = canvas.height / 2;
-    rightPaddleY = canvas.height / 2;
+export function canvasInit(game_data={}) {
+    game_data['canvas'] = document.getElementById("pongCanvas");
+    game_data['ctx'] = document.getElementById("pongCanvas").getContext("2d");
+    game_data['leftPaddleY'] = game_data['canvas'].height / 2;
+    game_data['rightPaddleY'] = game_data['canvas'].height / 2;
+    game_data['ballX'] = game_data['canvas'].width / 2
+    game_data['ballY'] = game_data['canvas'].height / 2;
 }
 
-function updatePaddlePosition() {
-    if (leftPaddleY < 0) leftPaddleY = 0;
-    if (leftPaddleY + paddleHeight > canvas.height) leftPaddleY = canvas.height - paddleHeight;
-    if (rightPaddleY < 0) rightPaddleY = 0;
-    if (rightPaddleY + paddleHeight > canvas.height) rightPaddleY = canvas.height - paddleHeight;
+export function resetBall(game_data={}) {
+    game_data['ballX'] = game_data['canvas'].width / 2;
+    game_data['ballY'] = game_data['canvas'].height / 2;
+    game_data['ballSpeedX'] = 2 + 1.5 * Math.random();
+    game_data['ballSpeedY'] = 2 + 1.5 * Math.random();
+    game_data['leftPaddleY'] = game_data['canvas'].height / 2;
+    game_data['rightPaddleY'] = game_data['canvas'].height / 2;
 }
 
-function paddleCollision() {
-    if (ballX <= paddleWidth / 2 && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) {
-        ballSpeedX = -ballSpeedX;
-        ballSpeedX += 0.001;
+export function updatePaddlePosition(game_data={}) {
+    if (game_data['leftPaddleY'] < 0) game_data['leftPaddleY'] = 0;
+    if (game_data['leftPaddleY'] + game_data['paddleHeight'] > game_data['canvas'].height) game_data['leftPaddleY'] = game_data['canvas'].height - game_data['paddleHeight'];
+    if (game_data['rightPaddleY'] < 0) game_data['rightPaddleY'] = 0;
+    if (game_data['rightPaddleY'] + game_data['paddleHeight'] > game_data['canvas'].height) game_data['rightPaddleY'] = game_data['canvas'].height - game_data['paddleHeight'];
+}
+
+export function paddleCollision(game_data={}) {
+    if (game_data['ballX'] <= game_data['paddleWidth'] / 2 && game_data['ballY'] > game_data['leftPaddleY'] && game_data['ballY'] < game_data['leftPaddleY'] + game_data['paddleHeight']) {
+        game_data['ballSpeedX'] = -game_data['ballSpeedX'];
+        game_data['ballSpeedX'] += 0.001;
     }
-    if (ballX >= canvas.width - paddleWidth / 2 && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight)
+    if (game_data['ballX'] >= game_data['canvas'].width - game_data['paddleWidth'] / 2 && game_data['ballY'] > game_data['rightPaddleY'] && game_data['ballY'] < game_data['rightPaddleY'] + game_data['paddleHeight'])
     {
-        ballSpeedX = -ballSpeedX;
-        ballSpeedX -= 0.001;
+        game_data['ballSpeedX'] = -game_data['ballSpeedX'];
+        game_data['ballSpeedX'] -= 0.001;
     }
 }
 
-function checkScore() {
-        if (tournamentModeFlag && (ballX < 0 || ballX > canvas.width)) {
-                if (ballX < 0) score2++; else score1++;
-                document.getElementById("score1").textContent = score1;
-                document.getElementById("score2").textContent = score2;
-                if (score1 >= 1 || score2 >= 1) {
-                        endMatch();
+export function checkScore(game_data={}) {
+        if (game_data['tournamentModeFlag'] && (game_data['ballX'] < 0 || game_data['ballX'] > game_data['canvas'].width)) {
+                if (game_data['ballX'] < 0) game_data['score2']++; else game_data['score1']++;
+                document.getElementById("score1").textContent = game_data['score1'];
+                document.getElementById("score2").textContent = game_data['score2'];
+                if (game_data['score1'] >= 1 || game_data['score2'] >= 1) {
+                        endMatch(game_data);
                 } else {
-                        startMatch();
+                        startMatch(game_data);
                 }
-        } else if ((ballX < 0 || ballX > canvas.width)) {
-                if (ballX < 0) score2++; else score1++;
-                document.getElementById("score1").textContent = score1;
-                document.getElementById("score2").textContent = score2;
-                normalModeGamesPlayed++;
-                if (normalModeGamesPlayed < 3 && Math.max(score1, score2) < 2) {
-                        startMatch();
+        } else if ((game_data['ballX'] < 0 || game_data['ballX'] > game_data['canvas'].width)) {
+                if (game_data['ballX'] < 0) game_data['score2']++; else game_data['score1']++;
+                document.getElementById("score1").textContent = game_data['score1'];
+                document.getElementById("score2").textContent = game_data['score2'];
+                game_data['normalModeGamesPlayed']++;
+                if (game_data['normalModeGamesPlayed'] < 3 && Math.max(game_data['score1'], game_data['score2']) < 2) {
+                        startMatch(game_data);
                 } else {
-                        endNormalGame();
+                        endNormalGame(game_data);
                 }
         }
 }
 
-function drawEverything() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
-    ctx.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
-    ctx.beginPath();
-    ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2, false);
-    ctx.fill();
+export function drawEverything(game_data) {
+    game_data['ctx'].clearRect(0, 0, game_data['canvas'].width, game_data['canvas'].height);
+    game_data['ctx'].fillStyle = 'white';
+    game_data['ctx'].fillRect(0, game_data['leftPaddleY'], game_data['paddleWidth'], game_data['paddleHeight']);
+    game_data['ctx'].fillRect(game_data['canvas'].width - game_data['paddleWidth'], game_data['rightPaddleY'], game_data['paddleWidth'], game_data['paddleHeight']);
+    game_data['ctx'].beginPath();
+    game_data['ctx'].arc(game_data['ballX'], game_data['ballY'], game_data['ballSize'], 0, Math.PI * 2, false);
+    game_data['ctx'].fill();
 }
 
-function startMatch() {
-        random++;
-        resetBall();
-        if (tournamentModeFlag) {
+export function startMatch(game_data={}) {
+        game_data['random']++;
+        resetBall(game_data);
+        if (game_data['tournamentModeFlag']) {
                 document.getElementById("tournamentInfo").style.display = "block";
         }
-        if (!gameLoopId) {
-                isGameInProgress = true;
-                gameLoopId = requestAnimationFrame(gameLoop);
+        if (!game_data['gameLoopId']) {
+                game_data['isGameInProgress'] = true;
+                game_data['gameLoopId'] = requestAnimationFrame(() => {
+                    gameLoop(game_data);
+                });
         }
 }
 
-function gameLoop() {
-    if (!isGameInProgress) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+export function gameLoop(game_data={}) {
+    if (!game_data['isGameInProgress']) {
+        game_data['ctx'].clearRect(0, 0, game_data['canvas'].width, game_data['canvas'].height);
         return;
     }
-    updatePaddlePosition();
-    if (random % 2 !== 0) {
-        ballX -= ballSpeedX;
-        ballY -= ballSpeedY;
+    updatePaddlePosition(game_data);
+    if (game_data['random'] % 2 !== 0) {
+        game_data['ballX'] -= game_data['ballSpeedX'];
+        game_data['ballY'] -= game_data['ballSpeedY'];
     }
     else {
-        ballX += ballSpeedX;
-        ballY += ballSpeedY;
+        game_data['ballX'] += game_data['ballSpeedX'];
+        game_data['ballY'] += game_data['ballSpeedY'];
     }
-    if (ballY <= 5 || ballY >= canvas.height - 5) ballSpeedY = -ballSpeedY;
-    paddleCollision();
-    checkScore();
-    drawEverything();
-    gameLoopId = requestAnimationFrame(gameLoop);
+    if (game_data['ballY'] <= 5 || game_data['ballY'] >= game_data['canvas'].height - 5) game_data['ballSpeedY'] = -game_data['ballSpeedY'];
+    paddleCollision(game_data);
+    checkScore(game_data);
+    drawEverything(game_data);
+    game_data['gameLoopId'] = requestAnimationFrame(() => {
+        gameLoop(game_data);
+    });
 }
 
-function resetGame() {
-    isGameInProgress = false;
-    if (gameLoopId) {
-        cancelAnimationFrame(gameLoopId);
-        gameLoopId = null;
+export function resetGame(game_data={}) {
+    game_data['isGameInProgress'] = false;
+    if (game_data['gameLoopId']) {
+        cancelAnimationFrame(game_data['gameLoopId']);
+        game_data['gameLoopId'] = null;
     }
-    gameLoopId = null;
-    score1 = 0;
-    score2 = 0;
-    document.getElementById("score1").textContent = score1;
-    document.getElementById("score2").textContent = score2;
-    if (tournamentModeFlag === 1) {
+    game_data['gameLoopId'] = null;
+    game_data['score1'] = 0;
+    game_data['score2'] = 0;
+    document.getElementById("score1").textContent = game_data['score1'];
+    document.getElementById("score2").textContent = game_data['score2'];
+    if (game_data['tournamentModeFlag'] === 1) {
         for (let i = 1; i <= document.getElementById("numPlayers").value; i++) {
             document.getElementById(`player${i}`).value = "";
         }
         document.getElementById("numPlayers").value = "empty";
         document.getElementById("playerInputs").innerHTML = '';
-        players = [];
+        game_data['players'] = [];
     }
-    currentMatchIndex = 0;
+    game_data['currentMatchIndex'] = 0;
 }
 
-function resetToHomeScreen() {
-        resetBall();
-        resetGame();
+export function resetToHomeScreen(game_data) {
+        resetBall(game_data);
+        resetGame(game_data);
         document.getElementById("pongCanvas").style.display = "block";
         document.getElementById("gameDashboard").style.display = "none";
-        if (tournamentModeFlag === 1)
+        if (game_data['tournamentModeFlag'] === 1)
                 document.getElementById("tournamentInfo").style.display = "none";
         document.getElementById("modeSelection").style.display = "block";
-        tournamentModeFlag = 0;
+        game_data['tournamentModeFlag'] = 0;
 }
