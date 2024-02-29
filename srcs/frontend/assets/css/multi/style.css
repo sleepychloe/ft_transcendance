@@ -179,7 +179,7 @@
         font-size: 0.9em;
 }
 
-.btn-modal-input-submit {
+#btn-modal-input-submit {
         cursor: pointer;
         border: none;
         font-weight: 600;

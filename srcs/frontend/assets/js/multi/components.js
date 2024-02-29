@@ -1,3 +1,8 @@
+import { multiListRoom } from '/static/game/multi/pongMulti.js';
+import { multiJoinRoom } from '/static/game/multi/pongMulti.js';
+import { multiPlayerSetReady } from '/static/game/multi/pongMulti.js';
+import { multiPlayerUnsetReady } from '/static/game/multi/pongMulti.js';
+
 const trans = {
 	en: {
 		areReady: "are ready",
@@ -24,7 +29,7 @@ const trans = {
 
 const l = trans[currentLanguage];
 
-function multiGameScreenComponent() {
+export function multiGameScreenComponent() {
 	let container = document.createElement('div');
 	container.classList.add('game');
 
@@ -37,7 +42,7 @@ function multiGameScreenComponent() {
 	return container;
 }
 
-function lobbyComponent(ws={}, data={}) {
+export function lobbyComponent(ws={}, data={}) {
 	let lobby = document.createElement('div');
 	lobby.classList.add('lobby');
 	lobby.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
@@ -46,7 +51,7 @@ function lobbyComponent(ws={}, data={}) {
 	return lobby;
 }
 
-function lobbyListRoomComponent(data={}) {
+export function lobbyListRoomComponent(data={}) {
 	let lobbyRoomList;
 	var i = 0;
 	try {
@@ -95,6 +100,7 @@ function lobbyPlayersListItemComponent(playerId="client", n=0) {
 	let playersCard = document.createElement('div');
 	playersCard.classList.add('lobby-players-card');
 	listItem.appendChild(playersCard);
+	
 	let playerIcon = document.createElement('div');
 	playerIcon.classList.add('lobby-players-card-icon');
 	playersCard.appendChild(playerIcon);
@@ -117,7 +123,7 @@ function lobbyPlayersListItemComponent(playerId="client", n=0) {
 	return listItem;
 }
 
-function lobbyListPlayersComponent(quantity_player=0) {
+export function lobbyListPlayersComponent(quantity_player=0) {
 	let lobbyPlayerList = document.createElement('div');
 	lobbyPlayerList.classList.add('lobby-players-list');
 	try {
@@ -172,7 +178,7 @@ function lobbyReadyButtonComponent(ws={}, n_client="client") {
 	return buttonDiv;
 }
 
-function responseMsgComponent(text="error") {
+export function responseMsgComponent(text="error") {
 	let msg = document.createElement('p');
 	msg.classList.add('list-room-status-msg');
 	msg.innerHTML = text;
@@ -180,7 +186,7 @@ function responseMsgComponent(text="error") {
 	return msg;
 }
 
-function loadingCircleComponent() {
+export function loadingCircleComponent() {
 	let loader = document.createElement('div');
 	loader.classList.add('loading');
 	loader.style.visibility = 'visible';
@@ -188,7 +194,7 @@ function loadingCircleComponent() {
 	return loader;
 }
 
-function lobbyRefreshButtonComponent() {
+export function lobbyRefreshButtonComponent() {
 	let refresh = document.createElement('div');
 	refresh.classList.add('lobby-refresh');
 	refresh.style.cursor = 'pointer';

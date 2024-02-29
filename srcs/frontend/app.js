@@ -1,10 +1,15 @@
-import { routes } from "/static/routes.js";
-import { initLogo, start3dMode, stopAnimation } from "/static/3d.js";
+import { routes } from '/static/routes.js';
+import { initLogo, start3dMode, stopAnimation } from '/static/3d.js';
 import { createScriptTag } from '/static/game/createScriptTag.js';
 import { startNormalMode } from '/static/game/local_pvp/pongLocal.js';
 import { startTournamentMode } from '/static/game/tournament/pongTour.js';
 import { createPlayerInputs } from '/static/game/tournament/pongTour.js';
 import { registerPlayers } from '/static/game/tournament/pongTour.js';
+import { multiCreateRoom, modalShow, multiListRoom } from '/static/game/multi/pongMulti.js';
+
+export let websocket = {
+        ws: undefined,
+};
 
 const app = async () => {
         const pageMatch = routes.map(route => {
@@ -32,6 +37,9 @@ const app = async () => {
                 document.getElementById('playerInputs').addEventListener('click', createPlayerInputs);
                 document.getElementById('registerPlayersButton').addEventListener('click', registerPlayers);
         } else if (match.route.path === '/multi') {
+                document.getElementById('btn-modal-input-submit').addEventListener('click', multiCreateRoom);
+                document.getElementById('btn-create-room').addEventListener('click', modalShow);
+                document.getElementById('btn-join-room').addEventListener('click', multiListRoom);
         }
 }
 

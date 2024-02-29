@@ -1,3 +1,14 @@
+import { loadingCircleComponent } from '/static/assets/js/multi/components.js';
+import { lobbyRefreshButtonComponent } from '/static/assets/js/multi/components.js';
+import { responseMsgComponent } from '/static/assets/js/multi/components.js';
+import { lobbyComponent } from '/static/assets/js/multi/components.js';
+import { lobbyListPlayersComponent } from '/static/assets/js/multi/components.js';
+import { multiGameScreenComponent } from '/static/assets/js/multi/components.js';
+import { lobbyListRoomComponent } from '/static/assets/js/multi/components.js';
+import { websocket } from '/static/app.js';
+
+let ws = websocket.ws;
+
 const tr = {
 	en: {
 		ready: "are ready",
@@ -17,7 +28,7 @@ const lan = tr[currentLanguage];
 
 
 // global variables
-let ws;
+// let ws;
 
 // websocket base URL
 const wsBaseURL = "wss://" + window.location.host + "/ws/";
@@ -50,7 +61,7 @@ const createRoomOnEnter = async (e) => {
 	}
 }
 
-function modalShow() {
+export function modalShow() {
 	let overlay = document.getElementsByClassName('overlay')[0];
 	let modal = document.getElementsByClassName('modal')[0];
 	let roomNameInput = document.getElementById('room-name-input');
@@ -75,7 +86,7 @@ function modalClose() {
 	}
 }
 
-async function multiPlayerSetReady(ws = {}, data = {}) {
+export async function multiPlayerSetReady(ws = {}, data = {}) {
 	// console.log('player send ready to server: ', data);
 	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'none';
 	await ws.send(JSON.stringify(data));
@@ -83,7 +94,7 @@ async function multiPlayerSetReady(ws = {}, data = {}) {
 	document.getElementsByClassName('ready')[0].style.display = 'block';
 }
 
-async function multiPlayerUnsetReady(ws = {}, data = {}) {
+export async function multiPlayerUnsetReady(ws = {}, data = {}) {
 	// console.log('player send unready to server: ', data);
 	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'none';
 	await ws.send(JSON.stringify(data));
@@ -216,7 +227,7 @@ function reqWsConnection(url = "") {
 		};
 		ws.onclose = (event) => {
 			console.log('websocket closed: ', event);
-			multiFinishGame();
+			// multiFinishGame();
 		}
 		ws.onerror = (error) => {
 			console.error('websocket connection has error: calling reject');
@@ -263,7 +274,7 @@ async function reqCreateRoom(url = "", data = {}) {
 	}
 }
 
-function multiCreateRoom() {
+export function multiCreateRoom() {
 	let roomName = document.getElementById('room-name-input').value;
 	if (!roomName) {
 		document.getElementById('room-name-input').style.border = '2px solid red';
@@ -317,7 +328,7 @@ async function reqJoinRoom(url = "", room_id = "") {
 	}
 }
 
-function multiJoinRoom() {
+export function multiJoinRoom() {
 	console.log('sending request to join room...');
 	let mainPart = document.getElementsByClassName('main-part')[0];
 	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
@@ -362,7 +373,7 @@ async function getListRoom(url = "") {
 	}
 }
 
-function multiListRoom() {
+export function multiListRoom() {
 	console.log('sending request to list room...');
 	let mainPart = document.getElementsByClassName('main-part')[0];
 	mainPart.innerHTML = '';

@@ -24,12 +24,12 @@ export function multiPage() {
         return `<div class="modal">
                         <div class="modal-content">
                                 <input type="text" id="room-name-input" placeholder="${t.lobbyName}" minlength="1" maxlength="16" required />
-                                <button class="btn-modal-input-submit" onClick="multiCreateRoom()">${t.create}</button>
+                                <button id="btn-modal-input-submit">${t.create}</button>
                         </div>
                 </div>
                 <div class="overlay"></div>
                 <div class="multi-room-choice-list">
-                        <div class="multi-room-choice-list-item"><button class="btn-multi-room-select" onClick="modalShow()">${t.createGame}</button></div>
-                        <div class="multi-room-choice-list-item"><button class="btn-multi-room-select" onClick="multiListRoom()">${t.joinGame}</button></div>
+                        <div class="multi-room-choice-list-item"><button class="btn-multi-room-select" id="btn-create-room">${t.createGame}</button></div>
+                        <div class="multi-room-choice-list-item"><button class="btn-multi-room-select" id="btn-join-room">${t.joinGame}</button></div>
                 </div>`
 };
