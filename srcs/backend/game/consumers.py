@@ -121,13 +121,16 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		game_data.save()
 
 	@database_sync_to_async
+	@transaction.atomic()
 	def	remove_game_data(self):
-		self.game_data.delete()
+		print("in the remove_game_data")
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		game_data.delete()
 
 	async def disconnect(self, close_code):
-		await self.get_game_data()
 		if self.game_data.GameStatus == False:
 			await self.remove_client_data()
+			await self.get_game_data()
 			if self.game_data.QuantityPlayer == 0:
 				await self.remove_game_data()
 		else:
