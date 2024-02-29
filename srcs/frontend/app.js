@@ -1,9 +1,10 @@
-import { routes } from "./routes.js";
-import { initLogo, start3dMode, stopAnimation } from "./3d.js";
-import { startNormalMode } from './game/local_pvp/pongLocal.js';
-import { startTournamentMode } from './game/tournament/pongTour.js';
-import { createPlayerInputs } from './game/tournament/pongTour.js';
-import { registerPlayers } from './game/tournament/pongTour.js';
+import { routes } from "/static/routes.js";
+import { initLogo, start3dMode, stopAnimation } from "/static/3d.js";
+import { createScriptTag } from '/static/game/createScriptTag.js';
+import { startNormalMode } from '/static/game/local_pvp/pongLocal.js';
+import { startTournamentMode } from '/static/game/tournament/pongTour.js';
+import { createPlayerInputs } from '/static/game/tournament/pongTour.js';
+import { registerPlayers } from '/static/game/tournament/pongTour.js';
 
 const app = async () => {
         const pageMatch = routes.map(route => {
@@ -30,6 +31,7 @@ const app = async () => {
                 document.getElementById('tournamentMode').addEventListener('click', startTournamentMode);
                 document.getElementById('playerInputs').addEventListener('click', createPlayerInputs);
                 document.getElementById('registerPlayersButton').addEventListener('click', registerPlayers);
+        } else if (match.route.path === '/multi') {
         }
 }
 

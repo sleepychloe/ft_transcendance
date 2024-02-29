@@ -44,18 +44,18 @@ function getCookie(name) {
 	return cookieValue;
 }
 
-// on press Enter while input lobby name
-document.getElementById('room-name-input').addEventListener('keydown', (e) => {
+const createRoomOnEnter = async (e) => {
 	if (e.key === 'Enter') {
 		multiCreateRoom();
 	}
-});
+}
 
 function modalShow() {
 	let overlay = document.getElementsByClassName('overlay')[0];
 	let modal = document.getElementsByClassName('modal')[0];
 	let roomNameInput = document.getElementById('room-name-input');
 	if (overlay && modal && roomNameInput) {
+		roomNameInput.addEventListener('keydown', createRoomOnEnter);
 		overlay.addEventListener('click', modalClose);
 		modal.style.visibility = 'visible';
 		overlay.style.visibility = 'visible';
@@ -66,7 +66,9 @@ function modalShow() {
 function modalClose() {
 	let modal = document.getElementsByClassName('modal')[0];
 	let overlay = document.getElementsByClassName('overlay')[0];
-	if (modal && overlay) {
+	let roomNameInput = document.getElementById('room-name-input');
+	if (modal && overlay && roomNameInput) {
+		roomNameInput.removeEventListener('keydown', createRoomOnEnter);
 		overlay.removeEventListener('click', modalClose);
 		modal.style.visibility = 'hidden';
 		overlay.style.visibility = 'hidden';
