@@ -51,6 +51,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		if match:
 			self.client_id = match.group(1)
 		else:
+			print("here 1")
 			await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 			self.close()
 			return
@@ -60,6 +61,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		if self.game_data.GameStatus == True:
 			self.n_client = await self.search_client_data()
 			if self.n_client == None:
+				print("here 2")
 				await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 				self.close()
 				return
@@ -128,6 +130,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		game_data.delete()
 
 	async def disconnect(self, close_code):
+		await self.get_game_data()
 		if self.game_data.GameStatus == False:
 			await self.remove_client_data()
 			await self.get_game_data()
@@ -554,25 +557,25 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			client1['ready_status'] = 'unready'
 			game_data.QuantityPlayerReady -= 1
 		else:
-			client1 = None
+			game_data.client1 = {}
 
 		if client2['online'] == True:
 			client2['ready_status'] = 'unready'
 			game_data.QuantityPlayerReady -= 1
 		else:
-			client2 = None
+			game_data.client2 = {}
 
 		if client3['online'] == True:
 			client3['ready_status'] = 'unready'
 			game_data.QuantityPlayerReady -= 1
 		else:
-			client3 = None
+			game_data.client3 = {}
 
 		if client4['online'] == True:
 			client4['ready_status'] = 'unready'
 			game_data.QuantityPlayerReady -= 1
 		else:
-			client4 = None
+			game_data.client4 = {}
 
 		game_data.save()
 
@@ -588,6 +591,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				else:
 					self.score['score']['left'] += 1
 				if (self.score['score']['right'] > 2 or self.score['score']['left'] > 2):
+					self.score['score']['right'] = 0
+					self.score['score']['left'] = 0
 					try:
 						await self.remove_paddle_data()
 						await self.player_status_check()
@@ -628,7 +633,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 														'data': paddle_position,
 														'sender_channel_name': self.channel_name,
 													})
-			await asyncio.sleep(0.03)
+			await asyncio.sleep(0.015)
 			await self.get_game_data()
 		#out of scope while
 		print("out of while")
@@ -654,8 +659,10 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		paddle_height = 50
 		canvas_width = 800
 		if ((ball_x <= paddle_width and ball_y >= left_paddle1['y'] and ball_y <= left_paddle1['y'] + paddle_height) or 
-			(ball_x <= paddle_width and ball_y >= left_paddle2['y'] and ball_y <= left_paddle2['y'] + paddle_height) or
-			(ball_x >= canvas_width - paddle_width and ball_y >= right_paddle3['y'] and ball_y <= right_paddle3['y'] + paddle_height) or
+			(ball_x <= paddle_width and ball_y >= left_paddle2['y'] and ball_y <= left_paddle2['y'] + paddle_height)) :
+			self.vx = -self.vx
+			self.vx += 0.001
+		if ((ball_x >= canvas_width - paddle_width and ball_y >= right_paddle3['y'] and ball_y <= right_paddle3['y'] + paddle_height) or
 			(ball_x >= canvas_width - paddle_width and ball_y >= right_paddle4['y'] and ball_y <= right_paddle4['y'] + paddle_height)) :
 			self.vx = -self.vx
 			self.vx -= 0.001

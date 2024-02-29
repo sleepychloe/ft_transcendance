@@ -135,6 +135,7 @@ class GameRoomJoinView(View):
 		# 	return JsonResponse({'Error' : 'Can not request several time in same browser'})
 
 		if room.QuantityPlayer < 4:
+			first_connection_flag = False
 			if self.search_client_data(room, client_id) != None:
 				error_message = translations.get(current_language)['errShadowCloneJutsu']
 				return JsonResponse({'Error': error_message})
@@ -143,9 +144,10 @@ class GameRoomJoinView(View):
 			room.save()
 			if not client_id:
 				client_id = create_new_uuid()
+				first_connection_flag = True
 			Nclient = self.check_client_id_for_data(game_id, client_id)
 			response = JsonResponse({'status': 'join', 'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})			
-			if not client_id:
+			if first_connection_flag == True:
 				response.set_cookie('client_id', client_id)
 			return response
 		else:
