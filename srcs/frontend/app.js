@@ -31,6 +31,14 @@ const app = async () => {
                         initLogo();
                 });
         }
+        else
+        {
+                var languageSelection = document.querySelector('.language-selection');
+                if (languageSelection) {
+                languageSelection.style.display = 'none';
+        }
+
+        }
         if (match.route.path === '/local_3d')
         {
                 start3dMode();

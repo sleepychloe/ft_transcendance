@@ -1,4 +1,4 @@
-const t = {
+const trans = {
 	en: {
 		areReady: "are ready",
 		ready: "Ready",
@@ -22,7 +22,7 @@ const t = {
 	},
 };
 
-const l = t[currentLanguage];
+const l = trans[currentLanguage];
 
 function multiGameScreenComponent() {
 	let container = document.createElement('div');
