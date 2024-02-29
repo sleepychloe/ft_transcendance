@@ -58,6 +58,15 @@ const createRoomOnEnter = async (e) => {
 	}
 }
 
+function instruction() {
+	let help = document.getElementsByClassName('how-to-play')[0];
+	let img = document.createElement('img');
+	img.classList.add('img-key');
+	img.alt = 'img-key';
+	img.src = '/static/assets/img/buttons.png';
+	help.appendChild(img);
+}
+
 export function modalShow() {
 	let overlay = document.getElementsByClassName('overlay')[0];
 	let modal = document.getElementsByClassName('modal')[0];
@@ -148,6 +157,7 @@ function multiStartGame() {
 	} else {
 		mainPart.appendChild(multiGameScreenComponent());
 	}
+	instruction();
 	document.addEventListener('keydown', sendPaddleMovement);
 }
 
