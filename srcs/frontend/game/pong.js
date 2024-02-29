@@ -55,6 +55,8 @@ let game_data = {
     tournamentModeFlag : 0,
 };
 
+let keyPress = {};
+
 export function get_data() {
     return game_data;
 }
@@ -217,9 +219,10 @@ export function endMatch() {
                 game_data['gameLoopId'] = null;
             }
             resetToHomeScreen(game_data);
+            document.removeEventListener('keydown', movePaddle);
+            document.removeEventListener('keyup', stopPaddle);
         }
     }
-    document.removeEventListener('keydown', movePaddle);
 }
 
 export function displayMatchups() {
@@ -253,19 +256,26 @@ export function endNormalGame(game_data={}) {
         resetToHomeScreen(game_data);
     }
     document.removeEventListener('keydown', movePaddle);
+    document.removeEventListener('keyup', stopPaddle);
 }
 
 export const movePaddle = async (e) => {
-    if (e.key === 'w') {
-        game_data['leftPaddleY'] -= game_data['paddleSpeed'];
-    }
-    if (e.key === 's') {
-        game_data['leftPaddleY'] += game_data['paddleSpeed'];
-    }
-    if (e.key === 'ArrowUp') {
+    keyPress[e.which] = true;
+
+    if (keyPress[38]) {
         game_data['rightPaddleY'] -= game_data['paddleSpeed'];
     }
-    if (e.key === 'ArrowDown') {
+    if (keyPress[40]) {
         game_data['rightPaddleY'] += game_data['paddleSpeed'];
     }
+    if (keyPress[87]) {
+        game_data['leftPaddleY'] -= game_data['paddleSpeed'];
+    }
+    if (keyPress[83]) {
+        game_data['leftPaddleY'] += game_data['paddleSpeed'];
+    }
+}
+
+export const stopPaddle = async (e) => {
+    keyPress[e.which] = false;
 }

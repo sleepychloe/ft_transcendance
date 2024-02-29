@@ -78,3 +78,10 @@ body {
         cursor: pointer;
         color: rgb(243, 243, 243);
 }
+
+.choice-in-choice {
+        display: flex;
+        flex-direction: row;
+        padding: 0px;
+        margin: auto;
+}

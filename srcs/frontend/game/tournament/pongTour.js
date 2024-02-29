@@ -4,31 +4,19 @@ import { startMatch } from '/static/game/pong.js';
 import { displayMatchups } from '/static/game/pong.js';
 import { get_data } from '/static/game/pong.js';
 import { t } from '/static/game/pong.js';
+import { movePaddle } from '/static/game/pong.js';
+import { stopPaddle } from '/static/game/pong.js';
 
 let game_data = get_data();
 
-const movePaddle = async (e) => {
-    if (e.key === 'w') {
-        game_data['leftPaddleY'] -= game_data['paddleSpeed'];
-    }
-    if (e.key === 's') {
-        game_data['leftPaddleY'] += game_data['paddleSpeed'];
-    }
-    if (e.key === 'ArrowUp') {
-        game_data['rightPaddleY'] -= game_data['paddleSpeed'];
-    }
-    if (e.key === 'ArrowDown') {
-        game_data['rightPaddleY'] += game_data['paddleSpeed'];
-    }
-}
-
 export function startTournamentMode() {
+    game_data['tournamentModeFlag'] = 1;
     canvasInit(game_data);
     resetGame(game_data);
-    game_data['tournamentModeFlag'] = 1;
     document.getElementById("modeSelection").style.display = "none";
     document.getElementById("registration").style.display = "block";
     document.addEventListener('keydown', movePaddle);
+    document.addEventListener('keyup', stopPaddle);
 }
 
 export function createPlayerInputs() {

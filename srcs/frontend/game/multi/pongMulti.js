@@ -195,8 +195,8 @@ function reqWsConnection(url = "") {
 				}
 			} else if (response.info === 'game') {
 				if (response.type === 'position') {
-					canvas = document.getElementById("pongCanvas");
-					ctx = canvas.getContext("2d");
+					let canvas = document.getElementById("pongCanvas");
+					let ctx = canvas.getContext("2d");
 					ctx.fillStyle = 'white';
 					ctx.clearRect(0, 0, 800, 400);
 					Object.entries(data).forEach(([key, value]) => {
@@ -224,7 +224,6 @@ function reqWsConnection(url = "") {
 		};
 		ws.onclose = (event) => {
 			console.log('websocket closed: ', event);
-			// multiFinishGame();
 		}
 		ws.onerror = (error) => {
 			console.error('websocket connection has error: calling reject');

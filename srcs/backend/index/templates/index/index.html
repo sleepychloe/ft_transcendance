@@ -37,20 +37,26 @@
             <div class="navbar-list">
                 {% if request.LANGUAGE_CODE == 'en' %}
                 <a href="/" class="navbar-list-item">Home</a>
-                <a href="/local" class="navbar-list-item">Local</a>
-                <a href="/local_3d" class="navbar-list-item">Local 3D</a>
+                <div class="choice-in-choice">
+                    <a href="/local" class="navbar-list-item">Local</a>
+                    <a href="/local_3d" class="navbar-list-item">3D</a>
+                </div>
                 <a href="/tournament" class="navbar-list-item">Tournament</a>
                 <a href="/multi" class="navbar-list-item">Multi</a>
                 {% elif request.LANGUAGE_CODE == 'ko' %}
                 <a href="/" class="navbar-list-item">홈</a>
-                <a href="/local" class="navbar-list-item">로컬</a>
-                <a href="/local_3d" class="navbar-list-item">로컬 3D</a>
+                <div class="choice-in-choice">
+                    <a href="/local" class="navbar-list-item">로컬</a>
+                    <a href="/local_3d" class="navbar-list-item">3D</a>
+                </div>
                 <a href="/tournament" class="navbar-list-item">토너먼트</a>
                 <a href="/multi" class="navbar-list-item">멀티</a>
                 {% elif request.LANGUAGE_CODE == 'fr' %}
                 <a href="/" class="navbar-list-item">Accueil</a>
-                <a href="/local" class="navbar-list-item">Local</a>
-                <a href="/local_3d" class="navbar-list-item">Local 3D</a>
+                <div class="choice-in-choice">
+                    <a href="/local" class="navbar-list-item">Local</a>
+                    <a href="/local_3d" class="navbar-list-item">3D</a>
+                </div>
                 <a href="/tournament" class="navbar-list-item">Tournoi</a>
                 <a href="/multi" class="navbar-list-item">Multi</a>
                 {% endif %}

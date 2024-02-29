@@ -1,11 +1,14 @@
 import { routes } from '/static/routes.js';
-import { initLogo, start3dMode, stopAnimation } from '/static/3d.js';
-import { createScriptTag } from '/static/game/createScriptTag.js';
+import { initLogo } from '/static/3d.js';
+import { start3dMode, stopAnimation } from '/static/game/local_3d/pongLocal3d.js';
 import { startNormalMode } from '/static/game/local_pvp/pongLocal.js';
 import { startTournamentMode } from '/static/game/tournament/pongTour.js';
 import { createPlayerInputs } from '/static/game/tournament/pongTour.js';
 import { registerPlayers } from '/static/game/tournament/pongTour.js';
 import { multiCreateRoom, modalShow, multiListRoom } from '/static/game/multi/pongMulti.js';
+import { get_data } from '/static/game/pong.js';
+
+let game_data = get_data();
 
 const app = async () => {
         const pageMatch = routes.map(route => {
@@ -45,9 +48,9 @@ const navigate = url => {
                 stopAnimation();
         }
         if (window.location.pathname === '/local' || window.location.pathname === '/tournament') {
-                if (gameLoopId) {
-                        cancelAnimationFrame(gameLoopId);
-                        gameLoopId = 0;
+                if (game_data['gameLoopId']) {
+                        cancelAnimationFrame(game_data['gameLoopId']);
+                        game_data['gameLoopId'] = 0;
                 }
         }
         window.history.pushState({}, "", url);
