@@ -24,10 +24,9 @@ const translations = {
 
 export function localpvpPage() {
         const t = translations[currentLanguage];
-        // console.log("local_pvp/page.js : localpvpPage function called");
         return `<div id="modeSelection">
                         <h2>${t.vs}</h2>
-                        <button id="normalMode" onClick="startNormalMode()">${t.start}</button>
+                        <button id="normalMode">${t.start}</button>
                 </div>
                 <div id="gameDashboard" class="hidden">
                         <h2>${t.score}</h2>

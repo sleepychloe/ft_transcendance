@@ -1,5 +1,3 @@
-import { endNormalGame } from "/static/game/local_pvp/pongLocal.js";
-
 const translations = {
     en: {
         player: "Player",
@@ -199,4 +197,75 @@ export function resetToHomeScreen(game_data) {
                 document.getElementById("tournamentInfo").style.display = "none";
         document.getElementById("modeSelection").style.display = "block";
         game_data['tournamentModeFlag'] = 0;
+}
+
+export function endMatch() {
+    let winner = game_data['score1'] > game_data['score2'] ? game_data['players'][0] : game_data['players'][1];
+
+    game_data['players'].push(winner);
+    game_data['players'].splice(0, 2);
+
+    if (game_data['players'].length > 1) {
+        displayMatchups();
+        startMatch(game_data);
+    } else {
+        if (game_data['isGameInProgress'] === true) {
+            alert(`${t.alertTournamentWinner}: ${winner}`);
+            game_data['isGameInProgress'] = false;
+            if (game_data['gameLoopId']) {
+                cancelAnimationFrame(game_data['gameLoopId']);
+                game_data['gameLoopId'] = null;
+            }
+            resetToHomeScreen(game_data);
+        }
+    }
+    document.removeEventListener('keydown', movePaddle);
+}
+
+export function displayMatchups() {
+    const currentMatchDisplay = document.getElementById("currentMatch");
+    const upcomingMatchesDisplay = document.getElementById("upcomingMatches");
+
+    if (game_data['players'].length >= 2) {
+        currentMatchDisplay.textContent = `${game_data['players'][0]} ${t.vs} ${game_data['players'][1]}`;
+    } else {
+        currentMatchDisplay.textContent = `${t.waiting}`;
+    }
+    upcomingMatchesDisplay.innerHTML = '';
+    for (let i = 2; i < game_data['players'].length; i++) {
+        const matchInfo = document.createElement("div");
+        matchInfo.textContent = `${game_data['players'][i]} (${t.next})`;
+        upcomingMatchesDisplay.appendChild(matchInfo);
+    }
+}
+
+export function endNormalGame(game_data={}) {
+    if (game_data['isGameInProgress']) {
+        let winner = game_data['score1'] > game_data['score2'] ? `${t.player}` + ' 1' : `${t.player}` + ' 2' ;
+
+        game_data['isGameInProgress'] = false;
+        if (game_data['gameLoopId']) {
+            cancelAnimationFrame(game_data['gameLoopId']);
+            game_data['gameLoopId'] = null;
+        }
+        alert(`${t.alertWinner}: ${winner}`);
+        game_data['normalCount']++;
+        resetToHomeScreen(game_data);
+    }
+    document.removeEventListener('keydown', movePaddle);
+}
+
+export const movePaddle = async (e) => {
+    if (e.key === 'w') {
+        game_data['leftPaddleY'] -= game_data['paddleSpeed'];
+    }
+    if (e.key === 's') {
+        game_data['leftPaddleY'] += game_data['paddleSpeed'];
+    }
+    if (e.key === 'ArrowUp') {
+        game_data['rightPaddleY'] -= game_data['paddleSpeed'];
+    }
+    if (e.key === 'ArrowDown') {
+        game_data['rightPaddleY'] += game_data['paddleSpeed'];
+    }
 }

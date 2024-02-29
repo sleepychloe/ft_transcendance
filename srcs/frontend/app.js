@@ -1,5 +1,9 @@
 import { routes } from "./routes.js";
 import { initLogo, start3dMode, stopAnimation } from "./3d.js";
+import { startNormalMode } from './game/local_pvp/pongLocal.js';
+import { startTournamentMode } from './game/tournament/pongTour.js';
+import { createPlayerInputs } from './game/tournament/pongTour.js';
+import { registerPlayers } from './game/tournament/pongTour.js';
 
 const app = async () => {
         const pageMatch = routes.map(route => {
@@ -11,40 +15,21 @@ const app = async () => {
         let match = pageMatch.find(page => page.isMatch);
         document.getElementById('app').innerHTML = match.route.template;
         document.getElementsByClassName('main-title')[0].innerHTML = match.route.name;
-        let scriptTag = match.route.script;
-        if (scriptTag !== null)
-                document.getElementsByTagName("head")[0].appendChild(scriptTag);
-        
-        // insert pong.js script inside HTML head on game page load
-        if ((match.route.path !== '/'
-                && match.route.path !== '/multi'
-                && match.route.path !== '/local_3d') && !document.getElementById('script-path-/static/game/pong.js'))
-        {
-                var tag = document.createElement("script");
-                tag.src = "/static/game/pong.js";
-                tag.id = "script-path-/static/game/pong.js";
-                document.getElementsByTagName("head")[0].appendChild(tag);
-        }
+        var languageSelection = document.querySelector('.language-selection');
+        languageSelection.style.display = 'none';
         if (match.route.path === '/') {
-                // Ensure the DOM update has been processed
-                var languageSelection = document.querySelector('.language-selection');
                 languageSelection.style.display = 'block';
-
                 requestAnimationFrame(() => {
                         initLogo();
                 });
-        }
-        else
-        {
-                var languageSelection = document.querySelector('.language-selection');
-                if (languageSelection) {
-                languageSelection.style.display = 'none';
-        }
-
-        }
-        if (match.route.path === '/local_3d')
-        {
+        } else if (match.route.path === '/local') {
+                document.getElementById('normalMode').addEventListener('click', startNormalMode);
+        } else if (match.route.path === '/local_3d') {
                 start3dMode();
+        } else if (match.route.path === '/tournament') {
+                document.getElementById('tournamentMode').addEventListener('click', startTournamentMode);
+                document.getElementById('playerInputs').addEventListener('click', createPlayerInputs);
+                document.getElementById('registerPlayersButton').addEventListener('click', registerPlayers);
         }
 }
 
@@ -69,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // stop pong.js
                 // will try to find another way to avoid try catch block
                 // if (window.location.pathname === '/')
+                console.log('ref: ', document.referrer);
                 try {
                         resetToHomeScreen();
                 } catch {

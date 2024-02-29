@@ -1,0 +1,80 @@
+html {
+        width: 100%;
+        height: 100%;
+        font-family: "Protest Strike", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+}
+
+body {
+        background-color: rgb(19, 19, 19);
+}
+
+.main-title {
+        display: flex;
+        flex-direction: column;
+        color: rgb(240, 240, 240);
+        font-size: 72px;
+        font-style: normal;
+        text-align: center;
+        text-overflow: ellipsis;
+        margin: auto;
+        width: 100%;
+        min-height: 100px;
+}
+
+.language-selection {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px auto;
+}
+
+.language-selection form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+}
+
+#language-select {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 10px 18px;
+        border: none;
+        color: rgb(206, 206, 206);
+        background-color: rgb(53, 53, 53);
+}
+
+.main-part {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+}
+
+.navbar {
+        margin-top: 50px;
+        margin-bottom: 50px;
+}
+
+.navbar-list {
+        display: flex;
+        flex-direction: column;
+}
+
+.navbar-list-item {
+        margin: auto;
+        padding: 10px 10px 10px 10px;
+        font-size: 42px;
+        color: rgb(110, 110, 110);
+        text-align: center;
+        text-decoration: none !important;
+        transition-duration: 0.3s;
+}
+
+.navbar-list-item:hover {
+        cursor: pointer;
+        color: rgb(243, 243, 243);
+}

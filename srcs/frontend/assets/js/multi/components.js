@@ -122,7 +122,7 @@ function lobbyListPlayersComponent(quantity_player=0) {
 	lobbyPlayerList.classList.add('lobby-players-list');
 	try {
 		for (let i = 0; i < quantity_player; i++) {
-			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent('client' + (i + 1), i));
+			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent('client' + (i + 1), i + 1));
 		}
 	} catch {
 		return responseMsgComponent(`${l.errorLoadingLobby}`);

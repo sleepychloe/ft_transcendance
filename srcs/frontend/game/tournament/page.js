@@ -33,17 +33,16 @@ const translations = {
 
 export function tournamentPage() {
         const t = translations[currentLanguage];
-        // console.log("tournament/page.js : tournamentPage function called");
         return `<div id="modeSelection">
                         <h2>${t.tournament}</h2>
-                        <button id="tournamentMode" onClick="startTournamentMode()">${t.start}</button>
+                        <button id="tournamentMode">${t.start}</button>
                 </div>
                 <div id="registration" class="hidden">
                         <h2>${t.tournamentRegistration}</h2>
                         <input type="number" id="numPlayers" placeholder="${t.numberOfPlayers}">
-                        <button onclick="createPlayerInputs()">${t.setPlayers}</button>
+                        <button id="playerInputs">${t.setPlayers}</button>
                         <div id="playerInputs"></div>
-                        <button onclick="registerPlayers()" class="hidden" id="registerPlayersButton">${t.registerPlayers}</button>
+                        <button class="hidden" id="registerPlayersButton">${t.registerPlayers}</button>
                 </div>
                 <div id="gameDashboard" class="hidden">
                         <h2>${t.score}</h2>
