@@ -34,16 +34,12 @@ const translations = {
 const t = translations[currentLanguage];
 
 export function start3dMode() {
-	document.getElementById("modeSelection").style.display = "block";
-	document.getElementById("startButton").style.display = "block";
-
 	const button = document.getElementById('3dMode');
 	button.addEventListener('click', handleButtonClick);
 }
 
 function handleButtonClick() {
-	document.getElementById("modeSelection").style.display = "block";
-	document.getElementById("startButton").style.display = "none";
+	document.getElementById("3dMode").setAttribute('disabled', true);
 	gameInProgress = true;
 	local3dMode = true;
 	paddleHit = 0;
@@ -236,6 +232,7 @@ export function stopAnimation() {
 	if (animationFrameId) {
 		cancelAnimationFrame(animationFrameId);
 		animationFrameId = undefined;
+		document.getElementById("3dMode").removeAttribute('disabled');
 	}
 }
 

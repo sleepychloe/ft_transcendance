@@ -24,14 +24,17 @@ const translations = {
 
 export function localpvpPage() {
         const t = translations[currentLanguage];
-        return `<div id="modeSelection">
-                        <h2>${t.vs}</h2>
-                        <button id="normalMode">${t.start}</button>
-                </div>
-                <div id="gameDashboard" class="hidden">
-                        <h2>${t.score}</h2>
-                        <p>${t.player1}: <span id="score1">0</span></p>
-                        <p>${t.player2}: <span id="score2">0</span></p>
-                </div>
-                <canvas id="pongCanvas" width="800" height="400" class="hidden"></canvas>`
+        return `<div class="d-flex flex-column justify-content-center">
+                    <div class="d-none flex-column justify-content-center m-auto" id="gameDashboard">
+                            <h3 style="d-flex justify-content-center lead m-auto">
+                                <strong class="d-flex justify-content-center">${t.score}</strong>
+                            </h3>
+                            <div class="d-flex flex-row">
+                                <p class="d-flex mx-2">${t.player1}:<span class="mx-2" id="score1">0</span></p>
+                                <p class="d-flex mx-2">${t.player2}:<span class="mx-2" id="score2">0</span></p>
+                            </div>
+                    </div>
+                    <button class="d-flex justify-content-center btn btn-sm btn-outline-success mt-2 p-2 px-3 m-auto" id="normalMode">${t.start}</button>
+                    <canvas class="hidden" id="pongCanvas" width="800" height="400"></canvas>
+                </div>`
 };

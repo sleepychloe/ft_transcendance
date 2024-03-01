@@ -6,6 +6,9 @@
 .game {
         display: flex;
         flex-direction: column;
+        margin: auto;
+        width: 800;
+        height: 400;
 }
 
 .lobby-space-counter {
@@ -277,6 +280,28 @@
         width: 32px;
         height: 32px;
         margin: auto;
+}
+
+/* .scoreboard {
+        display: flex;
+        flex-direction: row;
+        width: 100px;
+        height: 75px;
+        margin: auto;
+        padding: 10px;
+        color: rgb(222, 222, 222);
+        font-size: 48px;
+} */
+
+.scoreboard {
+        color: rgb(138, 138, 138);
+        text-align: center;
+        flex-direction: column;
+        width: 100px;
+        height: 100px;
+        margin: auto;
+        padding: 10px;
+        margin-bottom: 80px;
 }
 
 #gameDashboard {

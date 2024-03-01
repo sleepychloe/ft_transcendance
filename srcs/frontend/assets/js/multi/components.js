@@ -5,33 +5,55 @@ import { multiPlayerUnsetReady } from '/static/game/multi/pongMulti.js';
 
 const trans = {
 	en: {
-		areReady: "are ready",
-		ready: "Ready",
-		undo: "Undo",
-		client: "Client",
-		errorSearchingLobby: "error while searching lobby",
-		errorLoadingLobby: "error while loading lobby",
-
+	    areReady: "are ready",
+	    ready: "Ready",
+	    undo: "Undo",
+	    client: "Client",
+	    errorSearchingLobby: "error while searching lobby",
+	    errorLoadingLobby: "error while loading lobby",
+	    score: "Score",
+	    team1: "Team 1",
+	    team2: "Team 2",
 	},
 	fr: {
-		areReady: "sont prêts",
-		ready: "Prêt",
-        	undo: "Annuler",
-		client: "Client",
+	    areReady: "sont prêts",
+	    ready: "Prêt",
+	    undo: "Annuler",
+	    client: "Client",
+	    errorSearchingLobby: "erreur lors de la recherche du lobby",
+	    errorLoadingLobby: "erreur lors du chargement du lobby",
+	    score: "Score",
+	    team1: "Équipe 1",
+            team2: "Équipe 2",
 	},
 	ko: {
-		areReady: "준비됨",
-		ready: "준비됨",
-        	undo: "실행 취소",
-		client: "클라이언트",
+	    areReady: "준비됨",
+	    ready: "준비됨",
+	    undo: "실행 취소",
+	    client: "클라이언트",
+	    errorSearchingLobby: "로비 검색 중 오류",
+	    errorLoadingLobby: "로비 로딩 중 오류",
+	    score: "점수",
+	    team1: "팀 1",
+	    team2: "팀 2",
 	},
-};
+    };
 
 const l = trans[currentLanguage];
 
+export function multiGameScoreComponent() {
+	let scoreboard = document.createElement('div');
+	scoreboard.className = "d-flex flex-row justify-content-center fs-1 text-white";
+	scoreboard.setAttribute('id', 'scoreboard');
+	scoreboard.innerHTML = "0 : 0";
+
+	return scoreboard;
+}
+
 export function multiGameScreenComponent() {
 	let container = document.createElement('div');
-	container.classList.add('game');
+	container.setAttribute('id', 'game');
+	container.className = "d-flex";
 
 	let gameCanvas = document.createElement('canvas');
 	gameCanvas.setAttribute('id', 'pongCanvas');
@@ -44,7 +66,8 @@ export function multiGameScreenComponent() {
 
 export function lobbyComponent(ws={}, data={}) {
 	let lobby = document.createElement('div');
-	lobby.classList.add('lobby');
+	lobby.setAttribute('id', 'lobby');
+	lobby.className = "d-flex flex-column justify-content-center";
 	lobby.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
 	lobby.appendChild(lobbyListPlayersComponent(data.quantity_player));
 	lobby.appendChild(lobbyReadyButtonComponent(ws, data.n_client));
@@ -56,28 +79,27 @@ export function lobbyListRoomComponent(data={}) {
 	var i = 0;
 	try {
 		lobbyRoomList = document.createElement('div');
-		lobbyRoomList.classList.add('lobby-room-list');
+		lobbyRoomList.className = 'd-flex flex-column justify-content-center';
 		for (i in data)
 		{
 			let listItem = document.createElement('div');
-			listItem.classList.add('lobby-room-list-item');
+			listItem.className = 'd-flex flex-row justify-content-between px-4 p-2 m-auto mb-2 btn btn-outline-primary';
+			listItem.style['width'] = "20vw";
+			listItem.style['height'] = "38";
+			listItem.style['min-width'] = "278px";
 			listItem.addEventListener('click', multiJoinRoom);
+			listItem.setAttribute('id', data[i].room_id);
 			lobbyRoomList.appendChild(listItem);
 			
-			let roomCard = document.createElement('div');
-			roomCard.classList.add('lobby-room-card');
-			listItem.appendChild(roomCard);
-			
 			let roomName = document.createElement('div');
-			roomName.classList.add('lobby-room-card-name');
-			roomName.setAttribute('id', data[i].room_id);
+			roomName.className = 'd-flex';
 			roomName.innerHTML = data[i].room_name;
-			roomCard.appendChild(roomName);
+			listItem.appendChild(roomName);
 
 			let roomSlot = document.createElement('div');
-			roomSlot.classList.add('lobby-room-card-slot');
+			roomSlot.className = 'd-flex';
 			roomSlot.innerHTML = data[i].quantity_player + "/4";
-			roomCard.appendChild(roomSlot);
+			listItem.appendChild(roomSlot);
 		}
 	} catch {
 		return responseMsgComponent(`${l.errorSearchingLobby}`);
@@ -87,45 +109,47 @@ export function lobbyListRoomComponent(data={}) {
 
 function lobbyPlayersReadyComponent(quantity_player_ready=0) {
 	let lobbySlot = document.createElement('div');
-	lobbySlot.classList.add('lobby-space-counter');
+	lobbySlot.setAttribute('id', 'lobby-space-counter');
+	lobbySlot.className = "d-flex flex-column justify-content-center text-center m-auto fs-5 text-danger mb-3";
 	lobbySlot.innerHTML = quantity_player_ready + '/4 ' + `${l.areReady}`;
 	return lobbySlot;
 }
 
 function lobbyPlayersListItemComponent(playerId="client", n=0) {
 	let listItem = document.createElement('div');
-	listItem.classList.add('lobby-players-list-item');
+	listItem.className = 'd-flex flex-column justify-content-center mb-1';
 	listItem.setAttribute("id", playerId);
 	
 	let playersCard = document.createElement('div');
-	playersCard.classList.add('lobby-players-card');
+	playersCard.className = 'd-flex flex-row card';
+	playersCard.style['height'] = "4rem";
+	playersCard.style['width'] = "15rem";
 	listItem.appendChild(playersCard);
-	
-	let playerIcon = document.createElement('div');
-	playerIcon.classList.add('lobby-players-card-icon');
-	playersCard.appendChild(playerIcon);
+
+	let iconBox = document.createElement('div');
+	iconBox.className = 'd-flex';
+	iconBox.style['height'] = "100%";
+	iconBox.style['width'] = "100%";
+	playersCard.appendChild(iconBox);
 
 	let iconImage = document.createElement('img');
-	iconImage.classList.add('img-player-icon');
+	iconImage.className = 'card-img-left';
 	iconImage.src = '/static/assets/img/user-person-single-id-account-player-male-female-512.webp';
 	iconImage.alt = 'playerIcon';
-	playerIcon.appendChild(iconImage);
+	iconBox.appendChild(iconImage);
 
 	let playersName = document.createElement('div');
-	playersName.classList.add('lobby-players-card-name');
+	playersName.className = 'd-flex justify-content-center card-title text-center text-md-start fs-5 m-auto';
 	playersName.innerHTML = `${l.client}` + n;
-	playersCard.appendChild(playersName);
-
-	let playerOption = document.createElement('div');
-	playerOption.classList.add('lobby-players-card-option');
-	playersCard.appendChild(playerOption);
+	iconBox.appendChild(playersName);
 
 	return listItem;
 }
 
 export function lobbyListPlayersComponent(quantity_player=0) {
 	let lobbyPlayerList = document.createElement('div');
-	lobbyPlayerList.classList.add('lobby-players-list');
+	lobbyPlayerList.setAttribute('id', 'lobby-players-list');
+	lobbyPlayerList.className = "d-flex flex-column justify-content-center";
 	try {
 		for (let i = 0; i < quantity_player; i++) {
 			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent('client' + (i + 1), i + 1));
@@ -139,10 +163,11 @@ export function lobbyListPlayersComponent(quantity_player=0) {
 
 function lobbyReadyButtonComponent(ws={}, n_client="client") {
 	let buttonDiv = document.createElement('div');
-	buttonDiv.classList.add('game-start');
+	buttonDiv.className = 'd-flex justify-content-center m-auto w-100 mt-4';
 
 	let btnReady = document.createElement('button');
-	btnReady.classList.add('btn-game-start');
+	btnReady.className = 'justify-content-center btn btn-success w-50 m-auto d-flex';
+	btnReady.setAttribute('id', 'btn-multi-ready');
 	btnReady.innerHTML = `${l.ready}`;
 	btnReady.addEventListener('click', () => {
 		multiPlayerSetReady(
@@ -157,8 +182,8 @@ function lobbyReadyButtonComponent(ws={}, n_client="client") {
 		);
 	});
 	let btnUnready = document.createElement('button');
-	btnUnready.classList.add('btn-game-start');
-	btnUnready.classList.add('ready');
+	btnUnready.className = 'justify-content-center btn btn-danger w-50 m-auto d-none';
+	btnUnready.setAttribute('id', 'btn-multi-unready');
 	btnUnready.innerHTML = `${l.undo}`;
 	btnUnready.addEventListener('click', () => {
 		multiPlayerUnsetReady(
@@ -180,7 +205,8 @@ function lobbyReadyButtonComponent(ws={}, n_client="client") {
 
 export function responseMsgComponent(text="error") {
 	let msg = document.createElement('p');
-	msg.classList.add('list-room-status-msg');
+	msg.setAttribute('id', 'status-msg');
+	msg.className = "d-flex justify-content-center fs-4 text-muted p-2 m-auto";
 	msg.innerHTML = text;
 
 	return msg;
@@ -188,23 +214,19 @@ export function responseMsgComponent(text="error") {
 
 export function loadingCircleComponent() {
 	let loader = document.createElement('div');
-	loader.classList.add('loading');
-	loader.style.visibility = 'visible';
+	loader.setAttribute('id', 'loading');
+	loader.setAttribute('role', 'status');
+	loader.className = "spinner-border text-light p-2 m-auto";
 
 	return loader;
 }
 
 export function lobbyRefreshButtonComponent() {
-	let refresh = document.createElement('div');
-	refresh.classList.add('lobby-refresh');
-	refresh.style.cursor = 'pointer';
-	refresh.addEventListener('click', multiListRoom);
+	let btnRefresh = document.createElement('button');
+	btnRefresh.setAttribute('id', 'btn-refresh');
+	btnRefresh.className = "btn btn-outline-warning m-auto mt-0 mb-5 px-3";
+	btnRefresh.addEventListener('click', multiListRoom);
+	btnRefresh.innerHTML = "Refresh";
 
-	let refreshImage = document.createElement('img');
-	refreshImage.classList.add('img-refresh-icon');
-	refreshImage.src = '/static/assets/img/refresh.png';
-	refreshImage.alt = 'refreshIcon';
-
-	refresh.appendChild(refreshImage);
-	return refresh;
+	return btnRefresh;
 }

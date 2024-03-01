@@ -3,12 +3,9 @@ version: '3'
 services:
   #backend framework
   django:
-    build: ./django
-    volumes:
-      - "../srcs/backend:/backend"
-    # build:
-    #   context: ../srcs/backend
-    #   dockerfile: ../../docker/django/dockerfile
+    build:
+      context: ../srcs/backend
+      dockerfile: ../../docker/django/dockerfile
     container_name: django
     restart: always
     expose:
@@ -35,14 +32,9 @@ services:
   
   #webserver
   nginx:
-    build: ./nginx
-    volumes:
-      - "../srcs/frontend:/usr/share/nginx/html"
-      - "./nginx/certs:/etc/nginx/certs"
-      - "../srcs/logs/nginx:/var/log/nginx"
-    # build:
-    #   context: ../srcs/frontend
-    #   dockerfile: ../../docker/nginx/dockerfile
+    build:
+      context: ../srcs/frontend
+      dockerfile: ../../docker/nginx/dockerfile
     logging:
       driver: syslog
       options:
@@ -58,54 +50,47 @@ services:
     depends_on:
       - django
   
-#ELK containers
-  # elasticsearch:
-  #   container_name: elasticsearch
-  #   build: ./ELK/elasticsearch
-  #   expose:
-  #     - "9200"
-  #   volumes:
-  #     - "./ELK/certificat:/usr/share/elasticsearch/config/certs"
-  #   networks:
-  #     ft_network:
-  #       ipv4_address: 42.42.42.0
-  #   env_file:
-  #     .env
-  #   restart: always
+# ELK containers
+  elasticsearch:
+    container_name: elasticsearch
+    build: ./ELK/elasticsearch
+    expose:
+      - "9200"
+    networks:
+      ft_network:
+        ipv4_address: 42.42.42.0
+    env_file:
+      .env
+    restart: always
 
-  # logstash:
-  #   container_name: logstash
-  #   build: ./ELK/logstash
-  #   expose:
-  #     - "5959"
-  #     - "5858/udp"
-  #   volumes:
-  #     - "./ELK/certificat:/usr/share/logstash/config/certs"
-  #     - "../srcs/logs/nginx:/usr/share/logstash/log/nginx"
-  #   networks:
-  #     ft_network:
-  #       ipv4_address: 42.42.42.1
-  #   env_file:
-  #     .env
-  #   restart: always
-  #   depends_on:
-  #     - elasticsearch
+  logstash:
+    container_name: logstash
+    build: ./ELK/logstash
+    expose:
+      - "5959"
+      - "5858/udp"
+    networks:
+      ft_network:
+        ipv4_address: 42.42.42.1
+    env_file:
+      .env
+    restart: always
+    depends_on:
+      - elasticsearch
 
-  # kibana:
-  #   container_name: kibana
-  #   build: ./ELK/kibana
-  #   expose:
-  #     - "5601"
-  #   volumes:
-  #     - "./ELK/certificat:/usr/share/kibana/config/certs"
-  #   networks:
-  #     ft_network:
-  #       ipv4_address: 42.42.42.2
-  #   env_file:
-  #     .env
-  #   restart: always
-  #   depends_on:
-  #     - elasticsearch
+  kibana:
+    container_name: kibana
+    build: ./ELK/kibana
+    expose:
+      - "5601"
+    networks:
+      ft_network:
+        ipv4_address: 42.42.42.2
+    env_file:
+      .env
+    restart: always
+    depends_on:
+      - elasticsearch
 
 networks:
   ft_network:

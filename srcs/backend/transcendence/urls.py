@@ -25,5 +25,4 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('', index),
 	re_path(r'^.*/$', RedirectView.as_view(url='/')),
-    
 ]

@@ -3,21 +3,33 @@ import { lobbyRefreshButtonComponent } from '/static/assets/js/multi/components.
 import { responseMsgComponent } from '/static/assets/js/multi/components.js';
 import { lobbyComponent } from '/static/assets/js/multi/components.js';
 import { lobbyListPlayersComponent } from '/static/assets/js/multi/components.js';
-import { multiGameScreenComponent } from '/static/assets/js/multi/components.js';
+import { multiGameScreenComponent, multiGameScoreComponent } from '/static/assets/js/multi/components.js';
 import { lobbyListRoomComponent } from '/static/assets/js/multi/components.js';
 
 const tr = {
 	en: {
 		ready: "are ready",
 		errorFailToLoad: "failed to load data from server",
+		errorNoLobby: "no lobby found",
+		score: "Score",
+		team1: "Team 1",
+	    	team2: "Team 2",
 	},
 	fr: {
 		ready: "sont prêts",
 		errorFailToLoad: "échec du chargement des données depuis le serveur",
+		errorNoLobby: "aucun lobby trouvé",
+		score: "Score",
+		team1: "Équipe 1",
+            	team2: "Équipe 2",
 	},
 	ko: {
 		ready: "준비됨",
 		errorFailToLoad: "서버에서 데이터를 로드하는 데 실패했습니다",
+		errorNoLobby: "로비를 찾을 수 없습니다",
+		score: "점수",
+		team1: "팀 1",
+	    	team2: "팀 2",
 	},
 };
 
@@ -52,79 +64,65 @@ function getCookie(name) {
 	return cookieValue;
 }
 
-const createRoomOnEnter = async (e) => {
-	if (e.key === 'Enter') {
-		multiCreateRoom();
-	}
-}
+// const createRoomOnEnter = async (e) => {
+// 	if (e.key === 'Enter') {
+// 		multiCreateRoom();
+// 	}
+// }
 
-function instruction() {
-	let help = document.getElementsByClassName('how-to-play')[0];
-	let img = document.createElement('img');
-	img.classList.add('img-key');
-	img.alt = 'img-key';
-	img.src = '/static/assets/img/buttons.png';
-	help.appendChild(img);
-}
+// export function modalShow() {
+// 	document.getElementById('room-name-input').select();
+// }
 
-export function modalShow() {
-	let overlay = document.getElementsByClassName('overlay')[0];
-	let modal = document.getElementsByClassName('modal')[0];
-	let roomNameInput = document.getElementById('room-name-input');
-	if (overlay && modal && roomNameInput) {
-		roomNameInput.addEventListener('keydown', createRoomOnEnter);
-		overlay.addEventListener('click', modalClose);
-		modal.style.visibility = 'visible';
-		overlay.style.visibility = 'visible';
-		roomNameInput.select();
-	}
-}
-
-function modalClose() {
-	let modal = document.getElementsByClassName('modal')[0];
-	let overlay = document.getElementsByClassName('overlay')[0];
-	let roomNameInput = document.getElementById('room-name-input');
-	if (modal && overlay && roomNameInput) {
-		roomNameInput.removeEventListener('keydown', createRoomOnEnter);
-		overlay.removeEventListener('click', modalClose);
-		modal.style.visibility = 'hidden';
-		overlay.style.visibility = 'hidden';
-	}
-}
+// function modalClose() {
+// 	let modal = document.getElementsByClassName('modal')[0];
+// 	let overlay = document.getElementsByClassName('overlay')[0];
+// 	let roomNameInput = document.getElementById('room-name-input');
+// 	if (modal && overlay && roomNameInput) {
+// 		roomNameInput.removeEventListener('keydown', createRoomOnEnter);
+// 		overlay.removeEventListener('click', modalClose);
+// 		modal.style.visibility = 'hidden';
+// 		overlay.style.visibility = 'hidden';
+// 	}
+// }
 
 export async function multiPlayerSetReady(ws = {}, data = {}) {
 	// console.log('player send ready to server: ', data);
-	document.getElementsByClassName('btn-game-start')[0].style['pointer-events'] = 'none';
+	let btnReady = document.getElementById('btn-multi-ready');
+	let btnUnready = document.getElementById('btn-multi-unready');
+	btnReady.setAttribute('disabled', true);
 	await ws.send(JSON.stringify(data));
-	document.getElementsByClassName('btn-game-start')[0].style.display = 'none';
-	document.getElementsByClassName('ready')[0].style.display = 'block';
+	btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-none";
+	btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-flex";
 }
 
 export async function multiPlayerUnsetReady(ws = {}, data = {}) {
 	// console.log('player send unready to server: ', data);
-	document.getElementsByClassName('ready')[0].style['pointer-events'] = 'none';
+	let btnReady = document.getElementById('btn-multi-ready');
+	let btnUnready = document.getElementById('btn-multi-unready');
+	btnUnready.setAttribute('disabled', true);
 	await ws.send(JSON.stringify(data));
-	document.getElementsByClassName('btn-game-start')[0].style.display = 'block';
-	document.getElementsByClassName('ready')[0].style.display = 'none';
+	btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-flex";
+	btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-none";
 }
 
 function updateLobbyPlayerList(data = {}) {
-	let lobbyPlayerList = document.getElementsByClassName('lobby-players-list')[0];
+	let lobbyPlayerList = document.getElementById('lobby-players-list');
 	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player));
 }
 
-function updateReadyButton(ready = false) {
-	let btnUndo = document.getElementsByClassName('ready')[0];
-	let btnReady = document.getElementsByClassName('btn-game-start')[0];
+function updateReadyButton(ready=false) {
+	let btnReady = document.getElementById('btn-multi-ready');
+	let btnUnready = document.getElementById('btn-multi-unready');
 	if (ready) {
-		btnUndo.style['pointer-events'] = 'visible';
+		btnUnready.removeAttribute('disabled');
 	} else {
-		btnReady.style['pointer-events'] = 'visible';
+		btnReady.removeAttribute('disabled');
 	}
 }
 
 function updateLobbySlot(quantity_player_ready = 0) {
-	let lobbySlot = document.getElementsByClassName('lobby-space-counter')[0];
+	let lobbySlot = document.getElementById('lobby-space-counter');
 	if (lobbySlot)
 		lobbySlot.innerHTML = quantity_player_ready + '/4 ' + `${lan.ready}`;
 }
@@ -141,33 +139,41 @@ const sendPaddleMovement = async (e) => {
 			'direction': "down",
 		}));
 	} else {
-		console.warn('no such action: ', e.key);
+		// console.warn('no such action: ', e.key);
 		return;
 	}
 	// console.log("Paddle movement sent:", direction);
 }
 
 function multiStartGame() {
-	let mainPart = document.getElementsByClassName('main-part')[0];
-	let lobby = document.getElementsByClassName('lobby')[0];
-	let game = document.getElementsByClassName('game')[0];
-	lobby.style.display = 'none';
-	if (game) {
-		game.style.display = 'flex';
+	let mainPart = document.getElementById('app');
+	let lobby = document.getElementById('lobby');
+	let game = document.getElementById('game');
+	let scoreboard = document.getElementById('scoreboard');
+	lobby.className = "d-none flex-column justify-content-center";
+	if (game && scoreboard) {
+		game.className = "d-flex";
+		scoreboard.className = 'd-flex flex-row justify-content-center fs-1 text-white';
 	} else {
-		mainPart.appendChild(multiGameScreenComponent());
+		let d = document.createElement('div');
+		d.className = "d-flex flex-column justify-content-center";
+		d.appendChild(multiGameScoreComponent());
+		d.appendChild(multiGameScreenComponent());
+		mainPart.appendChild(d);
 	}
-	instruction();
 	document.addEventListener('keydown', sendPaddleMovement);
 }
 
 export function multiFinishGame() {
-	let lobby = document.getElementsByClassName('lobby')[0];
-	let game = document.getElementsByClassName('game')[0];
+	let lobby = document.getElementById('lobby');
+	let game = document.getElementById('game');
+	let scoreboard = document.getElementById('scoreboard');
 	if (lobby)
-		lobby.style.display = 'flex';
+		lobby.className = "d-flex flex-column justify-content-center";
 	if (game)
-		game.style.display = 'none';
+		game.className = "d-none";
+	if (scoreboard)
+		scoreboard.className = 'd-none flex-row justify-content-center fs-1 text-white';
 	document.removeEventListener('keydown', sendPaddleMovement);
 }
 
@@ -224,6 +230,16 @@ function reqWsConnection(url = "") {
 						} else {
 							ctx.fillRect(value.x, value.y, 10, 50);
 						}
+						let scoreboard = document.getElementById('scoreboard');
+						if (scoreboard)
+							scoreboard.innerHTML = data.score.left + " : " + data.score.right;
+						// let scoreboard = document.getElementById('scoreboard');
+						// if (scoreboard)
+						// 	scoreboard.innerHTML = `
+						// 	<h2 id="scoreTitle">${lan.score}</h2>
+						// 	<p>${lan.team1}: ${data.score.left}</p>
+						// 	<p>${lan.team2}: ${data.score.right}</p>
+						// 	`;
 					});
 				} else if (response.type === 'start') {
 					console.log('start the game');
@@ -245,7 +261,6 @@ function reqWsConnection(url = "") {
 			disconnectGame();
 		}
 		ws.onerror = (error) => {
-			console.error('websocket connection has error: calling reject');
 			multiFinishGame();
 			disconnectGame();
 			reject(error);
@@ -297,9 +312,9 @@ export function multiCreateRoom() {
 		document.getElementById('room-name-input').style.border = '2px solid red';
 		return;
 	}
-	modalClose();
+	// modalClose();
 	console.log('sending request to create room...');
-	let mainPart = document.getElementsByClassName('main-part')[0];
+	let mainPart = document.getElementById('app');
 	mainPart.innerHTML = '';
 	mainPart.appendChild(loadingCircleComponent());
 	reqCreateRoom(apiMakeroom, { "room_name": roomName }).then(async (data) => {
@@ -311,7 +326,7 @@ export function multiCreateRoom() {
 
 			ws = await multiConnectWs(wsBaseURL, data);
 
-			let mainTitle = document.getElementsByClassName('main-title')[0];
+			let mainTitle = document.getElementById('main-title');
 			mainTitle.innerHTML = data.room_name;
 
 			if (data.status === 'create') {
@@ -347,8 +362,8 @@ async function reqJoinRoom(url = "", room_id = "") {
 
 export function multiJoinRoom() {
 	console.log('sending request to join room...');
-	let mainPart = document.getElementsByClassName('main-part')[0];
-	const room_id = this.getElementsByClassName('lobby-room-card-name')[0].id;
+	let mainPart = document.getElementById('app');
+	const room_id = this.id;
 	mainPart.innerHTML = '';
 	mainPart.appendChild(loadingCircleComponent());
 	reqJoinRoom(apiJoinroom, room_id).then(async (data) => {
@@ -360,7 +375,7 @@ export function multiJoinRoom() {
 
 			ws = await multiConnectWs(wsBaseURL, data);
 
-			let mainTitle = document.getElementsByClassName('main-title')[0];
+			let mainTitle = document.getElementById('main-title');
 			mainTitle.innerHTML = data.room_name;
 			if (data.status === 'join') {
 				mainPart.appendChild(lobbyComponent(ws, data));
@@ -392,7 +407,7 @@ async function getListRoom(url = "") {
 
 export function multiListRoom() {
 	console.log('sending request to list room...');
-	let mainPart = document.getElementsByClassName('main-part')[0];
+	let mainPart = document.getElementById('app');
 	mainPart.innerHTML = '';
 	mainPart.appendChild(loadingCircleComponent());
 	getListRoom(apiListroom).then((data) => {
@@ -401,14 +416,20 @@ export function multiListRoom() {
 			console.groupCollapsed('server responded successfully');
 			console.log('data: ', data);
 			console.groupEnd();
-			mainPart.appendChild(responseMsgComponent('no lobby found'));
-			mainPart.appendChild(lobbyRefreshButtonComponent());
+			let d = document.createElement('div');
+			d.className = "d-flex flex-column justify-content-center";
+			d.appendChild(responseMsgComponent(`${lan.errorNoLobby}`));
+			d.appendChild(lobbyRefreshButtonComponent());
+			mainPart.appendChild(d);
 		} else if (data && data.length > 0) {
 			console.groupCollapsed('server responded successfully');
 			console.log('data: ', data);
 			console.groupEnd();
-			mainPart.appendChild(lobbyListRoomComponent(data));
-			mainPart.appendChild(lobbyRefreshButtonComponent());
+			let d = document.createElement('div');
+			d.className = "d-flex flex-column justify-content-center";
+			d.appendChild(lobbyListRoomComponent(data));
+			d.appendChild(lobbyRefreshButtonComponent());
+			mainPart.appendChild(d);
 		} else {
 			console.groupCollapsed('server responded with error');
 			console.error('data: ', data);

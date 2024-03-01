@@ -33,28 +33,27 @@ const translations = {
 
 export function tournamentPage() {
         const t = translations[currentLanguage];
-        return `<div id="modeSelection">
-                        <h2>${t.tournament}</h2>
-                        <button id="tournamentMode">${t.start}</button>
-                </div>
-                <div id="registration" class="hidden">
-                        <h2>${t.tournamentRegistration}</h2>
-                        <input type="number" id="numPlayers" placeholder="${t.numberOfPlayers}">
-                        <button id="playerInputs">${t.setPlayers}</button>
-                        <div id="playerInputsContainer"></div>
-                        <button class="hidden" id="registerPlayersButton">${t.registerPlayers}</button>
-                </div>
-                <div id="gameDashboard" class="hidden">
-                        <h2>${t.score}</h2>
-                        <p>${t.player1}: <span id="score1">0</span></p>
-                        <p>${t.player2}: <span id="score2">0</span></p>
-                </div>
-                <div id="tournamentInfo" class="hidden">
-                        <h2>${t.currentMatch}</h2>
-                        <p id="currentMatch"></p>
-                        <h3>${t.upcomingMatches}</h3>
-                        <ul id="upcomingMatches"></ul>
-                </div>
-                <canvas id="pongCanvas" width="800" height="400" class="hidden"></canvas>`
+        return `<div class="d-flex flex-column justify-content-center">
+                        <div class="flex-column justify-content-center d-none" id="registration">
+                                <h2 class="d-flex m-auto">${t.tournamentRegistration}</h2>
+                                <input class="form-control m-auto w-25" type="number" id="numPlayers" placeholder="${t.numberOfPlayers}">
+                                <button class="btn btn-success m-auto" id="playerInputs">${t.setPlayers}</button>
+                                <div id="playerInputsContainer"></div>
+                                <button class="btn btn-success m-auto d-none" id="registerPlayersButton">${t.registerPlayers}</button>
+                        </div>
+                        <div class="flex-column justify-content-center d-none" id="gameDashboard">
+                                <h2 class="d-flex m-auto">${t.score}</h2>
+                                <p class="d-flex m-auto">${t.player1}: <span id="score1">0</span></p>
+                                <p class="d-flex m-auto">${t.player2}: <span id="score2">0</span></p>
+                        </div>
+                        <div class="flex-column justify-content-center d-none" id="tournamentInfo">
+                                <h2 class="d-flex m-auto">${t.currentMatch}</h2>
+                                <p class="d-flex m-auto" id="currentMatch"></p>
+                                <h3 class="d-flex m-auto">${t.upcomingMatches}</h3>
+                                <ul class="d-flex flex-column justify-content-center m-auto p-0" id="upcomingMatches"></ul>
+                        </div>
+                        <button class="d-flex justify-content-center btn btn-sm btn-outline-success mt-2 p-2 px-3 m-auto" id="tournamentMode">${t.start}</button>
+                        <canvas id="pongCanvas" width="800" height="400"></canvas>
+                </div>`
 };
 

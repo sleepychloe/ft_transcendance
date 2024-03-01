@@ -80,6 +80,7 @@ export function resetBall(game_data={}) {
     game_data['ballSpeedY'] = 2 + 1.5 * Math.random();
     game_data['leftPaddleY'] = game_data['canvas'].height / 2;
     game_data['rightPaddleY'] = game_data['canvas'].height / 2;
+    keyPress = {};
 }
 
 export function updatePaddlePosition(game_data={}) {
@@ -138,7 +139,7 @@ export function startMatch(game_data={}) {
         game_data['random']++;
         resetBall(game_data);
         if (game_data['tournamentModeFlag']) {
-                document.getElementById("tournamentInfo").style.display = "block";
+                document.getElementById("tournamentInfo").className = "flex-column justify-content-center d-flex";
         }
         if (!game_data['gameLoopId']) {
                 game_data['isGameInProgress'] = true;
@@ -172,6 +173,7 @@ export function gameLoop(game_data={}) {
 }
 
 export function resetGame(game_data={}) {
+    keyPress = {};
     game_data['isGameInProgress'] = false;
     if (game_data['gameLoopId']) {
         cancelAnimationFrame(game_data['gameLoopId']);
@@ -205,17 +207,16 @@ export function resetGame(game_data={}) {
 export function resetToHomeScreen(game_data) {
         resetBall(game_data);
         resetGame(game_data);
-        document.getElementById("pongCanvas").style.display = "block";
-        document.getElementById("gameDashboard").style.display = "none";
+        document.getElementById("gameDashboard").className = "flex-column justify-content-center d-none";
         if (game_data['tournamentModeFlag'] === 1)
-                document.getElementById("tournamentInfo").style.display = "none";
-        document.getElementById("modeSelection").style.display = "block";
+                document.getElementById("tournamentInfo").className = "flex-column justify-content-center d-none";
         game_data['tournamentModeFlag'] = 0;
 }
 
 export function endMatch() {
     let winner = game_data['score1'] > game_data['score2'] ? game_data['players'][0] : game_data['players'][1];
 
+    keyPress = {};
     game_data['players'].push(winner);
     game_data['players'].splice(0, 2);
 
@@ -233,6 +234,8 @@ export function endMatch() {
             resetToHomeScreen(game_data);
             document.removeEventListener('keydown', movePaddle);
             document.removeEventListener('keyup', stopPaddle);
+            let btnStart = document.getElementById('tournamentMode');
+            btnStart.removeAttribute('disabled');
         }
     }
 }
@@ -255,6 +258,7 @@ export function displayMatchups() {
 }
 
 export function endNormalGame(game_data={}) {
+    keyPress = {};
     if (game_data['isGameInProgress']) {
         let winner = game_data['score1'] > game_data['score2'] ? `${t.player}` + ' 1' : `${t.player}` + ' 2' ;
 
@@ -269,6 +273,9 @@ export function endNormalGame(game_data={}) {
     }
     document.removeEventListener('keydown', movePaddle);
     document.removeEventListener('keyup', stopPaddle);
+
+    let btnStart = document.getElementById('normalMode');
+    btnStart.removeAttribute('disabled');
 }
 
 export const movePaddle = async (e) => {

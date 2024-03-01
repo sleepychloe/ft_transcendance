@@ -10,11 +10,12 @@ import { stopPaddle } from '/static/game/pong.js';
 let game_data = get_data();
 
 export function startTournamentMode() {
+    let btnStart = document.getElementById('tournamentMode');
+    btnStart.setAttribute('disabled', true);
+    document.getElementById("registration").className = "flex-column justify-content-center d-flex";
     game_data['tournamentModeFlag'] = 1;
     canvasInit(game_data);
     resetGame(game_data);
-    document.getElementById("modeSelection").style.display = "none";
-    document.getElementById("registration").style.display = "block";
     document.addEventListener('keydown', movePaddle);
     document.addEventListener('keyup', stopPaddle);
 }
@@ -26,16 +27,17 @@ export function createPlayerInputs() {
     if (3 <= numPlayers && numPlayers <= 6 ) {
         for (let i = 1; i <= numPlayers; i++) {
             const input = document.createElement("input");
+            input.className = "form-control m-auto w-25";
             input.type = "text";
             input.placeholder = `${t.player} ${i}`;
             input.id = `player${i}`;
             playerInputs.appendChild(input);
         }
-        document.getElementById("registerPlayersButton").classList.remove("hidden");
+        document.getElementById("registerPlayersButton").className = "btn btn-success m-auto d-flex";
     }
     else {
         alert(`${t.alertPlayerNum}`);
-        document.getElementById("registerPlayersButton").classList.add("hidden");
+        document.getElementById("registerPlayersButton").className = "btn btn-success m-auto d-none";
     }
 }
 
@@ -71,8 +73,8 @@ export function registerPlayers() {
         }
         game_data['currentMatchIndex'] = 0;
         displayMatchups();
-        document.getElementById("registerPlayersButton").classList.add("hidden");
-        document.getElementById("registration").style.display = "none";
+        document.getElementById("registerPlayersButton").className = "btn btn-success m-auto d-none";
+        document.getElementById("registration").className = "flex-column justify-content-center d-none";
         startMatch(game_data);
         game_data['isGameInProgress'] = true;
     }

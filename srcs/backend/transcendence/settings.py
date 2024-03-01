@@ -23,42 +23,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-e8*xev0o%76d*l6a=ijafpt-!4z@-yly-a2mtabt_uuymk4#j0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.24.103.6',
+                 'localhost']
 
-# CORS_ALLOWED_ORIGINS = [
-#     "https://localhost:424",
-#     "https://www.test-cors.org",
-# ]
-
-# CORS_ALLOW_CREDENTIALS = True
-
-# CORS_ALLOW_HEADERS = (
-#     "accept",
-#     "authorization",
-#     "content-type",
-#     "user-agent",
-#     "x-csrftoken",
-#     "x-requested-with",
-# )
-
-# CORS_ALLOW_METHODS = [
-#     'DELETE',
-#     'GET',
-#     'OPTIONS',
-#     'PATCH',
-#     'POST',
-#     'PUT',
-# ]
-
-CSRF_TRUSTED_ORIGINS = ["https://localhost:4243"]
+CSRF_TRUSTED_ORIGINS = ["https://localhost:4243",
+						"https://10.24.103.6:4243"]
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
 INSTALLED_APPS = [
-    # 'corsheaders',
     'daphne',
     'channels',
 	'game.apps.GameConfig',
@@ -96,7 +72,6 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = [
-    # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

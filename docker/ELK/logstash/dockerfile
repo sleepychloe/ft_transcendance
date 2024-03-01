@@ -10,4 +10,4 @@ COPY config/pipeline.conf /usr/share/logstash/pipeline/pipeline.conf
 
 RUN mkdir -p /usr/share/logstash/log/nginx
 
-# COPY ./certificat/elastic-certificates.p12 /usr/share/logstash/config/certs/elastic-certificates.p12
+COPY ./certificat/elastic-certificates.p12 /usr/share/logstash/config/certs/elastic-certificates.p12

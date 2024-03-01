@@ -7,17 +7,16 @@ import { OrbitControls } from 'OrbitControls';
 export function initLogo() {
         const canvas = document.getElementById('threejs-canvas');
         if (!canvas) {
-                console.error('Canvas element not found');
                 return;
         }
 
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setSize(500, 500);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setClearColor(0xffffff, 0);
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(70, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(70, 500 / 500, 0.1, 1000);
 	    camera.position.set(0, 0, 500);
 
         // Lighting
@@ -73,9 +72,9 @@ export function initLogo() {
         window.addEventListener('resize', onWindowResize, false);
 
         function onWindowResize() {
-            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.aspect = 500 / 500;
             camera.updateProjectionMatrix();
-            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setSize(500, 500);
             renderer.setPixelRatio(window.devicePixelRatio);
         }
     }
@@ -90,9 +89,9 @@ export function initLogo() {
         const cameraZ = Math.abs(maxSize / (2 * Math.tan(fov / 2)));
         
         camera.position.z = center.z + 3 * cameraZ;
-        const aspect = canvas.clientWidth / canvas.clientHeight;
+        const aspect = 500 / 500;
         camera.aspect = aspect;
         camera.updateProjectionMatrix();
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        renderer.setSize(500, 500);
         renderer.setPixelRatio(window.devicePixelRatio);
 }

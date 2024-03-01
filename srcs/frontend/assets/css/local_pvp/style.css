@@ -2,8 +2,9 @@
 	background: black;
 	display: block;
 	margin: auto;
+	outline: white 2px solid;
 }
-
+/* 
 #gameDashboard,
 #modeSelection,
 #registration,
@@ -15,4 +16,4 @@
 
 .hidden {
 	display: none;
-}
+} */

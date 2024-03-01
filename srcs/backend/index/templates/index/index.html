@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ request.LANGUAGE_CODE }}">
+<html lang="{{ request.LANGUAGE_CODE }}" data-bs-theme="dark">
 
 <head>
     {% load static %}
@@ -8,62 +8,92 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Protest+Strike&display=swap">
+    <!-- <link rel="stylesheet" href="{% static 'assets/css/grid.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/index/style.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/multi/style.css' %}"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/grid.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/index/style.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/local_pvp/style.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/multi/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/local_3d/style.css' %}">
     <link rel="icon" href="data:,">
     <title>Transcendence</title>
 </head>
 
 <body>
-    <div class="grid">
-        <header>
-            <div class="main-title"></div>
-            <div class="language-selection">
-                <form action="{% url 'set_language' %}" method="post">
+    <div class="container-fluid mt-4">
+        <div class="d-flex flex-column justify-content-center">
+            <div class="offcanvas offcanvas-start" id="sidebar-menu">
+                <div class="offcanvas-header">
+                    <h1 class="offcanvas-title"></h1>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="nav flex-column justify-content-center">
+                        {% if request.LANGUAGE_CODE == 'en' %}
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">Local</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">Tournament</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">Multi</a></li>
+                        {% elif request.LANGUAGE_CODE == 'ko' %}
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">홈</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">로컬</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">토너먼트</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">멀티</a></li>
+                        {% elif request.LANGUAGE_CODE == 'fr' %}
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">Local</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">Tournoi</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">Multi</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm d-xxl-none fa fa-bars text-white position-absolute top-0 start-0 p-3 m-4" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-menu"></button>
+            <div class="text-white text-center h1 mx-5 text-wrap" id="main-title"></div>
+            <div class="d-flex justify-content-center" id="language-selection">
+                <form class="d-flex" action="{% url 'set_language' %}" method="post">
                     {% csrf_token %}
                     <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                    <select name="language" id="language-select" onchange="this.form.submit()">
+                    <select class="form-select d-flex w-100 mt-2" name="language" id="language-select" onchange="this.form.submit()">
+                        <option value="" selected="selected" disabled hidden>Select</option>
                         <option value="en">English</option>
                         <option value="ko">한국어</option>
                         <option value="fr">Français</option>
                     </select>
                 </form>
             </div>
-        </header>
-        <nav class="navbar">
-            <div class="navbar-list">
-                {% if request.LANGUAGE_CODE == 'en' %}
-                <a href="/" class="navbar-list-item">Home</a>
-                <div class="choice-in-choice">
-                    <a href="/local" class="navbar-list-item">Local</a>
-                    <a href="/local_3d" class="navbar-list-item">3D</a>
-                </div>
-                <a href="/tournament" class="navbar-list-item">Tournament</a>
-                <a href="/multi" class="navbar-list-item">Multi</a>
-                {% elif request.LANGUAGE_CODE == 'ko' %}
-                <a href="/" class="navbar-list-item">홈</a>
-                <div class="choice-in-choice">
-                    <a href="/local" class="navbar-list-item">로컬</a>
-                    <a href="/local_3d" class="navbar-list-item">3D</a>
-                </div>
-                <a href="/tournament" class="navbar-list-item">토너먼트</a>
-                <a href="/multi" class="navbar-list-item">멀티</a>
-                {% elif request.LANGUAGE_CODE == 'fr' %}
-                <a href="/" class="navbar-list-item">Accueil</a>
-                <div class="choice-in-choice">
-                    <a href="/local" class="navbar-list-item">Local</a>
-                    <a href="/local_3d" class="navbar-list-item">3D</a>
-                </div>
-                <a href="/tournament" class="navbar-list-item">Tournoi</a>
-                <a href="/multi" class="navbar-list-item">Multi</a>
-                {% endif %}
+        </div>
+        <div class="row mt-5">
+            <div class="col-xxl-2 d-none d-xxl-block">
+                <ul class="nav flex-column justify-content-center">
+                    {% if request.LANGUAGE_CODE == 'en' %}
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">Local</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">Tournament</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">Multi</a></li>
+                    {% elif request.LANGUAGE_CODE == 'ko' %}
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">홈</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">로컬</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">토너먼트</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">멀티</a></li>
+                    {% elif request.LANGUAGE_CODE == 'fr' %}
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">Local</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">Tournoi</a></li>
+                    <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">Multi</a></li>
+                    {% endif %}
+                </ul>
             </div>
-        </nav>
-        <main class="main-part" id="app"></main>
-        <help></help>
+            <div class="d-flex justify-content-center col-xxl-8 m-0 mb-5 p-0" id="app"></div>
+            <div class="col-xxl-2 d-none d-xxl-block"></div>
+        </div>
     </div>
     <script>
         const currentLanguage = "{{ request.LANGUAGE_CODE }}";
@@ -93,7 +123,7 @@
     <script type="module" src="{% static './game/local_3d/pongLocal3d.js' %}"></script>
     <script type="module" src="{% static './game/multi/pongMulti.js' %}"></script>
     <script type="module" src="{% static './assets/js/multi/components.js' %}"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

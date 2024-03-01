@@ -5,7 +5,7 @@ import { startNormalMode } from '/static/game/local_pvp/pongLocal.js';
 import { startTournamentMode } from '/static/game/tournament/pongTour.js';
 import { createPlayerInputs } from '/static/game/tournament/pongTour.js';
 import { registerPlayers } from '/static/game/tournament/pongTour.js';
-import { multiCreateRoom, modalShow, multiListRoom } from '/static/game/multi/pongMulti.js';
+import { multiCreateRoom, multiListRoom } from '/static/game/multi/pongMulti.js';
 import { resetGame } from '/static/game/pong.js';
 import { get_data } from '/static/game/pong.js';
 import { disconnectGame, multiFinishGame } from '/static/game/multi/pongMulti.js';
@@ -21,11 +21,11 @@ const app = async () => {
         });
         let match = pageMatch.find(page => page.isMatch);
         document.getElementById('app').innerHTML = match.route.template;
-        document.getElementsByClassName('main-title')[0].innerHTML = match.route.name;
-        var languageSelection = document.querySelector('.language-selection');
-        languageSelection.style.display = 'none';
+        document.getElementById('main-title').innerHTML = match.route.name;
+        var languageSelection = document.querySelector('#language-selection');
+        languageSelection.className = "d-none justify-content-center";
         if (match.route.path === '/') {
-                languageSelection.style.display = 'block';
+                languageSelection.className = 'd-flex justify-content-center';
                 requestAnimationFrame(() => {
                         initLogo();
                 });
@@ -39,7 +39,7 @@ const app = async () => {
                 document.getElementById('registerPlayersButton').addEventListener('click', registerPlayers);
         } else if (match.route.path === '/multi') {
                 document.getElementById('btn-modal-input-submit').addEventListener('click', multiCreateRoom);
-                document.getElementById('btn-create-room').addEventListener('click', modalShow);
+                // document.getElementById('btn-create-room').addEventListener('click', modalShow);
                 document.getElementById('btn-join-room').addEventListener('click', multiListRoom);
         }
 }

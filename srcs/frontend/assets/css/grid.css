@@ -2,7 +2,7 @@
         display: grid;
         grid-template-areas:
                 "head head head"
-                "nav main help"
+                "nav main ."
                 "foot main .";
         grid-template-rows: auto auto 25px;
         grid-template-columns: 3fr 5fr 3fr;

@@ -1,4 +1,9 @@
 html {
+        margin: 0;
+        padding: 0;
+}
+
+/* html {
         width: 100%;
         height: 100%;
         font-family: "Protest Strike", sans-serif;
@@ -83,4 +88,4 @@ body {
         flex-direction: row;
         padding: 0px;
         margin: auto;
-}
+} */

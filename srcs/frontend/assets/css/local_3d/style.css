@@ -1,0 +1,6 @@
+#pong3dCanvas, #pong3dLeft, #pong3dRight {
+	background: black;
+	display: block;
+	margin: auto;
+	outline: white 2px solid;
+}
