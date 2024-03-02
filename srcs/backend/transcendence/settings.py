@@ -55,6 +55,12 @@ STATICFILES_DIRS = (
 
 STATIC_URL = '/static/'
 
+SESSION_COOKIE_HTTPONLY = True
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'assets')
+
+MEDIA_URL = '/images/'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
