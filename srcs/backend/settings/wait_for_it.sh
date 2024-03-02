@@ -177,7 +177,9 @@ if [[ $WAITFORIT_CLI != "" ]]; then
         exit $WAITFORIT_RESULT
     fi
     python3 manage.py makemigrations game
+    python3 manage.py makemigrations login
     python3 manage.py sqlmigrate game 0001
+    python3 manage.py sqlmigrate login 0001
     python3 manage.py migrate
     exec "${WAITFORIT_CLI[@]}"
 else

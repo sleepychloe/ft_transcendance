@@ -4,5 +4,6 @@ app_name = 'api'
 
 urlpatterns = [
     path('game/', include('game.urls')),
+    path('login/', include('login.urls'))
 ]
 

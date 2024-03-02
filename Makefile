@@ -4,7 +4,7 @@ BLUE		:= $(shell tput -Txterm setaf 6)
 
 NETWORK_NUM	:= $(shell docker network ls | grep -n ft_network | cut -f 1 -d ':')
 
-COMPOSE_FILE	= ./docker/docker-compose.yaml
+COMPOSE_FILE	= ./docker-compose.yaml
 
 all: up
 

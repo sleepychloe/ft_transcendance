@@ -42,9 +42,9 @@ class GameRoomDeleteView(View):
 		if settings.DEBUG == True:
 			room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 			room.delete()
-			return JsonResponse({'status': 'delete ok'})
+			return JsonResponse({'status': 'delete ok'}, status=200)
 		else:
-			return JsonResponse({'status': 'delete ko'})
+			return JsonResponse({'status': 'delete ko'}, status=400)
 
 class GameRoomMakeView(View):
 
@@ -56,11 +56,11 @@ class GameRoomMakeView(View):
 
 		quantity_player = request.GET.get('quantity_player', 1)
 		if MultiRoomInfo.objects.filter(Roomid=new_room_id).exists():
-			return JsonResponse({'Error' : 'Game id already exists.'})
+			return JsonResponse({'Error' : 'Game id already exists.'}, status=400)
 		try:
 			room_name = json.loads(request.body).get("room_name")
 		except json.JSONDecodeError:
-			return JsonResponse({'Error' : 'Roomname is not json.'})
+			return JsonResponse({'Error' : 'Roomname is not json.'}, status=400)
 		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name,
 										  QuantityPlayer=quantity_player, QuantityPlayerReady=0,
 										  client1={'online': True, 'paddle': None, 'client_id':client_id,
@@ -69,7 +69,7 @@ class GameRoomMakeView(View):
 		channel_layer.group_add(new_room_id, 'BACKEND')
 		response = JsonResponse({'status': 'create', 'room_id' : new_room_id, 'client_id' : client_id,
 						   'room_name' : room_name, 'quantity_player' : quantity_player,
-						   'quantity_player_ready' : 0, 'n_client' : 'client1'})
+						   'quantity_player_ready' : 0, 'n_client' : 'client1'}, status=200)
 		response.set_cookie('client_id', client_id)
 		return response
 
@@ -79,7 +79,7 @@ class GameRoomListView(View):
 	def get(self, request):
 		all_data = MultiRoomInfo.objects.all()
 		serialized_data = self.serialize_model_to_json(all_data)
-		return JsonResponse(serialized_data, safe=False)
+		return JsonResponse(serialized_data, safe=False, status=200)
 
 	@staticmethod	
 	def serialize_model_to_json(queryset):
@@ -122,17 +122,17 @@ class GameRoomJoinView(View):
 			room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 		except MultiRoomInfo.DoesNotExist:
 				error_message = translations.get(current_language)['errUrlNotExists']
-				return JsonResponse({'Error': error_message})
+				return JsonResponse({'Error': error_message}, status=400)
 		client_id = request.COOKIES.get('client_id')
 		if room.GameStatus == True:
 			if client_id == None:
 				error_message = translations.get(current_language)['errJoinAfterStart']
-				return JsonResponse({'Error': error_message})
+				return JsonResponse({'Error': error_message}, status=400)
 			Nclient = self.search_client_data(room, client_id)
 			if Nclient == None:
 				print("error : RoomJoinView, GameStatus True, client_id None")
 				error_message = translations.get(current_language)['errJoinAfterStart']
-				return JsonResponse({'Error': error_message})
+				return JsonResponse({'Error': error_message}, status=400)
 			else:
 				print('room_id', game_id, '\nroom_name', room.RoomName)
 				return JsonResponse({'status': 'reconnect', 'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})
@@ -141,7 +141,7 @@ class GameRoomJoinView(View):
 			first_connection_flag = False
 			if self.search_client_data(room, client_id) != None:
 				error_message = translations.get(current_language)['errShadowCloneJutsu']
-				return JsonResponse({'Error': error_message})
+				return JsonResponse({'Error': error_message}, status=400)
 			room.QuantityPlayer += 1
 			room.save()
 			if not client_id:
@@ -155,7 +155,7 @@ class GameRoomJoinView(View):
 		else:
 			print("error: RoomJoinView, quantity player exceeds")
 			error_message = translations.get(current_language)['errQuantityPlayerExceed']
-			return JsonResponse({'Error': error_message})
+			return JsonResponse({'Error': error_message}, status=400)
 	
 	@staticmethod
 	@transaction.atomic
@@ -185,16 +185,16 @@ class GameRoomMoveView(View):
 		try:
 			room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 		except MultiRoomInfo.DoesNotExist:
-				return JsonResponse({"Error":"can not find game id"})
+				return JsonResponse({"Error":"can not find game id"}, status=400)
 		try:
 			body = json.loads(request.body)
 		except:
-			return JsonResponse({"Error":"not form of json"})
+			return JsonResponse({"Error":"not form of json"}, status=400)
 		if not (
 			body['client_id'] and
 			body['direction']
 		):
-			return JsonResponse({"Error":"json value error"})
+			return JsonResponse({"Error":"json value error"}, status=400)
 		
 		if room.GameStatus == True:
 			client_id = body['client_id']
@@ -207,10 +207,10 @@ class GameRoomMoveView(View):
 			elif room.client4['client_id'] == client_id:
 				self.move_paddle(room.client4['paddle'], game_id, body['direction'])
 			else:
-				return JsonResponse({"Error":"client_id does not exsits"})
+				return JsonResponse({"Error":"client_id does not exsits"}, status=400)
 			return JsonResponse({"Status": "Ok", "client_id":client_id, "direction": body['direction']})
 		else:
-			return JsonResponse({"Error":"Game not yet start"})
+			return JsonResponse({"Error":"Game not yet start"}, status=400)
 	
 	@transaction.atomic
 	def move_paddle(self, paddle, game_id, body):

@@ -4,7 +4,7 @@ services:
   #backend framework
   django:
     build:
-      context: ../srcs/backend
+      context: srcs/backend
       dockerfile: ../../docker/django/dockerfile
     container_name: django
     restart: always
@@ -19,7 +19,7 @@ services:
   
   #Database server
   postgresql:
-    build: ./postgresql
+    build: docker/postgresql
     restart: always
     container_name: postgresql
     expose:
@@ -33,7 +33,7 @@ services:
   #webserver
   nginx:
     build:
-      context: ../srcs/frontend
+      context: srcs/frontend
       dockerfile: ../../docker/nginx/dockerfile
     logging:
       driver: syslog
@@ -50,47 +50,47 @@ services:
     depends_on:
       - django
   
-# ELK containers
-  elasticsearch:
-    container_name: elasticsearch
-    build: ./ELK/elasticsearch
-    expose:
-      - "9200"
-    networks:
-      ft_network:
-        ipv4_address: 42.42.42.0
-    env_file:
-      .env
-    restart: always
+# # ELK containers
+#   elasticsearch:
+#     container_name: elasticsearch
+#     build: docker/ELK/elasticsearch
+#     expose:
+#       - "9200"
+#     networks:
+#       ft_network:
+#         ipv4_address: 42.42.42.0
+#     env_file:
+#       .env
+#     restart: always
 
-  logstash:
-    container_name: logstash
-    build: ./ELK/logstash
-    expose:
-      - "5959"
-      - "5858/udp"
-    networks:
-      ft_network:
-        ipv4_address: 42.42.42.1
-    env_file:
-      .env
-    restart: always
-    depends_on:
-      - elasticsearch
+#   logstash:
+#     container_name: logstash
+#     build: docker/ELK/logstash
+#     expose:
+#       - "5959"
+#       - "5858/udp"
+#     networks:
+#       ft_network:
+#         ipv4_address: 42.42.42.1
+#     env_file:
+#       .env
+#     restart: always
+#     depends_on:
+#       - elasticsearch
 
-  kibana:
-    container_name: kibana
-    build: ./ELK/kibana
-    expose:
-      - "5601"
-    networks:
-      ft_network:
-        ipv4_address: 42.42.42.2
-    env_file:
-      .env
-    restart: always
-    depends_on:
-      - elasticsearch
+#   kibana:
+#     container_name: kibana
+#     build: docker/ELK/kibana
+#     expose:
+#       - "5601"
+#     networks:
+#       ft_network:
+#         ipv4_address: 42.42.42.2
+#     env_file:
+#       .env
+#     restart: always
+#     depends_on:
+#       - elasticsearch
 
 networks:
   ft_network:

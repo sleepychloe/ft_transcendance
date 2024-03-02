@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-e8*xev0o%76d*l6a=ijafpt-!4z@-yly-a2mtabt_uuymk4#j0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['10.24.103.6',
                  'localhost']
@@ -37,6 +37,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 INSTALLED_APPS = [
     'daphne',
     'channels',
+    'login.apps.LoginConfig',
 	'game.apps.GameConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -80,6 +81,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'transcendence.middleware.jwt_middleware',
 ]
 
 ROOT_URLCONF = 'transcendence.urls'
