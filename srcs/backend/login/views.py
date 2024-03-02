@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import View
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.core.files import File
 from django.urls import reverse
 from .models import User42Info
@@ -29,7 +29,7 @@ class Auth42CallBackView(View):
 	def get(self, request):
 		code = request.GET.get('code', None)
 		if code == None:
-			return JsonResponse({"Error": "No code in request"}, status=400)
+			return HttpResponseForbidden(context={"Error": "No code in request"})
 		
 		auth_client =  os.getenv("42_AUTH_CLIENT_KEY")
 		auth_secret = os.getenv("42_AUTH_SECRET_KEY")
@@ -39,13 +39,11 @@ class Auth42CallBackView(View):
 		
 		response = requests.post("https://api.intra.42.fr/oauth/token/", data=data)
 		if response.status_code != 200:
-			print("response",response.status_code,response.content)
-			return JsonResponse({"Error": "Not good code"}, status=400)
+			return HttpResponseForbidden({"Error": "Not good code"})
 		token = response.json().get('access_token')
 		user_data = self.save_or_find_user_info(token)
-		print(user_data)
 		if user_data == None:
-			return JsonResponse({"Error": "42 api server no response"}, status=400)
+			return HttpResponseForbidden({"Error": "42 api server no response"})
 		jwt_secret_key = os.getenv("JWT_SECRET_KEY")
 		jwt_token = jwt.encode({"user_name" : user_data.Username, "user_id": user_data.Userid},
 						 jwt_secret_key, algorithm="HS256")
@@ -71,16 +69,11 @@ class Auth42CallBackView(View):
 		else:
 			user_avatar = None
 		if User42Info.objects.filter(Username=user_info['displayname']).exists():
-			print("old user")
 			user_data = User42Info.objects.select_for_update().get(Username=user_info['displayname'])
 			return user_data
 		else:
-			print("new user")
 			user_data = User42Info.objects.create(Username=user_info['displayname'], Userid=user_info['login'])
 			if user_avatar:
 				user_data.Useravatar.save(f'{user_info["login"]}_avatar.jpg', file_avatar, save=True)
 			user_data.save()
 			return user_data
-
-# class Auth42CallBackView(View):
-# 	asdf
