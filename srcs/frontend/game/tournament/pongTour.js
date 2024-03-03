@@ -9,6 +9,10 @@ import { stopPaddle } from '/static/game/pong.js';
 
 let game_data = get_data();
 
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
 export function startTournamentMode() {
     let btnStart = document.getElementById('tournamentMode');
     btnStart.setAttribute('disabled', true);
@@ -75,6 +79,9 @@ export function registerPlayers() {
         displayMatchups();
         document.getElementById("registerPlayersButton").className = "btn btn-success m-auto d-none";
         document.getElementById("registration").className = "flex-column justify-content-center d-none";
+        if (isMobileDevice()) {
+            document.getElementById("pongCanvas").className = "d-flex";
+        }
         startMatch(game_data);
         game_data['isGameInProgress'] = true;
     }

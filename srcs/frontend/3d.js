@@ -109,8 +109,6 @@ export function initLogo(canvasData={}) {
             canvasData['canvasWidth'] = 500;
             canvasData['canvasHeight'] = 500;
         }
-        console.log(`w: ${canvasData['canvasWidth']}, h: ${canvasData['canvasHeight']}`);
-
         camera.aspect = canvasData['canvasWidth'] / canvasData['canvasHeight'];
         camera.updateProjectionMatrix();
         renderer.setSize(canvasData['canvasWidth'], canvasData['canvasHeight']);

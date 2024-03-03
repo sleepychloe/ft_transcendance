@@ -53,7 +53,7 @@ export function tournamentPage() {
                                 <ul class="d-flex flex-column justify-content-center m-auto p-0" id="upcomingMatches"></ul>
                         </div>
                         <button class="d-flex justify-content-center btn btn-sm btn-outline-success mt-2 p-2 px-3 m-auto" id="tournamentMode">${t.start}</button>
-                        <canvas id="pongCanvas" width="800" height="400"></canvas>
+                        <canvas id="pongCanvas"></canvas>
                 </div>`
 };
 

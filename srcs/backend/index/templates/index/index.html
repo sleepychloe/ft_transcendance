@@ -106,6 +106,17 @@
             });
         });
     </script>
+    <script>
+        function updateMaxWidth() {
+            var style = document.createElement('style');
+            document.head.appendChild(style);
+            var sheet = style.sheet;
+            var windowWidth = window.innerWidth;
+            sheet.insertRule(`@media (max-width: ${windowWidth}px) { .offcanvas { max-width: ${windowWidth}px; } }`, 0);
+        }
+        updateMaxWidth();
+        window.addEventListener('resize', updateMaxWidth);
+    </script>
     <script type="importmap">
             {
                 "imports": {

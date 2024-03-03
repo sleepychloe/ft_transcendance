@@ -7,7 +7,7 @@ import { createPlayerInputs } from '/static/game/tournament/pongTour.js';
 import { registerPlayers } from '/static/game/tournament/pongTour.js';
 import { multiCreateRoom, multiListRoom } from '/static/game/multi/pongMulti.js';
 import { resetGame } from '/static/game/pong.js';
-import { get_data } from '/static/game/pong.js';
+import { get_data, setCanvasSize } from '/static/game/pong.js';
 import { disconnectGame, multiFinishGame } from '/static/game/multi/pongMulti.js';
 
 let game_data = get_data();
@@ -30,10 +30,14 @@ const app = async () => {
                         initLogo();
                 });
         } else if (match.route.path === '/local') {
+                setCanvasSize();
+                window.addEventListener('resize', setCanvasSize, false);
                 document.getElementById('normalMode').addEventListener('click', startNormalMode);
         } else if (match.route.path === '/local_3d') {
                 start3dMode();
         } else if (match.route.path === '/tournament') {
+                setCanvasSize();
+                window.addEventListener('resize', setCanvasSize, false);
                 document.getElementById('tournamentMode').addEventListener('click', startTournamentMode);
                 document.getElementById('playerInputs').addEventListener('click', createPlayerInputs);
                 document.getElementById('registerPlayersButton').addEventListener('click', registerPlayers);
@@ -94,4 +98,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
         app();
 });
-
