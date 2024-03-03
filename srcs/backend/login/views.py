@@ -59,7 +59,7 @@ class Auth42CallBackView(View):
 		if response.status_code != 200:
 			return None
 		user_info = json.loads(response.content.decode('utf-8'))
-		response_avatar = requests.get(user_info['image']['link'])
+		response_avatar = requests.get(user_info['image']['versions']['small'])
 		if response.status_code == 200:
 			user_avatar = Image.open(BytesIO(response_avatar.content))
 			user_avatar = user_avatar.convert('RGB')
