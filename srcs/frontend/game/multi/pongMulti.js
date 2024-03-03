@@ -128,12 +128,12 @@ function updateLobbySlot(quantity_player_ready = 0) {
 }
 
 const sendPaddleMovement = async (e) => {
-	if (e.key === 'ArrowUp') {
+	if (e.key === 'w' || e.key === 'i') {
 		await ws.send(JSON.stringify({
 			'action': 'move_paddle',
 			'direction': "up",
 		}));
-	} else if (e.key === 'ArrowDown') {
+	} else if (e.key === 's' || e.key === 'k') {
 		await ws.send(JSON.stringify({
 			'action': 'move_paddle',
 			'direction': "down",
@@ -182,6 +182,37 @@ export function disconnectGame() {
 		ws.close();
 }
 
+function isMobileDevice() {
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    }
+
+function onWindowResize() {
+	let width, height;
+	let proportion = 0.5;
+    
+	// mobile mode && rotated
+	if (isMobileDevice() && window.innerWidth > window.innerHeight) {
+	    height = window.innerHeight - 4 -47;
+	    if (window.innerHeight > 400) {
+		height = 400 - 4;
+	    }
+	    width = height / proportion;
+	} else { // web mode, mobile mode && not rotated
+	    width = window.innerWidth - 4;
+    
+	    if (window.innerWidth > 800) {
+		width = 800 - 4;
+	    }
+	    height = width * proportion;
+	}
+    
+	let pongCanvas = document.getElementById('pongCanvas');
+	if (pongCanvas) {
+	    pongCanvas.setAttribute('width', width);
+	    pongCanvas.setAttribute('height', height);
+	}
+    }
+
 function reqWsConnection(url = "") {
 	return new Promise((resolve, reject) => {
 		ws = new WebSocket(url);
@@ -193,6 +224,7 @@ function reqWsConnection(url = "") {
 			const response = JSON.parse(event.data);
 			const data = response.data;
 
+			onWindowResize();
 			if (response.info === 'player') {
 				if (response.type === 'join') {
 					console.log('player joined lobby: ', data.n_client);
@@ -221,25 +253,18 @@ function reqWsConnection(url = "") {
 					let canvas = document.getElementById("pongCanvas");
 					let ctx = canvas.getContext("2d");
 					ctx.fillStyle = 'white';
-					ctx.clearRect(0, 0, 800, 400);
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
 					Object.entries(data).forEach(([key, value]) => {
 						if (key === 'ball') {
 							ctx.beginPath();
-							ctx.arc(value.x, value.y, 10, 0, Math.PI * 2, false);
+							ctx.arc(value.x * canvas.width / 800, value.y / 400 * canvas.height, canvas.width / 80, 0, Math.PI * 2, false);
 							ctx.fill();
 						} else {
-							ctx.fillRect(value.x, value.y, 10, 50);
+							ctx.fillRect(value.x * canvas.width / 800, value.y / 400 * canvas.height, canvas.width / 80, canvas.width / 16);
 						}
 						let scoreboard = document.getElementById('scoreboard');
 						if (scoreboard)
 							scoreboard.innerHTML = data.score.left + " : " + data.score.right;
-						// let scoreboard = document.getElementById('scoreboard');
-						// if (scoreboard)
-						// 	scoreboard.innerHTML = `
-						// 	<h2 id="scoreTitle">${lan.score}</h2>
-						// 	<p>${lan.team1}: ${data.score.left}</p>
-						// 	<p>${lan.team2}: ${data.score.right}</p>
-						// 	`;
 					});
 				} else if (response.type === 'start') {
 					console.log('start the game');
