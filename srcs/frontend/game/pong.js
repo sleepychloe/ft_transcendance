@@ -34,28 +34,28 @@ const translations = {
 export const t = translations[currentLanguage];
 
 let game_data = {
-    canvas : undefined,
-    ctx : undefined,
-    normalCount : 0,
-    random : 0,
-    leftPaddleY : 0,
-    rightPaddleY : 0,
-    paddleWidth : 0,
-    paddleHeight : 0,
-    paddleSpeed : 14,
-    ballX : 0,
-    ballY : 0,
-    ballSpeedX : 0,
-    ballSpeedY : 0,
-    ballSize : 0,
-    score1 : 0,
-    score2 : 0,
-    players : [],
-    currentMatchIndex : 0,
-    gameLoopId : 0,
-    normalModeGamesPlayed : 0,
-    isGameInProgress : false,
-    tournamentModeFlag : 0,
+    canvas: undefined,
+    ctx: undefined,
+    normalCount: 0,
+    random: 0,
+    leftPaddleY: 0,
+    rightPaddleY: 0,
+    paddleWidth: 0,
+    paddleHeight: 0,
+    paddleSpeed: 14,
+    ballX: 0,
+    ballY: 0,
+    ballSpeedX: 0,
+    ballSpeedY: 0,
+    ballSize: 0,
+    score1: 0,
+    score2: 0,
+    players: [],
+    currentMatchIndex: 0,
+    gameLoopId: 0,
+    normalModeGamesPlayed: 0,
+    isGameInProgress: false,
+    tournamentModeFlag: 0,
 };
 
 let keyPress = {};
@@ -68,13 +68,13 @@ function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 }
 
-function onWindowResize(game_data={}) {
+function onWindowResize(game_data = {}) {
     let width, height;
     let proportion = 0.5;
 
     // mobile mode && rotated
     if (isMobileDevice() && window.innerWidth > window.innerHeight) {
-        height = window.innerHeight - 4 -47;
+        height = window.innerHeight - 4 - 47;
         if (window.innerHeight > 400) {
             height = 400 - 4;
         }
@@ -101,13 +101,13 @@ function onWindowResize(game_data={}) {
     }
 }
 
-export function canvasInit(game_data={}) {
+export function canvasInit(game_data = {}) {
     let width, height;
     let proportion = 0.5;
 
     // mobile mode && rotated
     if (isMobileDevice() && window.innerWidth > window.innerHeight) {
-        height = window.innerHeight - 4 -47;
+        height = window.innerHeight - 4 - 47;
         if (window.innerHeight > 400) {
             width = 400 - 4;
         }
@@ -136,7 +136,7 @@ export function canvasInit(game_data={}) {
     game_data['ballY'] = game_data['canvas'].height / 2;
 }
 
-export function resetBall(game_data={}) {
+export function resetBall(game_data = {}) {
     game_data['ballX'] = game_data['canvas'].width / 2;
     game_data['ballY'] = game_data['canvas'].height / 2;
     game_data['ballSpeedX'] = game_data['canvas'].width / 400 + game_data['canvas'].width / 540 * Math.random();
@@ -146,46 +146,45 @@ export function resetBall(game_data={}) {
     keyPress = {};
 }
 
-export function updatePaddlePosition(game_data={}) {
+export function updatePaddlePosition(game_data = {}) {
     if (game_data['leftPaddleY'] < 0) game_data['leftPaddleY'] = 0;
     if (game_data['leftPaddleY'] + game_data['paddleHeight'] > game_data['canvas'].height) game_data['leftPaddleY'] = game_data['canvas'].height - game_data['paddleHeight'];
     if (game_data['rightPaddleY'] < 0) game_data['rightPaddleY'] = 0;
     if (game_data['rightPaddleY'] + game_data['paddleHeight'] > game_data['canvas'].height) game_data['rightPaddleY'] = game_data['canvas'].height - game_data['paddleHeight'];
 }
 
-export function paddleCollision(game_data={}) {
+export function paddleCollision(game_data = {}) {
     if (game_data['ballX'] <= game_data['paddleWidth'] / 2 && game_data['ballY'] > game_data['leftPaddleY'] && game_data['ballY'] < game_data['leftPaddleY'] + game_data['paddleHeight']) {
         game_data['ballSpeedX'] = -game_data['ballSpeedX'];
         game_data['ballSpeedX'] += 0.001;
     }
-    if (game_data['ballX'] >= game_data['canvas'].width - game_data['paddleWidth'] / 2 && game_data['ballY'] > game_data['rightPaddleY'] && game_data['ballY'] < game_data['rightPaddleY'] + game_data['paddleHeight'])
-    {
+    if (game_data['ballX'] >= game_data['canvas'].width - game_data['paddleWidth'] / 2 && game_data['ballY'] > game_data['rightPaddleY'] && game_data['ballY'] < game_data['rightPaddleY'] + game_data['paddleHeight']) {
         game_data['ballSpeedX'] = -game_data['ballSpeedX'];
         game_data['ballSpeedX'] -= 0.001;
     }
 }
 
-export function checkScore(game_data={}) {
-        if (game_data['tournamentModeFlag'] && (game_data['ballX'] < 0 || game_data['ballX'] > game_data['canvas'].width)) {
-                if (game_data['ballX'] < 0) game_data['score2']++; else game_data['score1']++;
-                document.getElementById("score1").textContent = game_data['score1'];
-                document.getElementById("score2").textContent = game_data['score2'];
-                if (game_data['score1'] >= 1 || game_data['score2'] >= 1) {
-                        endMatch(game_data);
-                } else {
-                        startMatch(game_data);
-                }
-        } else if ((game_data['ballX'] < 0 || game_data['ballX'] > game_data['canvas'].width)) {
-                if (game_data['ballX'] < 0) game_data['score2']++; else game_data['score1']++;
-                document.getElementById("score1").textContent = game_data['score1'];
-                document.getElementById("score2").textContent = game_data['score2'];
-                game_data['normalModeGamesPlayed']++;
-                if (game_data['normalModeGamesPlayed'] < 3 && Math.max(game_data['score1'], game_data['score2']) < 2) {
-                        startMatch(game_data);
-                } else {
-                        endNormalGame(game_data);
-                }
+export function checkScore(game_data = {}) {
+    if (game_data['tournamentModeFlag'] && (game_data['ballX'] < 0 || game_data['ballX'] > game_data['canvas'].width)) {
+        if (game_data['ballX'] < 0) game_data['score2']++; else game_data['score1']++;
+        document.getElementById("score1").textContent = game_data['score1'];
+        document.getElementById("score2").textContent = game_data['score2'];
+        if (game_data['score1'] >= 1 || game_data['score2'] >= 1) {
+            endMatch(game_data);
+        } else {
+            startMatch(game_data);
         }
+    } else if ((game_data['ballX'] < 0 || game_data['ballX'] > game_data['canvas'].width)) {
+        if (game_data['ballX'] < 0) game_data['score2']++; else game_data['score1']++;
+        document.getElementById("score1").textContent = game_data['score1'];
+        document.getElementById("score2").textContent = game_data['score2'];
+        game_data['normalModeGamesPlayed']++;
+        if (game_data['normalModeGamesPlayed'] < 3 && Math.max(game_data['score1'], game_data['score2']) < 2) {
+            startMatch(game_data);
+        } else {
+            endNormalGame(game_data);
+        }
+    }
 }
 
 export function drawEverything(game_data) {
@@ -198,21 +197,21 @@ export function drawEverything(game_data) {
     game_data['ctx'].fill();
 }
 
-export function startMatch(game_data={}) {
-        game_data['random']++;
-        resetBall(game_data);
-        if (game_data['tournamentModeFlag']) {
-                document.getElementById("tournamentInfo").className = "flex-column justify-content-center d-flex";
-        }
-        if (!game_data['gameLoopId']) {
-                game_data['isGameInProgress'] = true;
-                game_data['gameLoopId'] = requestAnimationFrame(() => {
-                    gameLoop(game_data);
-                });
-        }
+export function startMatch(game_data = {}) {
+    game_data['random']++;
+    resetBall(game_data);
+    if (game_data['tournamentModeFlag']) {
+        document.getElementById("tournamentInfo").className = "flex-column justify-content-center d-flex";
+    }
+    if (!game_data['gameLoopId']) {
+        game_data['isGameInProgress'] = true;
+        game_data['gameLoopId'] = requestAnimationFrame(() => {
+            gameLoop(game_data);
+        });
+    }
 }
 
-export function gameLoop(game_data={}) {
+export function gameLoop(game_data = {}) {
     onWindowResize(game_data);
     if (!game_data['isGameInProgress']) {
         game_data['ctx'].clearRect(0, 0, game_data['canvas'].width, game_data['canvas'].height);
@@ -237,7 +236,7 @@ export function gameLoop(game_data={}) {
     });
 }
 
-export function resetGame(game_data={}) {
+export function resetGame(game_data = {}) {
     keyPress = {};
     game_data['isGameInProgress'] = false;
     if (game_data['gameLoopId']) {
@@ -271,12 +270,12 @@ export function resetGame(game_data={}) {
 }
 
 export function resetToHomeScreen(game_data) {
-        resetBall(game_data);
-        resetGame(game_data);
-        document.getElementById("gameDashboard").className = "flex-column justify-content-center d-none";
-        if (game_data['tournamentModeFlag'] === 1)
-                document.getElementById("tournamentInfo").className = "flex-column justify-content-center d-none";
-        game_data['tournamentModeFlag'] = 0;
+    resetBall(game_data);
+    resetGame(game_data);
+    document.getElementById("gameDashboard").className = "flex-column justify-content-center d-none";
+    if (game_data['tournamentModeFlag'] === 1)
+        document.getElementById("tournamentInfo").className = "flex-column justify-content-center d-none";
+    game_data['tournamentModeFlag'] = 0;
 }
 
 export function endMatch() {
@@ -323,10 +322,10 @@ export function displayMatchups() {
     }
 }
 
-export function endNormalGame(game_data={}) {
+export function endNormalGame(game_data = {}) {
     keyPress = {};
     if (game_data['isGameInProgress']) {
-        let winner = game_data['score1'] > game_data['score2'] ? `${t.player}` + ' 1' : `${t.player}` + ' 2' ;
+        let winner = game_data['score1'] > game_data['score2'] ? `${t.player}` + ' 1' : `${t.player}` + ' 2';
 
         game_data['isGameInProgress'] = false;
         if (game_data['gameLoopId']) {

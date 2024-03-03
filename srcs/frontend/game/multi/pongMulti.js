@@ -183,35 +183,35 @@ export function disconnectGame() {
 }
 
 function isMobileDevice() {
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    }
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
 function onWindowResize() {
 	let width, height;
 	let proportion = 0.5;
-    
+
 	// mobile mode && rotated
 	if (isMobileDevice() && window.innerWidth > window.innerHeight) {
-	    height = window.innerHeight - 4 -47;
-	    if (window.innerHeight > 400) {
-		height = 400 - 4;
-	    }
-	    width = height / proportion;
+		height = window.innerHeight - 4 - 47;
+		if (window.innerHeight > 400) {
+			height = 400 - 4;
+		}
+		width = height / proportion;
 	} else { // web mode, mobile mode && not rotated
-	    width = window.innerWidth - 4;
-    
-	    if (window.innerWidth > 800) {
-		width = 800 - 4;
-	    }
-	    height = width * proportion;
+		width = window.innerWidth - 4;
+
+		if (window.innerWidth > 800) {
+			width = 800 - 4;
+		}
+		height = width * proportion;
 	}
-    
+
 	let pongCanvas = document.getElementById('pongCanvas');
 	if (pongCanvas) {
-	    pongCanvas.setAttribute('width', width);
-	    pongCanvas.setAttribute('height', height);
+		pongCanvas.setAttribute('width', width);
+		pongCanvas.setAttribute('height', height);
 	}
-    }
+}
 
 function reqWsConnection(url = "") {
 	return new Promise((resolve, reject) => {

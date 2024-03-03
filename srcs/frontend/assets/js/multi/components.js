@@ -83,12 +83,12 @@ export function lobbyListRoomComponent(data={}) {
 			let listItem = document.createElement('div');
 			listItem.className = 'd-flex flex-row justify-content-between px-4 p-2 m-auto mb-2 btn btn-outline-primary';
 			listItem.style['width'] = "20vw";
-			listItem.style['height'] = "38";
+			listItem.style['height'] = "38px";
 			listItem.style['min-width'] = "278px";
 			listItem.addEventListener('click', multiJoinRoom);
 			listItem.setAttribute('id', data[i].room_id);
 			lobbyRoomList.appendChild(listItem);
-			
+
 			let roomName = document.createElement('div');
 			roomName.className = 'd-flex';
 			roomName.innerHTML = data[i].room_name;

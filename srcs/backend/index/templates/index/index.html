@@ -31,23 +31,23 @@
                 <div class="offcanvas-body">
                     <ul class="nav flex-column justify-content-center">
                         {% if request.LANGUAGE_CODE == 'en' %}
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">Local</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">Tournament</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">Multi</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/local">Local</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/local_3d">3D</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/tournament">Tournament</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/multi">Multi</a></li>
                         {% elif request.LANGUAGE_CODE == 'ko' %}
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">홈</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">로컬</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">토너먼트</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">멀티</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/">홈</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/local">로컬</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/local_3d">3D</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/tournament">토너먼트</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/multi">멀티</a></li>
                         {% elif request.LANGUAGE_CODE == 'fr' %}
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/">Accueil</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local">Local</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/local_3d">3D</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/tournament">Tournoi</a></li>
-                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" href="/multi">Multi</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/">Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/local">Local</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/local_3d">3D</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/tournament">Tournoi</a></li>
+                        <li class="nav-item"><a class="nav-link text-decoration-none text-muted text-center text-white-hover fs-4" data-bs-dismiss="offcanvas" href="/multi">Multi</a></li>
                         {% endif %}
                     </ul>
                 </div>
