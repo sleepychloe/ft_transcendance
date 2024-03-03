@@ -101,7 +101,6 @@ export function initLogo(canvasData={}) {
     function onWindowResize() {
 
         if (window.innerWidth < window.innerHeight) {
-            console.log('3');
             canvasData['canvasWidth'] = window.innerWidth * canvasData['proportion'];
             canvasData['canvasHeight'] = canvasData['canvasWidth'];
         } else {

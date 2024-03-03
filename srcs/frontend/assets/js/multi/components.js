@@ -57,8 +57,6 @@ export function multiGameScreenComponent() {
 
 	let gameCanvas = document.createElement('canvas');
 	gameCanvas.setAttribute('id', 'pongCanvas');
-	gameCanvas.setAttribute('width', '800');
-	gameCanvas.setAttribute('height', '400');
 	
 	container.appendChild(gameCanvas);
 	return container;
