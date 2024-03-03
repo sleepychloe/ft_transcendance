@@ -35,6 +35,6 @@ export function localpvpPage() {
                             </div>
                     </div>
                     <button class="d-flex justify-content-center btn btn-sm btn-outline-success mt-2 p-2 px-3 m-auto" id="normalMode">${t.start}</button>
-                    <canvas class="hidden" id="pongCanvas"></canvas>
+                    <canvas class="d-none" id="pongCanvas"></canvas>
                 </div>`
 };

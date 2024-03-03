@@ -1,6 +1,12 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'GLTFLoader';
 import { OrbitControls } from 'OrbitControls';
+
+let game_data = {
+    'mainCanvasWidth': 0,
+	'mainCanvasHeight': 0,
+	'subCanvasWidth': 0,
+	'subCanvasHeight': 0,
+};
 
 let scene, camera, renderer
 let cameraLeft, cameraRight, rendererLeft, rendererRight;
@@ -33,6 +39,10 @@ const translations = {
 
 const t = translations[currentLanguage];
 
+function isMobileDevice() {
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
 export function start3dMode() {
 	const button = document.getElementById('3dMode');
 	button.addEventListener('click', handleButtonClick);
@@ -43,6 +53,54 @@ function handleButtonClick() {
 	gameInProgress = true;
 	local3dMode = true;
 	paddleHit = 0;
+	document.getElementById("pong3dCanvas").className = "d-flex";
+	document.getElementById("pong3dLeft").className = "d-flex";
+	document.getElementById("pong3dRight").className = "d-flex";
+
+	let widthMain, heightMain, widthSub, heightSub;
+	let proportion = 0.5;
+
+	// mobile mode && rotated
+	if (isMobileDevice() && window.innerWidth > window.innerHeight) {
+		heightMain = window.innerHeight - 4 - 47;
+		if (window.innerHeight > 400) {
+			widthMain = 400 - 4;
+		}
+		widthMain = heightMain / proportion;
+	} else { // web mode, mobile mode && not rotated
+		widthMain = window.innerWidth - 4;
+
+		if (window.innerWidth > 800) {
+			widthMain = 800 - 4;
+		}
+		heightMain = widthMain * proportion;
+	}
+
+	widthSub = (widthMain + 4) / 2 - (widthMain + 4) / 40 - 4;
+	heightSub = widthSub;
+
+	let pongCanvasMain = document.getElementById('pong3dCanvas');
+	if (pongCanvasMain) {
+		pongCanvasMain.setAttribute('width', widthMain);
+		pongCanvasMain.setAttribute('height', heightMain);
+		pongCanvasMain.style.marginBottom = (widthMain + 4) / 20 + 'px';
+	}
+	let pongCanvasLeft = document.getElementById('pong3dLeft');
+	if (pongCanvasLeft) {
+		pongCanvasLeft.setAttribute('width', widthSub);
+		pongCanvasLeft.setAttribute('height', heightSub);
+	}
+	let pongCanvasRight = document.getElementById('pong3dRight');
+	if (pongCanvasRight) {
+		pongCanvasRight.setAttribute('width', widthSub);
+		pongCanvasRight.setAttribute('height', heightSub);
+		document.getElementById('lowerCanvases').style.gap = (widthMain + 4) / 20 + 'px';
+	}
+
+	game_data['mainCanvasWidth'] = widthMain;
+	game_data['mainCanvasHeight'] = heightMain;
+	game_data['subCanvasWidth'] = widthSub;
+	game_data['subCanvasHeight'] = heightSub;
 	startMatch();
 }
 
@@ -54,18 +112,15 @@ function startMatch() {
 }
 
 function init() {
-	const fixedWidth = 800;
-	const fixedHeight = 400;
 
 	// Setup scene
 	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera(75, fixedWidth / fixedHeight, 0.1, 1000);
+	camera = new THREE.PerspectiveCamera(75, game_data['mainCanvasWidth'] / game_data['mainCanvasHeight'], 0.1, 1000);
 	camera.position.y = 0;
 	camera.position.z = 30;
-	// camera.aspect = fixedWidth / fixedHeight;
-	// camera.updateProjectionMatrix();
-	cameraLeft = new THREE.PerspectiveCamera(75, 350 / 350, 0.1, 1000);
-	cameraRight = new THREE.PerspectiveCamera(75, 350 / 350, 0.1, 1000);
+
+	cameraLeft = new THREE.PerspectiveCamera(75, game_data['subCanvasWidth'] / game_data['subCanvasHeight'], 0.1, 1000);
+	cameraRight = new THREE.PerspectiveCamera(75, game_data['subCanvasWidth'] / game_data['subCanvasHeight'], 0.1, 1000);
 
 	cameraLeft.position.set(-45, 12, 0);
 	cameraLeft.lookAt(new THREE.Vector3(0, 50, 0));
@@ -75,18 +130,18 @@ function init() {
 
 	const canvas = document.getElementById('pong3dCanvas');
 	renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-	canvas.width = fixedWidth;
-	canvas.height = fixedHeight;
-	renderer.setSize(fixedWidth, fixedHeight);
+	canvas.width = game_data['mainCanvasWidth'];
+	canvas.height = game_data['mainCanvasHeight'];
+	renderer.setSize(game_data['mainCanvasWidth'], game_data['mainCanvasHeight']);
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setClearColor(0x000000);
 
 	rendererLeft = new THREE.WebGLRenderer({ canvas: document.getElementById('pong3dLeft') });
-	rendererLeft.setSize(390, 390);
+	rendererLeft.setSize(game_data['subCanvasWidth'], game_data['subCanvasHeight']);
 	rendererLeft.setClearColor(0x000000);
 
 	rendererRight = new THREE.WebGLRenderer({ canvas: document.getElementById('pong3dRight') });
-	rendererRight.setSize(390, 390);
+	rendererRight.setSize(game_data['subCanvasWidth'], game_data['subCanvasHeight']);
 	rendererRight.setClearColor(0x000000);
 
 	// lighting
@@ -196,18 +251,66 @@ function init() {
 	window.addEventListener('resize', onWindowResize, false);
 
 	function onWindowResize() {
-		camera.aspect = fixedWidth / fixedWidth;
+		let widthMain, heightMain, widthSub, heightSub;
+		let proportion = 0.5;
+
+		// mobile mode && rotated
+		if (isMobileDevice() && window.innerWidth > window.innerHeight) {
+			heightMain = window.innerHeight - 4 - 47;
+			if (window.innerHeight > 400) {
+				widthMain = 400 - 4;
+			}
+			widthMain = heightMain / proportion;
+		} else { // web mode, mobile mode && not rotated
+			widthMain = window.innerWidth - 4;
+
+			if (window.innerWidth > 800) {
+				widthMain = 800 - 4;
+			}
+			heightMain = widthMain * proportion;
+		}
+		widthSub = (widthMain + 4) / 2 - (widthMain + 4) / 40 - 4;
+		heightSub = widthSub;
+
+		let pongCanvasMain = document.getElementById('pong3dCanvas');
+		if (pongCanvasMain) {
+			pongCanvasMain.setAttribute('width', widthMain);
+			pongCanvasMain.setAttribute('height', heightMain);
+			pongCanvasMain.style.marginBottom = (widthMain + 4) / 20 + 'px';
+		}
+		let pongCanvasLeft = document.getElementById('pong3dLeft');
+		if (pongCanvasLeft) {
+			pongCanvasLeft.setAttribute('width', widthSub);
+			pongCanvasLeft.setAttribute('height', heightSub);
+		}
+		let pongCanvasRight = document.getElementById('pong3dRight');
+		if (pongCanvasRight) {
+			pongCanvasRight.setAttribute('width', widthSub);
+			pongCanvasRight.setAttribute('height', heightSub);
+			document.getElementById('lowerCanvases').style.gap = (widthMain + 4) / 20 + 'px';
+		}
+		
+		game_data['mainCanvasWidth'] = widthMain;
+		game_data['mainCanvasHeight'] = heightMain;
+		game_data['subCanvasWidth'] = widthSub;
+		game_data['subCanvasHeight'] = heightSub;
+
+
+
+
+
+		camera.aspect = game_data['mainCanvasWidth'] / game_data['mainCanvasHeight'];
 		camera.updateProjectionMatrix();
-		renderer.setSize(fixedWidth, fixedHeight);
+		renderer.setSize(game_data['mainCanvasWidth'], game_data['mainCanvasHeight']);
 		renderer.setPixelRatio(window.devicePixelRatio);
 
-		cameraLeft.aspect = 350 / 350;
+		cameraLeft.aspect = game_data['subCanvasWidth'] / game_data['subCanvasHeight'];
 		cameraLeft.updateProjectionMatrix();
-		rendererLeft.setSize(390, 390);
+		rendererLeft.setSize(game_data['subCanvasWidth'], game_data['subCanvasHeight']);;
 
-		cameraRight.aspect = 350 / 350;
+		cameraRight.aspect = game_data['subCanvasWidth'] / game_data['subCanvasHeight'];
 		cameraRight.updateProjectionMatrix();
-		rendererRight.setSize(390, 390);
+		rendererRight.setSize(game_data['subCanvasWidth'], game_data['subCanvasHeight']);;
 	}
 }
 
@@ -303,6 +406,9 @@ function checkBallBoundaries() {
 		gameInProgress = false;
 		local3dMode = false;
 		stopAnimation();
+		document.getElementById("pong3dCanvas").className = "d-none";
+		document.getElementById("pong3dLeft").className = "d-none";
+		document.getElementById("pong3dRight").className = "d-none";
 		start3dMode();
 	}
 }

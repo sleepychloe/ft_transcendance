@@ -68,13 +68,13 @@ function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 }
 
-export function setCanvasSize() {
+function onWindowResize(game_data={}) {
     let width, height;
     let proportion = 0.5;
 
     // mobile mode && rotated
     if (isMobileDevice() && window.innerWidth > window.innerHeight) {
-        height = window.innerHeight - 4 - 47;
+        height = window.innerHeight - 4 -47;
         if (window.innerHeight > 400) {
             width = 400 - 4;
         }
@@ -89,17 +89,19 @@ export function setCanvasSize() {
     }
 
     let pongCanvas = document.getElementById('pongCanvas');
-    pongCanvas.setAttribute('width', width);
-    pongCanvas.setAttribute('height', height);
+    if (pongCanvas) {
+        pongCanvas.setAttribute('width', width);
+        pongCanvas.setAttribute('height', height);
+    }
 
-    if (game_data['isGameInProgress'] === false) {
-        if (isMobileDevice()) {
-            document.getElementById("pongCanvas").className = "d-none";
-        }
+    if (game_data['isGameInProgress'] === true) {
+        game_data['paddleWidth'] = width / 80;
+        game_data['paddleHeight'] = height / 4;
+        game_data['ballSize'] = width / 80;
     }
 }
 
-export function onWindowResize(game_data={}) {
+export function canvasInit(game_data={}) {
     let width, height;
     let proportion = 0.5;
 
@@ -123,14 +125,6 @@ export function onWindowResize(game_data={}) {
     pongCanvas.setAttribute('width', width);
     pongCanvas.setAttribute('height', height);
 
-    if (game_data['isGameInProgress'] === true) {
-        game_data['paddleWidth'] = width / 80;
-        game_data['paddleHeight'] = height / 4;
-        game_data['ballSize'] = width / 80;
-    }
-}
-
-export function canvasInit(game_data={}) {
     game_data['canvas'] = document.getElementById("pongCanvas");
     game_data['ctx'] = document.getElementById("pongCanvas").getContext("2d");
     game_data['paddleWidth'] = game_data['canvas'].width / 80;
@@ -273,9 +267,7 @@ export function resetGame(game_data={}) {
         game_data['players'] = [];
     }
     game_data['currentMatchIndex'] = 0;
-    if (isMobileDevice()) {
-        document.getElementById("pongCanvas").className = "d-none";
-    }
+    document.getElementById("pongCanvas").className = "d-none";
 }
 
 export function resetToHomeScreen(game_data) {
