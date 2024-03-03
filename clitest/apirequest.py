@@ -5,20 +5,20 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-uri_template = "https://10.24.103.6:4243/api/game/{game_id}/move"
+uri_template = "https://localhost:4243/apitest/{game_id}/move"
 
 
-BASE_URL = "https://10.24.103.6:4243/api/game/"
+base_uri = "https://localhost:4243/apitest/"
 
 def get_cookie():
     session = requests.Session()
     session.verify = False
-    csrf_token_url = BASE_URL + "user/csrftoken/"
+    csrf_token_url = base_uri + "user/csrftoken/"
     csrf_token_response = session.get(csrf_token_url)
     return csrf_token_response.cookies
 
 def make_api_call(endpoint, method="GET", cookies=None, data=None):
-    url = BASE_URL + endpoint
+    url = base_uri + endpoint
     csrf_token = cookies.get('csrftoken')
 
     headers = {}

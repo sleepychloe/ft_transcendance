@@ -23,6 +23,7 @@ urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('apitest/', include('apitest.urls')),
     path('', index),
 	re_path(r'^.*/$', RedirectView.as_view(url='/')),
 ]

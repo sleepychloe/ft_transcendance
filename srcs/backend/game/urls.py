@@ -5,8 +5,4 @@ urlpatterns = [
 	path('makeroom/', GameRoomMakeView.as_view()),
 	path('listroom/', GameRoomListView.as_view()),
 	path('<str:game_id>/', GameRoomJoinView.as_view()),
-	path('<str:game_id>/delete', GameRoomDeleteView.as_view()),
-
-	#move api
-	path('<str:game_id>/move', GameRoomMoveView.as_view()),
 ]

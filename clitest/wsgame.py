@@ -9,18 +9,18 @@ import requests
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-BASE_URL = "https://10.24.103.6:4243/api/game/"
-uri_template = "wss://10.24.103.6:4243/ws/{game_id}/"
+base_uri = "https://localhost:4243/"
+uri_template = "wss://localhost:4243/ws/{game_id}/"
 
 def get_cookie():
     session = requests.Session()
     session.verify = False
-    csrf_token_url = BASE_URL + "user/csrftoken/"
+    csrf_token_url = base_uri
     csrf_token_response = session.get(csrf_token_url)
     return csrf_token_response.cookies
 
 def check_game_id(game_id):
-    url = BASE_URL + "listroom/"
+    url = base_uri + "apitest/listroom/"
     cookies = get_cookie()
     csrf_token = cookies.get('csrftoken')
     headers = {}

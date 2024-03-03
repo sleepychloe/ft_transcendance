@@ -5,8 +5,8 @@ import json
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-view_uri_template = "https://10.24.103.6:4243/api/game/{game_id}/"
-
+view_uri_template = "https://localhost:4243/apitest/{game_id}/"
+base_uri = "https://localhost:4243/"
 
 def game_view_request(game_id):
     uri = view_uri_template.format(game_id=game_id)
@@ -31,7 +31,7 @@ def game_view_request(game_id):
 def get_cookie():
     session = requests.Session()
     session.verify = False
-    csrf_token_url = "https://10.24.103.6:4243/"
+    csrf_token_url = base_uri
     csrf_token_response = session.get(csrf_token_url)
     return csrf_token_response.cookies
 

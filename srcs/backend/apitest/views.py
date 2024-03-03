@@ -1,11 +1,12 @@
 import json
+from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
-from .models import MultiRoomInfo
+from game.models import MultiRoomInfo
 from django.db import transaction
+from django.conf import settings
 from channels.layers import get_channel_layer
 from django.utils.translation import get_language
-
 
 translations = {
     'en': {
@@ -28,11 +29,22 @@ translations = {
     },
 }
 
+class TESTGameRoomDeleteView(View):
+
+	@transaction.atomic
+	def delete(self, request, game_id):
+		if settings.DEBUG == True:
+			room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
+			room.delete()
+			return JsonResponse({'status': 'delete ok'}, status=200)
+		else:
+			return JsonResponse({'status': 'delete ko'}, status=400)
+
 def create_new_uuid():
 	import uuid
 	return str(uuid.uuid4()).replace("-", "")
 
-class GameRoomMakeView(View):
+class TESTGameRoomMakeView(View):
 
 	@transaction.atomic
 	def post(self, request):
@@ -59,8 +71,7 @@ class GameRoomMakeView(View):
 		response.set_cookie('client_id', client_id)
 		return response
 
-
-class GameRoomListView(View):
+class TESTGameRoomListView(View):
 	
 	def get(self, request):
 		all_data = MultiRoomInfo.objects.all()
@@ -83,8 +94,8 @@ class GameRoomListView(View):
 			for it in queryset
 		]
 		return serialized_data
-
-class GameRoomJoinView(View):
+	
+class TESTGameRoomJoinView(View):
 	def search_client_data(self, room, client_id):
 		if room.client1:
 			if room.client1['client_id'] == client_id:
@@ -163,3 +174,62 @@ class GameRoomJoinView(View):
 			room.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
 			room.save()
 			return "client4"
+		
+class TESTGameRoomMoveView(View):
+
+	@transaction.atomic
+	def put(self, request, game_id):
+		try:
+			room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
+		except MultiRoomInfo.DoesNotExist:
+				return JsonResponse({"Error":"can not find game id"}, status=400)
+		try:
+			body = json.loads(request.body)
+		except:
+			return JsonResponse({"Error":"not form of json"}, status=400)
+		if not (
+			body['client_id'] and
+			body['direction']
+		):
+			return JsonResponse({"Error":"json value error"}, status=400)
+		
+		if room.GameStatus == True:
+			client_id = body['client_id']
+			if room.client1['client_id'] == client_id:
+				self.move_paddle(room.client1['paddle'], game_id, body['direction'])
+			elif room.client2['client_id'] == client_id:
+				self.move_paddle(room.client2['paddle'], game_id, body['direction'])
+			elif room.client3['client_id'] == client_id:
+				self.move_paddle(room.client3['paddle'], game_id, body['direction'])
+			elif room.client4['client_id'] == client_id:
+				self.move_paddle(room.client4['paddle'], game_id, body['direction'])
+			else:
+				return JsonResponse({"Error":"client_id does not exsits"}, status=400)
+			return JsonResponse({"Status": "Ok", "client_id":client_id, "direction": body['direction']})
+		else:
+			return JsonResponse({"Error":"Game not yet start"}, status=400)
+	
+	@transaction.atomic
+	def move_paddle(self, paddle, game_id, body):
+		room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
+		if paddle == 'paddle1':
+			if body == 'down' and room.paddle1['y'] < 350:
+				room.paddle1['y'] += 10
+			elif body == 'up' and room.paddle1['y'] > 0:
+				room.paddle1['y'] -= 10
+		elif paddle == 'paddle2':
+			if body == 'down' and room.paddle2['y'] < 350:
+				room.paddle2['y'] += 10
+			elif body == 'up' and room.paddle2['y'] > 0:
+				room.paddle2['y'] -= 10
+		elif paddle == 'paddle3':
+			if body == 'down' and room.paddle3['y'] < 350:
+				room.paddle3['y'] += 10
+			elif body == 'up' and room.paddle3['y'] > 0:
+				room.paddle3['y'] -= 10
+		elif paddle == 'paddle4':
+			if body == 'down' and room.paddle4['y'] < 350:
+				room.paddle4['y'] += 10
+			elif body == 'up' and room.paddle4['y'] > 0:
+				room.paddle4['y'] -= 10
+		room.save()
