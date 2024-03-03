@@ -2,9 +2,12 @@ import json
 from django.views import View
 from django.http import JsonResponse
 from .models import MultiRoomInfo
+from user.models import User42Info
 from django.db import transaction
 from channels.layers import get_channel_layer
 from django.utils.translation import get_language
+import jwt
+import os
 
 
 translations = {
@@ -34,6 +37,27 @@ def create_new_uuid():
 
 class GameRoomMakeView(View):
 
+	def get_info_jwt_token(self, request):
+		token = request.COOKIES.get('jwt_token', None)
+		if token:
+			try:
+				decoded_token = jwt.decode(token, os.getenv("JWT_SECRET_KEY"), algorithms=['HS256'])
+				user_name = decoded_token['user_name']
+				if User42Info.objects.filter(Username=user_name).exists():
+					user_info = User42Info.objects.filter(Username=user_name)
+					self.intra_id = user_info.Userid
+					self.avatar = user_info.Useravatar
+				else:
+					self.intra_id = "Player"
+					self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
+			except Exception as e:
+				print(e)
+				self.intra_id = "Player"
+				self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
+		else:
+			self.intra_id = "Player"
+			self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
+
 	@transaction.atomic
 	def post(self, request):
 		new_room_id = create_new_uuid()
@@ -47,15 +71,16 @@ class GameRoomMakeView(View):
 			room_name = json.loads(request.body).get("room_name")
 		except json.JSONDecodeError:
 			return JsonResponse({'Error' : 'Roomname is not json.'}, status=400)
+		self.get_info_jwt_token(request)
 		new_data = MultiRoomInfo.objects.create(Roomid=new_room_id, RoomName=room_name,
 										  QuantityPlayer=quantity_player, QuantityPlayerReady=0,
 										  client1={'online': True, 'paddle': None, 'client_id':client_id,
-					 					'ready_status': 'not ready'}, client2={}, client3={}, client4={}) # why this is called on client1 ready
+					 					'ready_status': 'not ready', "intra_id": self.intra_id, "avatar": self.avatar}, client2={}, client3={}, client4={}) # why this is called on client1 ready
 		new_data.save()
 		channel_layer.group_add(new_room_id, 'BACKEND')
 		response = JsonResponse({'status': 'create', 'room_id' : new_room_id, 'client_id' : client_id,
 						   'room_name' : room_name, 'quantity_player' : quantity_player,
-						   'quantity_player_ready' : 0, 'n_client' : 'client1'}, status=200)
+						   'quantity_player_ready' : 0, 'n_client' : 'client1', "intra_id": self.intra_id, "avatar": self.avatar}, status=200)
 		response.set_cookie('client_id', client_id)
 		return response
 
@@ -85,6 +110,28 @@ class GameRoomListView(View):
 		return serialized_data
 
 class GameRoomJoinView(View):
+
+	def get_info_jwt_token_join(self, request):
+		token = request.COOKIES.get('jwt_token', None)
+		if token:
+			try:
+				decoded_token = jwt.decode(token, os.getenv("JWT_SECRET_KEY"), algorithms=['HS256'])
+				user_name = decoded_token['user_name']
+				if User42Info.objects.filter(Username=user_name).exists():
+					user_info = User42Info.objects.get(Username=user_name)
+					self.intra_id = user_info.Userid
+					self.avatar = user_info.Useravatar
+				else:
+					self.intra_id = "Player"
+					self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
+			except Exception as e:
+				print(e)
+				self.intra_id = "Player"
+				self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
+		else:
+			self.intra_id = "Player"
+			self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
+
 	def search_client_data(self, room, client_id):
 		if room.client1:
 			if room.client1['client_id'] == client_id:
@@ -99,6 +146,36 @@ class GameRoomJoinView(View):
 			if room.client4['client_id'] == client_id:
 				return 'client4'
 		return None
+
+	@transaction.atomic
+	def get(self, request, game_id):
+		id = game_id
+		response = {}
+		if MultiRoomInfo.objects.filter(Roomid=id).exists():
+			room = MultiRoomInfo.objects.get(Roomid=id)
+			if room.client1:
+				response["client1"] = {
+						"intra_id" : room.client1["intra_id"],
+						"avatar" : room.client1["avatar"]
+				}
+			if room.client2:
+				response["client2"] = {
+						"intra_id" : room.client2["intra_id"],
+						"avatar" : room.client2["avatar"]
+				}
+			if room.client3:
+				response["client3"] = {
+						"intra_id" : room.client3["intra_id"],
+						"avatar" : room.client3["avatar"]
+				}
+			if room.client4:
+				response["client4"] = {
+						"intra_id" : room.client4["intra_id"],
+						"avatar" : room.client4["avatar"]
+				}
+			return JsonResponse(response)
+		else:
+			return JsonResponse({"Error": "Game id does not exist"}, status=404)
 
 	@transaction.atomic
 	def put(self, request, game_id):
@@ -130,9 +207,10 @@ class GameRoomJoinView(View):
 				return JsonResponse({'Error': error_message}, status=400)
 			room.QuantityPlayer += 1
 			room.save()
-			if not client_id:
+			if client_id == None:
 				client_id = create_new_uuid()
 				first_connection_flag = True
+			self.get_info_jwt_token_join(request)
 			Nclient = self.check_client_id_for_data(game_id, client_id)
 			response = JsonResponse({'status': 'join', 'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})			
 			if first_connection_flag == True:
@@ -143,23 +221,22 @@ class GameRoomJoinView(View):
 			error_message = translations.get(current_language)['errQuantityPlayerExceed']
 			return JsonResponse({'Error': error_message}, status=400)
 	
-	@staticmethod
 	@transaction.atomic
-	def check_client_id_for_data(game_id, client_id):
+	def check_client_id_for_data(self, game_id, client_id):
 		room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 		if not room.client1:
-			room.client1 = {'client_id': client_id,  'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.client1 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True, 'intra_id': self.intra_id, 'avatar': self.avatar}
 			room.save()
 			return "client1"
 		elif not room.client2:
-			room.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True, 'intra_id': self.intra_id, 'avatar': self.avatar}
 			room.save()
 			return "client2"
 		elif not room.client3:
-			room.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True, 'intra_id': self.intra_id, 'avatar': self.avatar}
 			room.save()
 			return "client3"
 		elif not room.client4:
-			room.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True, 'intra_id': self.intra_id, 'avatar': self.avatar}
 			room.save()
 			return "client4"

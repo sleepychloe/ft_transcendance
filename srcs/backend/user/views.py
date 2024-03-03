@@ -15,10 +15,8 @@ class UserAvatarGetView(View):
 				user_name = decoded_token['user_name']
 				if User42Info.objects.filter(Username=user_name).exists():
 					user_data = User42Info.objects.get(Username=user_name)
-					img_path = user_data.Useravatar.path
-					with open(img_path, "rb") as image_file:
-						encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
-					return JsonResponse({user_name : encoded_image})
+					image_link = user_data.Useravatar
+					return JsonResponse({user_name : image_link})
 				else:
 					return JsonResponse({"Error":"User not found in db"}, status=404)
 			except:

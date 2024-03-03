@@ -59,13 +59,8 @@ class Auth42CallBackView(View):
 		if response.status_code != 200:
 			return None
 		user_info = json.loads(response.content.decode('utf-8'))
-		response_avatar = requests.get(user_info['image']['versions']['small'])
 		if response.status_code == 200:
-			user_avatar = Image.open(BytesIO(response_avatar.content))
-			user_avatar = user_avatar.convert('RGB')
-			imgio = BytesIO()
-			user_avatar.save(imgio, format="JPEG")
-			file_avatar = File(imgio, name=f'{user_info["login"]}_avatar.jpg')
+			user_avatar = user_info['image']['versions']['small']
 		else:
 			user_avatar = None
 		if User42Info.objects.filter(Username=user_info['displayname']).exists():
@@ -74,6 +69,6 @@ class Auth42CallBackView(View):
 		else:
 			user_data = User42Info.objects.create(Username=user_info['displayname'], Userid=user_info['login'])
 			if user_avatar:
-				user_data.Useravatar.save(f'{user_info["login"]}_avatar.jpg', file_avatar, save=True)
+				user_data.Useravatar = user_avatar
 			user_data.save()
 			return user_data

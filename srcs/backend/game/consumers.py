@@ -1,11 +1,14 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import MultiRoomInfo
+from user.models import User42Info
 from channels.db import database_sync_to_async
 from django.db import transaction
 import random
 import json
 import asyncio
 import time
+import os
+import jwt
 import re
 
 class MultiGameConsumer(AsyncWebsocketConsumer):
@@ -40,6 +43,10 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			return 'client4'
 		return None
 
+	# @database_sync_to_async
+	# def get_user_avatar(self):
+
+
 	async def connect(self):
 		try:
 			await self.accept()
@@ -54,6 +61,21 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 				self.close()
 				return
+			# match = re.search(r'jwt_token=([^;]*)', cookies)
+			# if match:
+			# 	jwt_token = match.group(1)
+			# 	jwt_info = jwt.decode(jwt_token, os.getenv("JWT_SECRET_KEY"), algorithms=['HS256'])
+			# 	self.intra_id = jwt_info['user_id']
+			# 	if User42Info.objects.filter(Userid=self.intra_id).exists():
+			# 		user_data = User42Info.objects.get(Userid=self.intra_id)
+			# 		self.avatar = user_data.Useravatar
+			# 	else:
+			# 		self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp" 
+			# 	print(self.intra_id)
+			# 	print(self.avatar)
+			# else:
+			# 	self.intra_id = "Player"
+			# 	self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
 			game_id = self.scope["url_route"]["kwargs"]["game_id"]
 			self.game_id = game_id
 			await self.get_game_data()
@@ -65,6 +87,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 					return
 				await self.channel_layer.group_add(game_id, self.channel_name)
 				await self.reconnect_client_quantity()
+				await self.get_game_data()
 				await self.channel_layer.group_send(self.game_id,
 														{
 															'type': 'room_inform',
@@ -72,29 +95,21 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 															'quantity_player': self.game_data.QuantityPlayer,
 															'quantity_player_ready': self.game_data.QuantityPlayerReady,
 															'n_client': self.n_client,
+															# 'intra_id': self.intra_id,
+															# 'user_avatar': self.avatar,
 															'sender_channel_name': self.channel_name,
 														})
-				paddle = await self.get_value_game_data(self.n_client)
-				if paddle['paddle'] == 'paddle1' or paddle['paddle'] == 'paddle2':
-					self.number_paddle = paddle['paddle']
-					await self.update_value_game_data(self.number_paddle, {
-						'x': 0,
-						'y': 150,
-					})
-				else:
-					self.number_paddle = paddle['paddle']
-					await self.update_value_game_data(self.number_paddle, {
-						'x': 790,
-						'y': 150,
-					})
+				self.number_paddle = await self.get_value_game_data(self.n_client)
+
+				await self.init_game_value()
 			else:
 				if await self.search_client_data() == None:
 					await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 					self.close()
 				await self.initialize_game()
 				await self.channel_layer.group_add(game_id, self.channel_name)
-		except:
-			print("Something Error!")
+		except Exception as e:
+			print("Something Error!", e)
 			await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 			self.close()
 			return
@@ -215,6 +230,34 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			self.close()
 
 	@database_sync_to_async
+	def init_game_value2(self):
+		self.get_game_data()
+		self.ball_speed = 8
+		random.seed(time.time())
+		self.vx = self.ball_speed * random.uniform(-1, 1)
+		self.vy = self.ball_speed * random.uniform(-1, 1)
+		while self.vx < 2 and self.vx > -2:
+			self.vx = self.ball_speed * random.uniform(-1, 1)
+
+		while ((self.vy > 10 and self.vy < -10) and 
+			(self.vy < 5 and self.vy > -5)):
+			self.vx = self.ball_speed * random.uniform(-1, 1)
+
+		self.game_state = {
+			'ball': {
+				'x': 400,
+				'y': 200,
+			}
+		}
+		if self.game_data.GameStatus == False:
+			self.score = {
+			'score': {
+				'left': 0,
+				'right': 0,
+			}
+		}
+	
+	@database_sync_to_async
 	def init_game_value(self):
 		self.get_game_data()
 		self.ball_speed = 8
@@ -235,8 +278,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			}
 		}
 		self.init_game_paddle_data()
-		if self.game_data.GameStatus == False:
-			self.score = {
+		self.score = {
 			'score': {
 				'left': 0,
 				'right': 0,
@@ -247,22 +289,22 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 	@transaction.atomic()
 	def reset_game_paddle_value(self):
 		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
-		if game_data.paddle1 == None:
+		if game_data.paddle1 != None:
 			game_data.paddle1 = {
 				'x': 0,
 				'y': 100,
 			}
-		if game_data.paddle2 == None:
+		if game_data.paddle2 != None:
 			game_data.paddle2 = {
 				'x': 0,
 				'y': 300,
 	 			}
-		if game_data.paddle3 == None:
+		if game_data.paddle3 != None:
 			game_data.paddle3 = {
 				'x': 790,
 				'y': 100		
 			}
-		if game_data.paddle4 == None:
+		if game_data.paddle4 != None:
 			game_data.paddle4 = {
 				'x': 790,
 				'y': 300,
@@ -435,6 +477,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 															'n_client': self.n_client,
 															'quantity_player': self.game_data.QuantityPlayer,
 															'quantity_player_ready': self.game_data.QuantityPlayerReady,
+															# 'intra_id': self.intra_id,
+															# 'user_avatar': self.avatar,
 															'sender_channel_name': self.channel_name,
 														})
 				else:
@@ -479,6 +523,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		quantity_player = event['quantity_player']
 		n_client = event['n_client']
 		action = event['action']
+		# intra_id = event['intra_id']
+		# user_avatar = event['user_avatar']
 		if self.channel_name != event['sender_channel_name']:
 			if action == 'join':
 				await self.send(text_data=json.dumps({
@@ -488,6 +534,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 						'n_client': n_client,
 						'quantity_player': quantity_player,
 						'quantity_player_ready': quantity_player_ready,
+						# 'intra_id': intra_id,
+						# 'user_avatar': user_avatar,
 					},
 				}))
 		if action == 'ready':
@@ -608,25 +656,25 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 	def player_status_check(self):
 		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
 		if game_data.client1['online'] == True:
-			game_data.client1['ready_status'] = 'unready'
+			game_data.client1['ready_status'] = 'not ready'
 			game_data.QuantityPlayerReady -= 1
 		else:
 			game_data.client1 = {}
 
 		if game_data.client2['online'] == True:
-			game_data.client2['ready_status'] = 'unready'
+			game_data.client2['ready_status'] = 'not ready'
 			game_data.QuantityPlayerReady -= 1
 		else:
 			game_data.client2 = {}
 
 		if game_data.client3['online'] == True:
-			game_data.client3['ready_status'] = 'unready'
+			game_data.client3['ready_status'] = 'not ready'
 			game_data.QuantityPlayerReady -= 1
 		else:
 			game_data.client3 = {}
 
 		if game_data.client4['online'] == True:
-			game_data.client4['ready_status'] = 'unready'
+			game_data.client4['ready_status'] = 'not ready'
 			game_data.QuantityPlayerReady -= 1
 		else:
 			game_data.client4 = {}
@@ -690,7 +738,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			await asyncio.sleep(0.015)
 			await self.get_game_data()
 		#out of scope while
-		await self.init_game_value()
+		await self.init_game_value2()
 		await self.reset_game_paddle_value()
 		await self.channel_layer.group_send(self.game_id,
 												{
