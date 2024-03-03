@@ -15,13 +15,15 @@ export function initLogo(canvasData={}) {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     }
 
-    if (isMobileDevice()) { canvasData['proportion'] = 0.4; }
-    else { canvasData['proportion'] = 0.8; }
+    canvasData['proportion'] = 0.8;
 
     if (window.innerWidth < window.innerHeight) {
         canvasData['canvasWidth'] = window.innerWidth * canvasData['proportion'];
         canvasData['canvasHeight'] = canvasData['canvasWidth'];
     } else {
+        if (isMobileDevice() && window.innerHeight < 600) {
+            canvasData['proportion'] = 0.4;
+        }
         canvasData['canvasHeight'] = window.innerHeight * canvasData['proportion'];
         canvasData['canvasWidth'] = canvasData['canvasHeight'];
     }
@@ -97,10 +99,15 @@ export function initLogo(canvasData={}) {
     window.addEventListener('resize', onWindowResize, false);
 
     function onWindowResize() {
+
         if (window.innerWidth < window.innerHeight) {
+            console.log('3');
             canvasData['canvasWidth'] = window.innerWidth * canvasData['proportion'];
             canvasData['canvasHeight'] = canvasData['canvasWidth'];
         } else {
+            if (isMobileDevice() && window.innerHeight < 600) {
+                canvasData['proportion'] = 0.4;
+            }
             canvasData['canvasHeight'] = window.innerHeight * canvasData['proportion'];
             canvasData['canvasWidth'] = canvasData['canvasHeight'];
         }
