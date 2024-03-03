@@ -99,8 +99,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 															# 'user_avatar': self.avatar,
 															'sender_channel_name': self.channel_name,
 														})
-				self.number_paddle = await self.get_value_game_data(self.n_client)
-
+				player_info = await self.get_value_game_data(self.n_client)
+				self.number_paddle = player_info["paddle"]
 				await self.init_game_value()
 			else:
 				if await self.search_client_data() == None:
@@ -109,7 +109,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				await self.initialize_game()
 				await self.channel_layer.group_add(game_id, self.channel_name)
 		except Exception as e:
-			print("Something Error!", e)
+			print("Something4 Error!", e)
 			await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 			self.close()
 			return
@@ -172,8 +172,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 														'sender_channel_name': self.channel_name,
 													})
 			await self.channel_layer.group_discard(self.game_id, self.channel_name)
-		except:
-			print("Something Wrong!")
+		except Exception as e:
+			print("Something1 Wrong!", e)
 			self.close()
 
 	@database_sync_to_async
@@ -181,22 +181,26 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 	def remove_client_data(self):
 		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
 		if game_data.GameStatus == False:
-			if game_data.client1['client_id'] == self.client_id:
-				if game_data.client1['ready_status'] == 'ready':
-					game_data.QuantityPlayerReady -= 1
-				game_data.client1 = {}
-			elif game_data.client2['client_id'] == self.client_id:
-				if game_data.client2['ready_status'] == 'ready':
-					game_data.QuantityPlayerReady -= 1
-				game_data.client2 = {}
-			elif game_data.client3['client_id'] == self.client_id:
-				if game_data.client3['ready_status'] == 'ready':
-					game_data.QuantityPlayerReady -= 1
-				game_data.client3 = {}
-			elif game_data.client4['client_id'] == self.client_id:
-				if game_data.client4['ready_status'] == 'ready':
-					game_data.QuantityPlayerReady -= 1
-				game_data.client4 = {}
+			if game_data.client1:
+				if game_data.client1['client_id'] == self.client_id:
+					if game_data.client1['ready_status'] == 'ready':
+						game_data.QuantityPlayerReady -= 1
+					game_data.client1 = {}
+			elif game_data.client2:
+				if game_data.client2['client_id'] == self.client_id:
+					if game_data.client2['ready_status'] == 'ready':
+						game_data.QuantityPlayerReady -= 1
+					game_data.client2 = {}
+			elif game_data.client3:
+				if game_data.client3['client_id'] == self.client_id:
+					if game_data.client3['ready_status'] == 'ready':
+						game_data.QuantityPlayerReady -= 1
+					game_data.client3 = {}
+			elif game_data.client4:
+				if game_data.client4['client_id'] == self.client_id:
+					if game_data.client4['ready_status'] == 'ready':
+						game_data.QuantityPlayerReady -= 1
+					game_data.client4 = {}
 
 			if self.number_paddle == 'paddle1':
 				game_data.paddle1 = {}
@@ -224,8 +228,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		try:
 			with transaction.atomic():
 				self.game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
-		except:
-			print("Wrong Url ! (can not match game id)")
+		except Exception as e:
+			print("Wrong Url ! (can not match game id)", e)
 			self.send(self.make_json_response('info', 'error', {'error': 'Wrong Url ! (can not match game id)'}))
 			self.close()
 
@@ -371,8 +375,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				self.n_client = 'client3'
 			elif game_data.client4['client_id'] == self.client_id:
 				self.n_client = 'client4'
-		except:
-			print("Somthing Wrong!")
+		except Exception as e:
+			print("Somthing Wrong!", e)
 
 	async def initialize_game(self):
 		await self.init_n_client()
@@ -394,8 +398,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				game_data.client4['ready_status'] = "ready"
 			game_data.QuantityPlayerReady += 1
 			game_data.save()
-		except:
-			print("Something Error!")
+		except Exception as e:
+			print("Something3 Error!", e)
 			self.close()
 
 	@database_sync_to_async
@@ -488,8 +492,8 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				await self.move_paddle(direction)
 			else:
 				await self.send(await self.make_json_response('info', 'error', {'error': 'There is nothings to do!'}))
-		except:
-			print("Something Wrong!")
+		except Exception as e:
+			print("Something2 Wrong!", e)
 			self.close()
 
 	# broadcasting for game event: ex. start/end
@@ -681,6 +685,13 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 
 		game_data.save()
 
+	@database_sync_to_async
+	@transaction.atomic()
+	def check_quantity_and_delete_game(self):
+		game_data = MultiRoomInfo.objects.select_for_update().get(Roomid=self.game_id)
+		if game_data.QuantityPlayer == 0:
+			game_data.delete()
+
 	async def ball_move_thread(self):
 		await self.get_game_data()
 		while self.game_data.GameStatus == True:
@@ -750,6 +761,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 													},
 													'sender_channel_name': self.channel_name,
 												})
+		await self.check_quantity_and_delete_game()
 
 	async def paddle_ball_collision(self):
 		left_paddle1 = self.game_data.paddle1

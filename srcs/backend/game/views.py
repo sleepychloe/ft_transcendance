@@ -173,7 +173,7 @@ class GameRoomJoinView(View):
 						"intra_id" : room.client4["intra_id"],
 						"avatar" : room.client4["avatar"]
 				}
-			return JsonResponse(response)
+			return JsonResponse(response, safe=False, status=200)
 		else:
 			return JsonResponse({"Error": "Game id does not exist"}, status=404)
 

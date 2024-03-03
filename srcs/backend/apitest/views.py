@@ -185,7 +185,8 @@ class TESTGameRoomMoveView(View):
 				return JsonResponse({"Error":"can not find game id"}, status=400)
 		try:
 			body = json.loads(request.body)
-		except:
+		except Exception as e:
+			print(e)
 			return JsonResponse({"Error":"not form of json"}, status=400)
 		if not (
 			body['client_id'] and
