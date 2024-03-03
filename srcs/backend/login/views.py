@@ -3,7 +3,7 @@ from django.views import View
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.core.files import File
 from django.urls import reverse
-from .models import User42Info
+from user.models import User42Info
 from django.db import transaction
 from index.views import index
 import json

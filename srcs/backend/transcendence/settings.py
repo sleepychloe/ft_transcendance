@@ -37,6 +37,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 INSTALLED_APPS = [
     'daphne',
     'channels',
+    'user.apps.UserConfig',
 	'apitest.apps.ApitestConfig',
     'login.apps.LoginConfig',
 	'game.apps.GameConfig',
