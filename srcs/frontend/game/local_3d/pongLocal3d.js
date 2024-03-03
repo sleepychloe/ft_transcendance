@@ -54,24 +54,27 @@ function handleButtonClick() {
 	local3dMode = true;
 	paddleHit = 0;
 	document.getElementById("pong3dCanvas").className = "d-flex";
-	document.getElementById("pong3dLeft").className = "d-flex";
-	document.getElementById("pong3dRight").className = "d-flex";
-
 	let widthMain, heightMain, widthSub, heightSub;
 	let proportion = 0.5;
 
 	// mobile mode && rotated
-	if (isMobileDevice() && window.innerWidth > window.innerHeight) {
-		heightMain = window.innerHeight - 4 - 47;
-		if (window.innerHeight > 400) {
-			widthMain = 400 - 4;
+	if (isMobileDevice() && window.screen.width > window.screen.height) {
+		heightMain = window.screen.height - 4 - 47;
+		if (window.screen.height > 400) {
+			heightMain = 400 - 4;
 		}
 		widthMain = heightMain / proportion;
-	} else { // web mode, mobile mode && not rotated
-		widthMain = window.innerWidth - 4;
-
-		if (window.innerWidth > 800) {
-			widthMain = 800 - 4;
+	} else { 
+		if (isMobileDevice()) { // mobile mode && not rotated
+			widthMain = window.screen.width - 4;
+			if (window.screen.width > 800) {
+				widthMain = 800 - 4;
+			}
+		} else { // web mode
+			widthMain = window.innerWidth - 4;
+			if (window.innerWidth > 800) {
+				widthMain = 800 - 4;
+			}
 		}
 		heightMain = widthMain * proportion;
 	}
@@ -101,6 +104,17 @@ function handleButtonClick() {
 	game_data['mainCanvasHeight'] = heightMain;
 	game_data['subCanvasWidth'] = widthSub;
 	game_data['subCanvasHeight'] = heightSub;
+
+	if (isMobileDevice() && window.innerHeight < 650) {
+		document.getElementById("pong3dLeft").className = "d-none";
+		document.getElementById("pong3dRight").className = "d-none";
+	} else {
+		if (gameInProgress === true && pongCanvasLeft && pongCanvasRight) {
+			document.getElementById("pong3dLeft").className = "d-flex";
+			document.getElementById("pong3dRight").className = "d-flex";
+		}
+	}
+
 	startMatch();
 }
 
@@ -255,17 +269,23 @@ function init() {
 		let proportion = 0.5;
 
 		// mobile mode && rotated
-		if (isMobileDevice() && window.innerWidth > window.innerHeight) {
+		if (isMobileDevice() && window.screen.width > window.screen.height) {
 			heightMain = window.innerHeight - 4 - 47;
-			if (window.innerHeight > 400) {
-				widthMain = 400 - 4;
+			if (window.screen.height > 400) {
+				heightMain = 400 - 4;
 			}
 			widthMain = heightMain / proportion;
-		} else { // web mode, mobile mode && not rotated
-			widthMain = window.innerWidth - 4;
-
-			if (window.innerWidth > 800) {
-				widthMain = 800 - 4;
+		} else {
+			if (isMobileDevice()) { // mobile mode && not rotated
+				widthMain = window.screen.width - 4;
+				if (window.screen.width > 800) {
+					widthMain = 800 - 4;
+				}
+			} else { // web mode
+				widthMain = window.innerWidth - 4;
+				if (window.innerWidth > 800) {
+					widthMain = 800 - 4;
+				}
 			}
 			heightMain = widthMain * proportion;
 		}
@@ -295,10 +315,6 @@ function init() {
 		game_data['subCanvasWidth'] = widthSub;
 		game_data['subCanvasHeight'] = heightSub;
 
-
-
-
-
 		camera.aspect = game_data['mainCanvasWidth'] / game_data['mainCanvasHeight'];
 		camera.updateProjectionMatrix();
 		renderer.setSize(game_data['mainCanvasWidth'], game_data['mainCanvasHeight']);
@@ -306,11 +322,21 @@ function init() {
 
 		cameraLeft.aspect = game_data['subCanvasWidth'] / game_data['subCanvasHeight'];
 		cameraLeft.updateProjectionMatrix();
-		rendererLeft.setSize(game_data['subCanvasWidth'], game_data['subCanvasHeight']);;
+		rendererLeft.setSize(game_data['subCanvasWidth'], game_data['subCanvasHeight']);
 
 		cameraRight.aspect = game_data['subCanvasWidth'] / game_data['subCanvasHeight'];
 		cameraRight.updateProjectionMatrix();
-		rendererRight.setSize(game_data['subCanvasWidth'], game_data['subCanvasHeight']);;
+		rendererRight.setSize(game_data['subCanvasWidth'], game_data['subCanvasHeight']);
+
+		if (isMobileDevice() && window.innerHeight < 650) {
+			document.getElementById("pong3dLeft").className = "d-none";
+			document.getElementById("pong3dRight").className = "d-none";
+		} else {
+			if (gameInProgress === true && pongCanvasLeft && pongCanvasRight) {
+				document.getElementById("pong3dLeft").className = "d-flex";
+				document.getElementById("pong3dRight").className = "d-flex";
+			}
+		}
 	}
 }
 

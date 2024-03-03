@@ -76,7 +76,7 @@ function onWindowResize(game_data={}) {
     if (isMobileDevice() && window.innerWidth > window.innerHeight) {
         height = window.innerHeight - 4 -47;
         if (window.innerHeight > 400) {
-            width = 400 - 4;
+            height = 400 - 4;
         }
         width = height / proportion;
     } else { // web mode, mobile mode && not rotated
