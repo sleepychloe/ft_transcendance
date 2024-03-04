@@ -63,6 +63,16 @@ function gc(url="") {
                 console.log('reset game for multi');
                 multiFinishGame();
                 disconnectGame();
+                let myModalEl = document.getElementById('createRoomModal');
+                if (myModalEl)
+                {
+                        console.log('createRoomModal found');
+                        let modal = bootstrap.Modal.getInstance(myModalEl);
+                        if (modal) {
+                                console.log('Modal found');
+                                modal.hide();
+                        }
+                }
         }
 }
 
@@ -75,7 +85,6 @@ const navigate = url => {
 document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('popstate', function (event) {
                 gc(history[history.length - 1]);
-                history.pop();
                 app();
         });
         // prevent default behaviour for all HTML <a> tags

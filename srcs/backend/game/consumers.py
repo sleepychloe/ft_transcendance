@@ -493,10 +493,14 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 					'data': data,
 				}))
 		elif action == 'finish':
+			await self.get_game_data()
 			await self.send(text_data=json.dumps({
 					'info': 'game',
 					'type': 'finish',
-					'data': {},
+					'data': {
+						"room_id": self.game_data.Roomid,
+						"quantity_player" : self.game_data.QuantityPlayer,
+					},
 			}))
 
 
@@ -729,14 +733,12 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		#out of scope while
 		await self.init_game_value2()
 		await self.reset_game_paddle_value()
+		await self.get_game_data()
 		await self.channel_layer.group_send(self.game_id,
 												{
 													'type': 'game_status',
 													'action': 'finish',
-													'data': {
-														'quantity_player': self.game_data.QuantityPlayer,
-														'quantity_player_ready': self.game_data.QuantityPlayerReady,
-													},
+													'data': {},
 													'sender_channel_name': self.channel_name,
 												})
 		await self.check_quantity_and_delete_game()

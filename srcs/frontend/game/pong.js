@@ -249,8 +249,12 @@ export function resetGame(game_data = {}) {
     game_data['gameLoopId'] = null;
     game_data['score1'] = 0;
     game_data['score2'] = 0;
-    document.getElementById("score1").textContent = game_data['score1'];
-    document.getElementById("score2").textContent = game_data['score2'];
+    let score1 = document.getElementById("score1");
+    let score2 = document.getElementById("score2");
+    if (score1 && score2) {
+        score1.textContent = game_data['score1'];
+        score2.textContent = game_data['score2'];
+    }
     if (game_data['tournamentModeFlag'] === 1) {
         const numPlayersElement = document.getElementById("numPlayers");
         if (numPlayersElement) {
@@ -269,7 +273,9 @@ export function resetGame(game_data = {}) {
         game_data['players'] = [];
     }
     game_data['currentMatchIndex'] = 0;
-    document.getElementById("pongCanvas").className = "d-none";
+    let pc = document.getElementById("pongCanvas");
+    if (pc)
+        pc.className = "d-none";
     document.removeEventListener('keydown', movePaddle);
     document.removeEventListener('keyup', stopPaddle);
     document.removeEventListener('touchstart', touchStartPaddle);

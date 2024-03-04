@@ -281,6 +281,7 @@ function reqWsConnection(url = "") {
 					multiPlayerUnsetReady(ws, data);
 					updateReadyButton(false);
 					updateLobbySlot(data.quantity_player_ready);
+					updateLobbyPlayerList(data);
 					multiFinishGame();
 				} else {
 					console.log('wrong game info type has been recieved: ', response.type);
