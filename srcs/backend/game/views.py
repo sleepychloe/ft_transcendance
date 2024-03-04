@@ -44,7 +44,7 @@ class GameRoomMakeView(View):
 				decoded_token = jwt.decode(token, os.getenv("JWT_SECRET_KEY"), algorithms=['HS256'])
 				user_name = decoded_token['user_name']
 				if User42Info.objects.filter(Username=user_name).exists():
-					user_info = User42Info.objects.filter(Username=user_name)
+					user_info = User42Info.objects.get(Username=user_name)
 					self.intra_id = user_info.Userid
 					self.avatar = user_info.Useravatar
 				else:

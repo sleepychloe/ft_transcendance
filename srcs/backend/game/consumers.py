@@ -43,10 +43,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 			return 'client4'
 		return None
 
-	# @database_sync_to_async
-	# def get_user_avatar(self):
-
-
 	async def connect(self):
 		try:
 			await self.accept()
@@ -61,21 +57,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 				await self.send(await self.make_json_response('info', 'error', {'error': 'Can not found your id!'}))
 				self.close()
 				return
-			# match = re.search(r'jwt_token=([^;]*)', cookies)
-			# if match:
-			# 	jwt_token = match.group(1)
-			# 	jwt_info = jwt.decode(jwt_token, os.getenv("JWT_SECRET_KEY"), algorithms=['HS256'])
-			# 	self.intra_id = jwt_info['user_id']
-			# 	if User42Info.objects.filter(Userid=self.intra_id).exists():
-			# 		user_data = User42Info.objects.get(Userid=self.intra_id)
-			# 		self.avatar = user_data.Useravatar
-			# 	else:
-			# 		self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp" 
-			# 	print(self.intra_id)
-			# 	print(self.avatar)
-			# else:
-			# 	self.intra_id = "Player"
-			# 	self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
 			game_id = self.scope["url_route"]["kwargs"]["game_id"]
 			self.game_id = game_id
 			await self.get_game_data()
@@ -95,8 +76,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 															'quantity_player': self.game_data.QuantityPlayer,
 															'quantity_player_ready': self.game_data.QuantityPlayerReady,
 															'n_client': self.n_client,
-															# 'intra_id': self.intra_id,
-															# 'user_avatar': self.avatar,
 															'sender_channel_name': self.channel_name,
 														})
 				player_info = await self.get_value_game_data(self.n_client)
@@ -527,8 +506,6 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 		quantity_player = event['quantity_player']
 		n_client = event['n_client']
 		action = event['action']
-		# intra_id = event['intra_id']
-		# user_avatar = event['user_avatar']
 		if self.channel_name != event['sender_channel_name']:
 			if action == 'join':
 				await self.send(text_data=json.dumps({
@@ -538,8 +515,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 						'n_client': n_client,
 						'quantity_player': quantity_player,
 						'quantity_player_ready': quantity_player_ready,
-						# 'intra_id': intra_id,
-						# 'user_avatar': user_avatar,
+						'room_id': self.game_id
 					},
 				}))
 		if action == 'ready':
@@ -570,6 +546,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 					'n_client': n_client,
 					'quantity_player': quantity_player,
 					'quantity_player_ready': quantity_player_ready,
+					'room_id': self.game_id
 				}
 			}))
 		elif action == 'reconnect':
@@ -580,6 +557,7 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 					'n_client': n_client,
 					'quantity_player': quantity_player,
 					'quantity_player_ready': quantity_player_ready,
+					'room_id': self.game_id
 				}
 			}))
 
