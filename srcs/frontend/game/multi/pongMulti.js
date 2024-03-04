@@ -106,7 +106,7 @@ export async function multiPlayerUnsetReady(ws = {}, data = {}) {
 	btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-none";
 }
 
-function updateLobbyPlayerList(data = {}) {
+function updateLobbyPlayerList(data={}) {
 	let lobbyPlayerList = document.getElementById('lobby-players-list');
 	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player));
 }
@@ -354,8 +354,9 @@ export function multiCreateRoom() {
 			let mainTitle = document.getElementById('main-title');
 			mainTitle.innerHTML = data.room_name;
 
+			let room = await getRoomPlayerInfo(apiBaseURL + data.room_id);
 			if (data.status === 'create') {
-				mainPart.appendChild(lobbyComponent(ws, data));
+				mainPart.appendChild(lobbyComponent(ws, data, room));
 			}
 		} else {
 			console.groupCollapsed('server responded with error');
@@ -385,6 +386,13 @@ async function reqJoinRoom(url = "", room_id = "") {
 	}
 }
 
+async function getRoomPlayerInfo(url="") {
+	let roomInfo = await fetch(url).then(async (response) => {
+		return await response.json();
+	});
+	return roomInfo;
+}
+
 export function multiJoinRoom() {
 	console.log('sending request to join room...');
 	let mainPart = document.getElementById('app');
@@ -402,10 +410,12 @@ export function multiJoinRoom() {
 
 			let mainTitle = document.getElementById('main-title');
 			mainTitle.innerHTML = data.room_name;
+			
+			let room = await getRoomPlayerInfo(apiBaseURL + room_id);
 			if (data.status === 'join') {
-				mainPart.appendChild(lobbyComponent(ws, data));
+				mainPart.appendChild(lobbyComponent(ws, data, room));
 			} else if (data.status === 'reconnect') {
-				mainPart.appendChild(lobbyComponent(ws, data));
+				mainPart.appendChild(lobbyComponent(ws, data, room));
 				multiStartGame();
 			}
 		} else {

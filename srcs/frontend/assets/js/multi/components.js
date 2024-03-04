@@ -62,12 +62,13 @@ export function multiGameScreenComponent() {
 	return container;
 }
 
-export function lobbyComponent(ws={}, data={}) {
+export function lobbyComponent(ws={}, data={}, room={}) {
 	let lobby = document.createElement('div');
 	lobby.setAttribute('id', 'lobby');
 	lobby.className = "d-flex flex-column justify-content-center";
+	console.log('lobbyComponent: ', room);
 	lobby.appendChild(lobbyPlayersReadyComponent(data.quantity_player_ready));
-	lobby.appendChild(lobbyListPlayersComponent(data.quantity_player));
+	lobby.appendChild(lobbyListPlayersComponent(data.quantity_player, room));
 	lobby.appendChild(lobbyReadyButtonComponent(ws, data.n_client));
 	return lobby;
 }
@@ -113,7 +114,7 @@ function lobbyPlayersReadyComponent(quantity_player_ready=0) {
 	return lobbySlot;
 }
 
-function lobbyPlayersListItemComponent(playerId="client", n=0) {
+function lobbyPlayersListItemComponent(playerId="client", n=0, room={}) {
 	let listItem = document.createElement('div');
 	listItem.className = 'd-flex flex-column justify-content-center mb-1';
 	listItem.setAttribute("id", playerId);
@@ -132,25 +133,25 @@ function lobbyPlayersListItemComponent(playerId="client", n=0) {
 
 	let iconImage = document.createElement('img');
 	iconImage.className = 'card-img-left';
-	iconImage.src = '/static/assets/img/user-person-single-id-account-player-male-female-512.webp';
+	iconImage.src = room.avatar;
 	iconImage.alt = 'playerIcon';
 	iconBox.appendChild(iconImage);
 
 	let playersName = document.createElement('div');
 	playersName.className = 'd-flex justify-content-center card-title text-center text-md-start fs-5 m-auto';
-	playersName.innerHTML = `${l.client}` + n;
+	playersName.innerHTML = room.intra_id;//`${l.client}` + n;
 	iconBox.appendChild(playersName);
 
 	return listItem;
 }
 
-export function lobbyListPlayersComponent(quantity_player=0) {
+export function lobbyListPlayersComponent(quantity_player=0, room={}) {
 	let lobbyPlayerList = document.createElement('div');
 	lobbyPlayerList.setAttribute('id', 'lobby-players-list');
 	lobbyPlayerList.className = "d-flex flex-column justify-content-center";
 	try {
-		for (let i = 0; i < quantity_player; i++) {
-			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent('client' + (i + 1), i + 1));
+		for (let i = 1; i < quantity_player + 1; i++) {
+			lobbyPlayerList.appendChild(lobbyPlayersListItemComponent('client' + i, i, room['client' + i]));
 		}
 	} catch {
 		return responseMsgComponent(`${l.errorLoadingLobby}`);
