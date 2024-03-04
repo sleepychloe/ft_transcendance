@@ -29,7 +29,7 @@ class Auth42CallBackView(View):
 	def get(self, request):
 		code = request.GET.get('code', None)
 		if code == None:
-			return HttpResponseForbidden(context={"Error": "No code in request"})
+			return HttpResponseForbidden()
 		
 		auth_client =  os.getenv("42_AUTH_CLIENT_KEY")
 		auth_secret = os.getenv("42_AUTH_SECRET_KEY")
@@ -39,11 +39,11 @@ class Auth42CallBackView(View):
 		
 		response = requests.post("https://api.intra.42.fr/oauth/token/", data=data)
 		if response.status_code != 200:
-			return HttpResponseForbidden({"Error": "Not good code"})
+			return HttpResponseForbidden()
 		token = response.json().get('access_token')
 		user_data = self.save_or_find_user_info(token)
 		if user_data == None:
-			return HttpResponseForbidden({"Error": "42 api server no response"})
+			return HttpResponseForbidden()
 		jwt_secret_key = os.getenv("JWT_SECRET_KEY")
 		jwt_token = jwt.encode({"user_name" : user_data.Username, "user_id": user_data.Userid},
 						 jwt_secret_key, algorithm="HS256")

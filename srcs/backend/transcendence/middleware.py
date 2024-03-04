@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import HttpResponse
 import jwt
 import os
 # from .
@@ -27,13 +27,13 @@ def jwt_middleware(get_response):
 
             jwt_token = request.COOKIES.get('jwt_token', None)
             if jwt_token == None:
-                return JsonResponse({'error': 'JWT token not found in the Authorization header'}, status=401)
+                return HttpResponse(status=401)
             if not jwt_verification(jwt_token):
-                return JsonResponse({'error': 'Invalid token'}, status=401)
+                return HttpResponse(status=401)
 
             response = get_response(request)
             return response
 
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=401)
+            return HttpResponse(status=401)
     return middleware
