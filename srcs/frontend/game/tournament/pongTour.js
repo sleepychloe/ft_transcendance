@@ -18,10 +18,6 @@ export function startTournamentMode() {
     game_data['tournamentModeFlag'] = 1;
     canvasInit(game_data);
     resetGame(game_data);
-    document.addEventListener('keydown', movePaddle);
-    document.addEventListener('keyup', stopPaddle);
-    document.addEventListener('touchstart', touchStartPaddle);
-    document.addEventListener('touchend', touchEndPaddle);
 }
 
 export function createPlayerInputs() {
@@ -80,6 +76,10 @@ export function registerPlayers() {
         document.getElementById("registerPlayersButton").className = "btn btn-success m-auto d-none";
         document.getElementById("registration").className = "flex-column justify-content-center d-none";
         document.getElementById("pongCanvas").className = "d-flex";
+        document.addEventListener('keydown', movePaddle);
+        document.addEventListener('keyup', stopPaddle);
+        document.addEventListener('touchstart', touchStartPaddle);
+        document.addEventListener('touchend', touchEndPaddle);
         startMatch(game_data);
         game_data['isGameInProgress'] = true;
     }

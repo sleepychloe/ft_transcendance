@@ -356,21 +356,21 @@ export function endNormalGame(game_data = {}) {
 
 export const touchStartPaddle = (e) => {
     console.log('touchStartPaddle fired');
-    // game_data['touchstartX'] = e.changedTouches[0].screenX;
-    // game_data['touchstartY'] = e.changedTouches[0].screenY;
+    game_data['touchstartX'] = e.changedTouches[0].screenX;
+    game_data['touchstartY'] = e.changedTouches[0].screenY;
 }
 
 export const touchEndPaddle = (e) => {
     console.log('touchEndPaddle fired');
-    // game_data['touchendY'] = e.changedTouches[0].screenY;
-    // console.log('touchstartX: ', game_data['touchstartX'], ' screen.width: ', 1920);
-    // if (game_data['touchstartX'] > 1920 / 2) {
-    //     if (game_data['touchendY'] < game_data['touchstartY']) game_data['rightPaddleY'] -= game_data['paddleSpeed'];
-    //     if (game_data['touchendY'] > game_data['touchstartY']) game_data['rightPaddleY'] += game_data['paddleSpeed'];
-    // } else if (game_data['touchstartX'] <= 1920 / 2) {
-    //     if (game_data['touchendY'] < game_data['touchstartY']) game_data['leftPaddleY'] -= game_data['paddleSpeed'];
-    //     if (game_data['touchendY'] > game_data['touchstartY']) game_data['leftPaddleY'] += game_data['paddleSpeed'];
-    // }
+    game_data['touchendY'] = e.changedTouches[0].screenY;
+    console.log('touchstartX: ', game_data['touchstartX'], ' screen.width: ', window.innerWidth);
+    if (game_data['touchstartX'] > window.innerWidth / 2) {
+        if (game_data['touchendY'] < game_data['touchstartY']) game_data['rightPaddleY'] -= game_data['paddleSpeed'];
+        if (game_data['touchendY'] > game_data['touchstartY']) game_data['rightPaddleY'] += game_data['paddleSpeed'];
+    } else if (game_data['touchstartX'] <= window.innerWidth / 2) {
+        if (game_data['touchendY'] < game_data['touchstartY']) game_data['leftPaddleY'] -= game_data['paddleSpeed'];
+        if (game_data['touchendY'] > game_data['touchstartY']) game_data['leftPaddleY'] += game_data['paddleSpeed'];
+    }
 }
 
 export const movePaddle = async (e) => {

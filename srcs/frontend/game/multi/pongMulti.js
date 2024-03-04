@@ -107,6 +107,29 @@ function updateLobbySlot(quantity_player_ready = 0) {
 		lobbySlot.innerHTML = quantity_player_ready + '/4 ' + `${lan.ready}`;
 }
 
+let touchstartY;
+let touchendY;
+
+const touchStartPaddle = (e) => {
+    // console.log('touchStartPaddle fired');
+    touchstartY = e.changedTouches[0].screenY;
+}
+
+const touchEndPaddle = async (e) => {
+    // console.log('touchEndPaddle fired');
+    touchendY = e.changedTouches[0].screenY;
+	if (touchendY < touchstartY)
+		await ws.send(JSON.stringify({
+			'action': 'move_paddle',
+			'direction': "up",
+		}));
+	if (touchendY > touchstartY)
+		await ws.send(JSON.stringify({
+			'action': 'move_paddle',
+			'direction': "down",
+		}));
+}
+
 const sendPaddleMovement = async (e) => {
 	if (e.key === 'w' || e.key === 'i') {
 		await ws.send(JSON.stringify({
@@ -142,6 +165,8 @@ function multiStartGame() {
 		mainPart.appendChild(d);
 	}
 	document.addEventListener('keydown', sendPaddleMovement);
+	document.addEventListener('touchstart', touchStartPaddle);
+    document.addEventListener('touchend', touchEndPaddle);
 }
 
 export function multiFinishGame() {
@@ -155,6 +180,8 @@ export function multiFinishGame() {
 	if (scoreboard)
 		scoreboard.className = 'd-none flex-row justify-content-center fs-1 text-white';
 	document.removeEventListener('keydown', sendPaddleMovement);
+	document.removeEventListener('touchstart', touchStartPaddle);
+    document.removeEventListener('touchend', touchEndPaddle);
 }
 
 export function disconnectGame() {
