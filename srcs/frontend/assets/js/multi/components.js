@@ -135,6 +135,7 @@ function lobbyPlayersListItemComponent(playerId="client", n=0, room={}) {
 	iconImage.className = 'card-img-left';
 	iconImage.src = room.avatar;
 	iconImage.alt = 'playerIcon';
+	iconImage.style['border-radius'] = "50%"
 	iconBox.appendChild(iconImage);
 
 	let playersName = document.createElement('div');
