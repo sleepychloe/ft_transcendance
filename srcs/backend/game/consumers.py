@@ -165,17 +165,17 @@ class MultiGameConsumer(AsyncWebsocketConsumer):
 					if game_data.client1['ready_status'] == 'ready':
 						game_data.QuantityPlayerReady -= 1
 					game_data.client1 = {}
-			elif game_data.client2:
+			if game_data.client2:
 				if game_data.client2['client_id'] == self.client_id:
 					if game_data.client2['ready_status'] == 'ready':
 						game_data.QuantityPlayerReady -= 1
 					game_data.client2 = {}
-			elif game_data.client3:
+			if game_data.client3:
 				if game_data.client3['client_id'] == self.client_id:
 					if game_data.client3['ready_status'] == 'ready':
 						game_data.QuantityPlayerReady -= 1
 					game_data.client3 = {}
-			elif game_data.client4:
+			if game_data.client4:
 				if game_data.client4['client_id'] == self.client_id:
 					if game_data.client4['ready_status'] == 'ready':
 						game_data.QuantityPlayerReady -= 1

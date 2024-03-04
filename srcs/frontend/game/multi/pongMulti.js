@@ -70,6 +70,8 @@ export async function multiPlayerSetReady(ws = {}, data = {}) {
 	let btnUnready = document.getElementById('btn-multi-unready');
 	btnReady.setAttribute('disabled', true);
 	await ws.send(JSON.stringify(data));
+	btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-none";
+	btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-flex";
 }
 
 export async function multiPlayerUnsetReady(ws = {}, data = {}) {
@@ -78,11 +80,14 @@ export async function multiPlayerUnsetReady(ws = {}, data = {}) {
 	let btnUnready = document.getElementById('btn-multi-unready');
 	btnUnready.setAttribute('disabled', true);
 	await ws.send(JSON.stringify(data));
+	btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-flex";
+	btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-none";
 }
 
 async function updateLobbyPlayerList(data={}) {
 	let lobbyPlayerList = document.getElementById('lobby-players-list');
 	let roomInfo = await getRoomPlayerInfo(apiBaseURL + data.room_id);
+	console.log('updateLobbyPlayerList:roomInfo: ', roomInfo);
 	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player, roomInfo));
 }
 
@@ -90,12 +95,8 @@ function updateReadyButton(ready=false) {
 	let btnReady = document.getElementById('btn-multi-ready');
 	let btnUnready = document.getElementById('btn-multi-unready');
 	if (ready) {
-		btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-none";
-		btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-flex";
 		btnUnready.removeAttribute('disabled');
 	} else {
-		btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-flex";
-		btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-none";
 		btnReady.removeAttribute('disabled');
 	}
 }
@@ -366,10 +367,14 @@ async function reqJoinRoom(url = "", room_id = "") {
 }
 
 async function getRoomPlayerInfo(url="") {
-	let roomInfo = await fetch(url).then(async (response) => {
-		return await response.json();
-	});
-	return roomInfo;
+	try {
+		let roomInfo = await fetch(url).then(async (response) => {
+			return await response.json();
+		});
+		return roomInfo;
+	} catch {
+		console.log('failed to fetch data from the server');
+	}
 }
 
 export function multiJoinRoom() {
