@@ -64,36 +64,12 @@ function getCookie(name) {
 	return cookieValue;
 }
 
-// const createRoomOnEnter = async (e) => {
-// 	if (e.key === 'Enter') {
-// 		multiCreateRoom();
-// 	}
-// }
-
-// export function modalShow() {
-// 	document.getElementById('room-name-input').select();
-// }
-
-// function modalClose() {
-// 	let modal = document.getElementsByClassName('modal')[0];
-// 	let overlay = document.getElementsByClassName('overlay')[0];
-// 	let roomNameInput = document.getElementById('room-name-input');
-// 	if (modal && overlay && roomNameInput) {
-// 		roomNameInput.removeEventListener('keydown', createRoomOnEnter);
-// 		overlay.removeEventListener('click', modalClose);
-// 		modal.style.visibility = 'hidden';
-// 		overlay.style.visibility = 'hidden';
-// 	}
-// }
-
 export async function multiPlayerSetReady(ws = {}, data = {}) {
 	// console.log('player send ready to server: ', data);
 	let btnReady = document.getElementById('btn-multi-ready');
 	let btnUnready = document.getElementById('btn-multi-unready');
 	btnReady.setAttribute('disabled', true);
 	await ws.send(JSON.stringify(data));
-	btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-none";
-	btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-flex";
 }
 
 export async function multiPlayerUnsetReady(ws = {}, data = {}) {
@@ -102,8 +78,6 @@ export async function multiPlayerUnsetReady(ws = {}, data = {}) {
 	let btnUnready = document.getElementById('btn-multi-unready');
 	btnUnready.setAttribute('disabled', true);
 	await ws.send(JSON.stringify(data));
-	btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-flex";
-	btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-none";
 }
 
 async function updateLobbyPlayerList(data={}) {
@@ -116,8 +90,12 @@ function updateReadyButton(ready=false) {
 	let btnReady = document.getElementById('btn-multi-ready');
 	let btnUnready = document.getElementById('btn-multi-unready');
 	if (ready) {
+		btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-none";
+		btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-flex";
 		btnUnready.removeAttribute('disabled');
 	} else {
+		btnReady.className = "justify-content-center btn btn-success w-50 m-auto d-flex";
+		btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-none";
 		btnReady.removeAttribute('disabled');
 	}
 }
@@ -247,7 +225,7 @@ function reqWsConnection(url = "") {
 					updateReadyButton(false);
 					updateLobbySlot(data.quantity_player_ready);
 				} else {
-					console.warn('wrong player info type has been recieved: ', response.type);
+					console.log('wrong player info type has been recieved: ', response.type);
 				}
 			} else if (response.info === 'game') {
 				if (response.type === 'position') {
@@ -277,7 +255,7 @@ function reqWsConnection(url = "") {
 					updateLobbySlot(data.quantity_player_ready);
 					multiFinishGame();
 				} else {
-					console.warn('wrong game info type has been recieved: ', response.type);
+					console.log('wrong game info type has been recieved: ', response.type);
 				}
 			}
 		};
@@ -308,7 +286,7 @@ async function multiConnectWs(url = "", data = {}) {
 		ws.send(JSON.stringify(player_info));
 		return ws;
 	} catch (error) {
-		console.error('error on establishing websocket connection: ', error);
+		console.log('error on establishing websocket connection: ', error);
 	}
 }
 
@@ -327,8 +305,8 @@ async function reqCreateRoom(url = "", data = {}) {
 		const result = await response.json();
 		return result;
 	} catch (error) {
-		console.error('couldn\'t request to server to create a room: ', error);
-		return { 'Error': `${errorFailToLoad}` };
+		console.log('couldn\'t request to server to create a room: ', error);
+		return { 'Error': `${lan.errorFailToLoad}` };
 	}
 }
 
@@ -361,7 +339,7 @@ export function multiCreateRoom() {
 			}
 		} else {
 			console.groupCollapsed('server responded with error');
-			console.error('data: ', data);
+			console.log('data: ', data);
 			console.groupEnd();
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
@@ -421,7 +399,7 @@ export function multiJoinRoom() {
 			}
 		} else {
 			console.groupCollapsed('server responded with error');
-			console.error('data: ', data);
+			console.log('data: ', data);
 			console.groupEnd();
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
@@ -436,7 +414,7 @@ async function getListRoom(url = "") {
 		const result = await response.json();
 		return result;
 	} catch (error) {
-		console.error('couldn\'t request to server to get list room: ', error);
+		console.log('couldn\'t request to server to get list room: ', error);
 		return { 'Error': `${lan.errorFailToLoad}` };
 	}
 }
@@ -468,22 +446,9 @@ export function multiListRoom() {
 			mainPart.appendChild(d);
 		} else {
 			console.groupCollapsed('server responded with error');
-			console.error('data: ', data);
+			console.log('data: ', data);
 			console.groupEnd();
 			mainPart.appendChild(responseMsgComponent(data.Error));
 		}
 	});
 };
-
-//////////////////////// for debugging ////////////////////////
-function deleteAllCookies() {
-	const cookies = document.cookie.split(";");
-
-	for (let i = 0; i < cookies.length; i++) {
-		const cookie = cookies[i];
-		const eqPos = cookie.indexOf("=");
-		const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-		document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-	}
-}
-///////////////////////////////////////////////////////////////

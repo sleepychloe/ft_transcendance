@@ -6,6 +6,8 @@ import { get_data } from '/static/game/pong.js';
 import { t } from '/static/game/pong.js';
 import { movePaddle } from '/static/game/pong.js';
 import { stopPaddle } from '/static/game/pong.js';
+import { touchStartPaddle } from '/static/game/pong.js';
+import { touchEndPaddle } from '/static/game/pong.js';
 
 let game_data = get_data();
 
@@ -18,6 +20,8 @@ export function startTournamentMode() {
     resetGame(game_data);
     document.addEventListener('keydown', movePaddle);
     document.addEventListener('keyup', stopPaddle);
+    document.addEventListener('touchstart', touchStartPaddle);
+    document.addEventListener('touchend', touchEndPaddle);
 }
 
 export function createPlayerInputs() {
