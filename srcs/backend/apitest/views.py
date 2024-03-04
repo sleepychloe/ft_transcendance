@@ -144,6 +144,8 @@ class TESTGameRoomJoinView(View):
 			if not client_id:
 				client_id = create_new_uuid()
 				first_connection_flag = True
+			self.intra_id = "apitest"
+			self.avatar = "/static/assets/img/user-person-single-id-account-player-male-female-512.webp"
 			Nclient = self.check_client_id_for_data(game_id, client_id)
 			response = JsonResponse({'status': 'join', 'room_id' : game_id, 'room_name' : room.RoomName, 'quantity_player' : room.QuantityPlayer, 'quantity_player_ready' : room.QuantityPlayerReady, 'client_id': client_id, 'n_client': Nclient})			
 			if first_connection_flag == True:
@@ -154,24 +156,23 @@ class TESTGameRoomJoinView(View):
 			error_message = translations.get(current_language)['errQuantityPlayerExceed']
 			return JsonResponse({'Error': error_message}, status=400)
 	
-	@staticmethod
 	@transaction.atomic
-	def check_client_id_for_data(game_id, client_id):
+	def check_client_id_for_data(self, game_id, client_id):
 		room = MultiRoomInfo.objects.select_for_update().get(Roomid=game_id)
 		if not room.client1:
-			room.client1 = {'client_id': client_id,  'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.client1 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True, 'intra_id' : self.intra_id, 'avatar':self.avatar}
 			room.save()
 			return "client1"
 		elif not room.client2:
-			room.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.client2 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True, 'intra_id' : self.intra_id, 'avatar':self.avatar}
 			room.save()
 			return "client2"
 		elif not room.client3:
-			room.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.client3 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True, 'intra_id' : self.intra_id, 'avatar':self.avatar}
 			room.save()
 			return "client3"
 		elif not room.client4:
-			room.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True}
+			room.client4 = {'client_id': client_id, 'ready_status':"not ready", 'paddle': None, 'online': True, 'intra_id' : self.intra_id, 'avatar':self.avatar}
 			room.save()
 			return "client4"
 		
