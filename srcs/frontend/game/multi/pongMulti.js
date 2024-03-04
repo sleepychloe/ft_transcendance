@@ -108,7 +108,7 @@ export async function multiPlayerUnsetReady(ws = {}, data = {}) {
 
 async function updateLobbyPlayerList(data={}) {
 	let lobbyPlayerList = document.getElementById('lobby-players-list');
-	let roomInfo = await getRoomPlayerInfo(data.room_id);
+	let roomInfo = await getRoomPlayerInfo(apiBaseURL + data.room_id);
 	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player, roomInfo));
 }
 
