@@ -106,9 +106,10 @@ export async function multiPlayerUnsetReady(ws = {}, data = {}) {
 	btnUnready.className = "justify-content-center btn btn-danger w-50 m-auto d-none";
 }
 
-function updateLobbyPlayerList(data={}) {
+async function updateLobbyPlayerList(data={}) {
 	let lobbyPlayerList = document.getElementById('lobby-players-list');
-	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player));
+	let roomInfo = await getRoomPlayerInfo(data.room_id);
+	lobbyPlayerList.replaceWith(lobbyListPlayersComponent(data.quantity_player, roomInfo));
 }
 
 function updateReadyButton(ready=false) {
