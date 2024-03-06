@@ -90,7 +90,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'transcendence.middleware.jwt_middleware',
+    # 'transcendence.middleware.jwt_middleware',
 ]
 
 ROOT_URLCONF = 'transcendence.urls'
