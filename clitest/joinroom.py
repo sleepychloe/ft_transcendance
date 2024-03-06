@@ -5,8 +5,10 @@ import json
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-view_uri_template = "https://10.12.1.3:4243/apitest/{game_id}/"
-base_uri = "https://10.12.1.3:4243/"
+# view_uri_template = "https://10.12.1.3:4243/apitest/{game_id}/"
+view_uri_template = "https://localhost:4243/apitest/{game_id}/"
+# base_uri = "https://10.12.1.3:4243/"
+base_uri = "https://localhost:4243/"
 
 def game_view_request(game_id):
     uri = view_uri_template.format(game_id=game_id)

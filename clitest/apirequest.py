@@ -5,10 +5,12 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-uri_template = "https://10.12.1.3:4243/apitest/{game_id}/move"
+# uri_template = "https://10.12.1.3:4243/apitest/{game_id}/move"
+uri_template = "https://localhost:4243/apitest/{game_id}/move"
 
 
-base_uri = "https://10.12.1.3:4243/apitest/"
+# base_uri = "https://10.12.1.3:4243/apitest/"
+base_uri = "https://localhost:4243/apitest/"
 
 def get_cookie():
     session = requests.Session()
