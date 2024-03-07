@@ -112,6 +112,8 @@ Success 125/100
 
 
 ### Accessibility: Support on all devices
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/564323ce-65ef-42ee-8ab9-98d382782c5d)
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/2152d9e3-9344-486f-a0ff-1d7da0ca0ac7)
 
 
 ### Accessibility: Expanding Browser Compatibility
