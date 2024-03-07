@@ -9,6 +9,17 @@ Tested on Linux
 
 Success 125/100
 
+
+## Installation
+
+```bash
+  git clone https://github.com/sleepychloe/ft_transcendance.git
+  cd ft_transcendance
+  make
+  (utl) https://localhost:4243
+```
+
+
 ## Modules
 
 ```
@@ -36,13 +47,6 @@ Success 125/100
 ```
 
 
-## Installation
-
-```bash
-  git clone https://github.com/sleepychloe/ft_transcendance.git
-  cd ft_transcendance
-  make
-  (utl) https://localhost:4243
-```
+## 
 
 
