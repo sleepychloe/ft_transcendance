@@ -32,7 +32,7 @@ ifneq ($(findstring ft_network, $(shell docker network ls)), ft_network)
 	@echo "$(YELLOW)There is no docker-network named ft_network$(RESET)"
 else
 	@docker network ls | head -$(shell echo $(NETWORK_NUM)-1 | bc -l)
-	@echo "$(YELLOW)$(shelldocker network ls | grep ft_network)$(RESET)"
+	@echo "$(YELLOW)$(shell docker network ls | grep ft_network)$(RESET)"
 	@docker network ls | tail -$(shell echo $(shell echo $(NETWORK_NUM)\
 	-$(shell echo $(NETWORK_NUM)-1 | bc -l) | bc -l))
 endif
@@ -83,6 +83,13 @@ ifneq ($(shell docker volume ls | wc -l), 1)
 	@echo "$(YELLOW)Volumes successfully removed$(RESET)"
 else
 	@echo "$(YELLOW)There is no volume to remove$(RESET)"
+endif
+
+ifneq ($(shell docker image ls | wc -l), 1)
+	@docker image prune -f
+	@echo "$(YELLOW)Images successfully removed$(RESET)"
+else
+	@echo "$(YELLOW)There is no image to remove$(RESET)"
 endif
 
 re: fclean up

@@ -2,7 +2,7 @@ import json
 import argparse
 import websocket
 from websocket import create_connection
-from websockets.exceptions import WebSocketException
+# from websockets.exceptions import WebSocketException
 import ssl
 import urllib3
 import requests
