@@ -86,30 +86,47 @@ Success 125/100
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/9b735623-72c3-4caf-848f-b75a1fca14c8)
 
 
-### List of Docker Containers for Web Modules
+#### List of Docker Containers for Web Modules
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/5c656fa5-13b0-430e-abf6-3fb2d67f3720)
 
 
 ### User Management: Implementing a remote authentication
+###### we disabled this module after submitting out project, so everyone can access to our ft_transcendance
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/25391541-1343-4db5-a4dc-918a6494dbcd)
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/d38f0648-4cd4-48f6-a0af-38ad9bd1ff80)
 
 
 ### Gameplay and UX: Remote Players
 ### Gameplay and UX: Multiplayers
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/gameplay/remote%26multi.gif)
 
 
 ### Devops: Infrastructure Setup for Log Management
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/752ce14c-da3e-41ca-b427-0de45fd0bd17)
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/fde70b3d-ddbe-479e-9241-b0c3c0e2a6b8)
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/9eb06fcb-f7bc-4da1-8f7b-b0294686da6d)
 
 
 ### Graphics: Use of advanced 3D techniques
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/graphics/advanced_3D_techniques_1.gif)
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/graphics/advanced_3D_techniques_2.gif)
 
 
 ### Accessibility: Support on all devices
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/635602d3-ec13-4c90-9bc6-dd17c52df8a7)
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/7594c31c-25cb-4751-b4e2-bd7930d22a88)
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/40675b36-0876-4a4e-9607-aeec9ddf520b)
 
 
 ### Accessibility: Expanding Browser Compatibility
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/expanding_browser_compatibility_1.gif)
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/expanding_browser_compatibility_2.gif)
 
 
 ### Accessibility: Multiple Language Supports
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/multiple_language_1.gif)
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/multiple_language_2.gif)
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/multiple_language_3.gif)
 
 
 ### Server-Side Pong: Replacing Basic Pong with Server-Side Pong and Implementing an API
