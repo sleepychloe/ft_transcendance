@@ -74,4 +74,42 @@ Success 125/100
 
 ## Modules
 
+### Web: Use a Framework as backend
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/063fd48d-29b5-40df-ab85-0b90cc92259e)
 
+
+### Web: Use a front-end framework or toolkit
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/4788cf0a-1290-470e-84b0-5d452ddeff85)
+
+
+### Web: Use a database for the backend
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/9b735623-72c3-4caf-848f-b75a1fca14c8)
+
+
+### List of Docker Containers for Web Modules
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/5c656fa5-13b0-430e-abf6-3fb2d67f3720)
+
+
+### User Management: Implementing a remote authentication
+
+
+### Gameplay and UX: Remote Players
+### Gameplay and UX: Multiplayers
+
+
+### Devops: Infrastructure Setup for Log Management
+
+
+### Graphics: Use of advanced 3D techniques
+
+
+### Accessibility: Support on all devices
+
+
+### Accessibility: Expanding Browser Compatibility
+
+
+### Accessibility: Multiple Language Supports
+
+
+### Server-Side Pong: Replacing Basic Pong with Server-Side Pong and Implementing an API
