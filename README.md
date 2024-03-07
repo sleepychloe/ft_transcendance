@@ -91,13 +91,12 @@ Success 125/100
 
 
 ### User Management: Implementing a remote authentication
-###### we disabled this module after submitting out project, so everyone can access to our ft_transcendance
+##### we disabled this module after submitting out project, so everyone can access to our ft_transcendance
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/25391541-1343-4db5-a4dc-918a6494dbcd)
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/d38f0648-4cd4-48f6-a0af-38ad9bd1ff80)
 
 
-### Gameplay and UX: Remote Players
-### Gameplay and UX: Multiplayers
+### Gameplay and UX: Remote Players & Multiplayers
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/gameplay/remote%26multi.gif)
 
 
@@ -113,9 +112,6 @@ Success 125/100
 
 
 ### Accessibility: Support on all devices
-![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/635602d3-ec13-4c90-9bc6-dd17c52df8a7)
-![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/7594c31c-25cb-4751-b4e2-bd7930d22a88)
-![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/40675b36-0876-4a4e-9607-aeec9ddf520b)
 
 
 ### Accessibility: Expanding Browser Compatibility
