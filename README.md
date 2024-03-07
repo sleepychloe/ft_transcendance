@@ -47,6 +47,23 @@ Success 125/100
 ```
 
 
-## 
+## Transcendance page
+
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/ft_transcendance/home.gif)
+###### ↳ Home
+
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/ft_transcendance/local.gif)
+###### ↳ Local
+
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/ft_transcendance/local_3d.gif)
+###### ↳ Local 3D
+
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/ft_transcendance/tournament.gif)
+###### ↳ Tournament
+
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/9deaede6-0982-4e68-974a-0472c5b47e14)
+![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/b70c79a9-da2c-4d6a-adf9-d7bb7a6d7d3e)
+![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/ft_transcendance/multi_3.gif)
+###### ↳ Multi
 
 
