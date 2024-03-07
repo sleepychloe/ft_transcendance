@@ -93,7 +93,7 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
 
 
 ### User Management: Implementing a remote authentication
-##### we disabled this module after submitting out project, so everyone can access to our ft_transcendance
+##### we disabled this module after submitting out project, so everyone can access our ft_transcendance
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/25391541-1343-4db5-a4dc-918a6494dbcd)
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/d38f0648-4cd4-48f6-a0af-38ad9bd1ff80)
 
