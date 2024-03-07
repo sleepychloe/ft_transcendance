@@ -9,6 +9,8 @@ Tested on Linux
 
 Success 125/100
 
+DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
+
 
 ## Installation
 
