@@ -18,7 +18,7 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
   git clone https://github.com/sleepychloe/ft_transcendance.git
   cd ft_transcendance
   make
-  (utl) https://localhost:4243
+  (url) https://localhost:4243
 ```
 
 
