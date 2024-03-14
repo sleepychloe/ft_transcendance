@@ -1,6 +1,6 @@
 ## ft_transcendence version 14.1 in ecole42 PARIS
 - [ychun](https://profile.intra.42.fr/users/ychun) (Yugeon CHUN)
-- [ywhang](https://profile.intra.42.fr/users/yhwang) (Chloe HWANG)
+- [yhwang](https://profile.intra.42.fr/users/yhwang) (Chloe HWANG)
 - [schaehun](https://profile.intra.42.fr/users/schaehun) (Chaehun SONG)
 
 Mandatory part + Bonus part
