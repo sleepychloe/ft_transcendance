@@ -25,24 +25,24 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
 ## Modules
 
 [Web]<br>
-  Major: [Use a Framework as backend](#web-backend) (1)<br>
-  Minor: [Use a front-end framework or toolkit](#web-frontend) (0.5)<br>
-  Minor: [Use a database for the backend](#web-database) (0.5)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Major: [Use a Framework as backend](#web-backend) (1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Minor: [Use a front-end framework or toolkit](#web-frontend) (0.5)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Minor: [Use a database for the backend](#web-database) (0.5)<br>
 [User Management]<br>
-  Major: [Implementing a remote authentication](user-management-remote-auth) (1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Major: [Implementing a remote authentication](user-management-remote-auth) (1)<br>
 [Gameplay and UX]<br>
-  Major: [Remote Players](gameplay-remote-multi) (1)<br>
-  Major: [Multiplayers](gameplay-remote-multi) (1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Major: [Remote Players](gameplay-remote-multi) (1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Major: [Multiplayers](gameplay-remote-multi) (1)<br>
 [Devops]<br>
-  Major: [Infrastructure Setup for Log Management](devops-log) (1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Major: [Infrastructure Setup for Log Management](devops-log) (1)<br>
 [Graphics]<br>
-  Major: [Use of advanced 3D techniques](3d-technique) (1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Major: [Use of advanced 3D techniques](3d-technique) (1)<br>
 [Accessibility]<br>
-  Minor: [Support on all devices](accessibility-support-all-devices) (0.5)<br>
-  Minor: [Expanding Browser Compatibility](accessibility-browser-compatibility) (0.5)<br>
-  Minor: [Multiple Language Supports](accessibility-multiple-language) (0.5)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Minor: [Support on all devices](accessibility-support-all-devices) (0.5)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Minor: [Expanding Browser Compatibility](accessibility-browser-compatibility) (0.5)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Minor: [Multiple Language Supports](accessibility-multiple-language) (0.5)<br>
 [Server-Side Pong]<br>
-  Major: [Replacing Basic Pong with Server-Side Pong and Implementing an API](server-side-pong) (1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Major: [Replacing Basic Pong with Server-Side Pong and Implementing an API](server-side-pong) (1)<br>
 
 Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
 
