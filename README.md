@@ -74,7 +74,7 @@ Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
 
 ## Modules
 
-### Web: Use a Framework as backend(#web-backend)
+### Web: Use a Framework as backend {#web-backend}
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/063fd48d-29b5-40df-ab85-0b90cc92259e)
 
 
