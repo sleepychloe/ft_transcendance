@@ -21,6 +21,15 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
   (url) https://localhost:4243
 ```
 
+if you do not have an 42 account, click [here](https://github.com/sleepychloe/ft_transcendance_42Oauth_removed) to git clone instead of cloning from this repository.
+
+```
+  git clone https://github.com/sleepychloe/ft_transcendance_42Oauth_removed.git
+  cd ft_transcendance
+  make
+  (url) https://localhost:4243
+```
+
 
 ## Modules
 
