@@ -163,32 +163,17 @@ Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
 
 #### api-test
 
-```
-  python3 apirequest.py listroom/ GET ""
-```
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/b19ba121-36db-448d-9267-f2bdba63a848)
-###### ↳ when there is no existing room
+###### ↳ when there is no existing room<br>[cmd]python3 apirequest.py listroom/ GET ""
 
-```
-  python3 apirequest.py listroom/ GET ""
-```
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/c147eaf2-7ef6-44a6-9524-a8a051e0faeb)
-###### ↳ when there is at least one room (room_id: 1a6d9c10202a4569973f6728c5781ce3)
+###### ↳ when there is at least one room (room_id: 1a6d9c10202a4569973f6728c5781ce3)<br>[cmd]python3 apirequest.py listroom/ GET ""
 
-```
-  python joinroom.py "1a6d9c10202a4569973f6728c5781ce3"
-```
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/8a1e1299-5848-4258-9ff0-413a7cbdbdd9)
-###### ↳ join to the room that room_id is 1a6d9c10202a4569973f6728c5781ce3<br>&nbsp;&nbsp;&nbsp;&nbsp; (client_id: 7b1bc09220044793ba11a3b76f19a5e6, n_client: client4)
+###### ↳ join to the room that room_id is 1a6d9c10202a4569973f6728c5781ce3<br>&nbsp;&nbsp;&nbsp;&nbsp; (client_id: 7b1bc09220044793ba11a3b76f19a5e6, n_client: client4)<br>[cmd]python joinroom.py "1a6d9c10202a4569973f6728c5781ce3"
 
-```
-  python3 wsgame.py "1a6d9c10202a4569973f6728c5781ce3" "7b1bc09220044793ba11a3b76f19a5e6" "client4"
-```
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/a5bf998d-df57-4ff7-9a55-a790c2c1d7b9)
-###### ↳ connect websocket for player in the room (room_id: 1a6d9c10202a4569973f6728c5781ce3)<br>&nbsp;&nbsp;&nbsp;&nbsp; for player whose client_id is 7b1bc09220044793ba11a3b76f19a5e6, and  n_client is client4
+###### ↳ connect websocket for player in the room (room_id: 1a6d9c10202a4569973f6728c5781ce3)<br>&nbsp;&nbsp;&nbsp;&nbsp; for player whose client_id is 7b1bc09220044793ba11a3b76f19a5e6, and  n_client is client4<br>[cmd]python3 wsgame.py "1a6d9c10202a4569973f6728c5781ce3" "7b1bc09220044793ba11a3b76f19a5e6" "client4"
 
-```
-  python3 wsgame.py "1a6d9c10202a4569973f6728c5781ce3" "7b1bc09220044793ba11a3b76f19a5e6"
-```
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/server-side_pong/server-side_5.gif)
-###### ↳ move paddle after starting game, using key w(paddle up) and key s(paddle down)
+###### ↳ move paddle after starting game, using key w(paddle up) and key s(paddle down)<br>[cmd]python3 wsgame.py "1a6d9c10202a4569973f6728c5781ce3" "7b1bc09220044793ba11a3b76f19a5e6"
