@@ -88,7 +88,7 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/9b735623-72c3-4caf-848f-b75a1fca14c8)
 
 
-#### List of Docker Containers for Web Modules
+#### List of Docker Containers
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/5c656fa5-13b0-430e-abf6-3fb2d67f3720)
 
 
