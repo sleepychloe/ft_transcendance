@@ -24,25 +24,25 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
 
 ## Modules
 
-#### Web
-  Major: [Use a Framework as backend](#web-backend) (1)
-  Minor: Use a front-end framework or toolkit (0.5)
-  Minor: Use a database for the backend (0.5)
-#### User Management
-  Major: Implementing a remote authentication (1)
-#### Gameplay and UX
-  Major: Remote Players (1)
-  Major: Multiplayers (1)
-#### Devops
-  Major: Infrastructure Setup for Log Management (1)
-#### Graphics
-  Major: Use of advanced 3D techniques (1)
-#### Accessibility
-  Minor: Support on all devices (0.5)
-  Minor: Expanding Browser Compatibility (0.5)
-  Minor: Multiple Language Supports (0.5)
-#### Server-Side Pong
-  Major: Replacing Basic Pong with Server-Side Pong and Implementing an API (1)
+[Web]<br>
+  Major: [Use a Framework as backend](#web-backend) (1)<br>
+  Minor: [Use a front-end framework or toolkit](#web-frontend) (0.5)<br>
+  Minor: [Use a database for the backend](#web-database) (0.5)<br>
+[User Management]<br>
+  Major: [Implementing a remote authentication](user-management-remote-auth) (1)<br>
+[Gameplay and UX]<br>
+  Major: [Remote Players](gameplay-remote-multi) (1)<br>
+  Major: [Multiplayers](gameplay-remote-multi) (1)<br>
+[Devops]<br>
+  Major: [Infrastructure Setup for Log Management](devops-log) (1)<br>
+[Graphics]<br>
+  Major: [Use of advanced 3D techniques](3d-technique) (1)<br>
+[Accessibility]<br>
+  Minor: [Support on all devices](accessibility-support-all-devices) (0.5)<br>
+  Minor: [Expanding Browser Compatibility](accessibility-browser-compatibility) (0.5)<br>
+  Minor: [Multiple Language Supports](accessibility-multiple-language) (0.5)<br>
+[Server-Side Pong]<br>
+  Major: [Replacing Basic Pong with Server-Side Pong and Implementing an API](server-side-pong) (1)<br>
 
 Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
 
@@ -78,11 +78,11 @@ Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/063fd48d-29b5-40df-ab85-0b90cc92259e)
 
 
-### Web: Use a front-end framework or toolkit
+### Web: Use a front-end framework or toolkit <a name="web-frontend"></a>
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/4788cf0a-1290-470e-84b0-5d452ddeff85)
 
 
-### Web: Use a database for the backend
+### Web: Use a database for the backend <a name="web-database"></a>
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/9b735623-72c3-4caf-848f-b75a1fca14c8)
 
 
@@ -90,44 +90,43 @@ Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/5c656fa5-13b0-430e-abf6-3fb2d67f3720)
 
 
-### User Management: Implementing a remote authentication
-##### we disabled this module after submitting out project, so everyone can access our ft_transcendance
+### User Management: Implementing a remote authentication <a name="user-management-remote-auth"></a>
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/25391541-1343-4db5-a4dc-918a6494dbcd)
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/d38f0648-4cd4-48f6-a0af-38ad9bd1ff80)
 
 
-### Gameplay and UX: Remote Players & Multiplayers
+### Gameplay and UX: Remote Players & Multiplayers <a name="gameplay-remote-multi"></a>
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/gameplay/remote%26multi.gif)
 
 
-### Devops: Infrastructure Setup for Log Management
+### Devops: Infrastructure Setup for Log Management <a name="devops-log"></a>
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/752ce14c-da3e-41ca-b427-0de45fd0bd17)
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/fde70b3d-ddbe-479e-9241-b0c3c0e2a6b8)
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/9eb06fcb-f7bc-4da1-8f7b-b0294686da6d)
 
 
-### Graphics: Use of advanced 3D techniques
+### Graphics: Use of advanced 3D techniques <a name="3d-technique"></a>
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/graphics/advanced_3D_techniques_1.gif)
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/graphics/advanced_3D_techniques_2.gif)
 
 
-### Accessibility: Support on all devices
+### Accessibility: Support on all devices <a name="accessibility-support-all-devices"></a>
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/564323ce-65ef-42ee-8ab9-98d382782c5d)
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/2152d9e3-9344-486f-a0ff-1d7da0ca0ac7)
 
 
-### Accessibility: Expanding Browser Compatibility
+### Accessibility: Expanding Browser Compatibility <a name="accessibility-browser-compatibility"></a>
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/expanding_browser_compatibility_1.gif)
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/expanding_browser_compatibility_2.gif)
 
 
-### Accessibility: Multiple Language Supports
+### Accessibility: Multiple Language Supports <a name="accessibility-multiple-language"></a>
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/multiple_language_1.gif)
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/multiple_language_2.gif)
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/accessibility/multiple_language_3.gif)
 
 
-### Server-Side Pong: Replacing Basic Pong with Server-Side Pong and Implementing an API
+### Server-Side Pong: Replacing Basic Pong with Server-Side Pong and Implementing an API <a name="server-side-pong"></a>
 
 #### How to run
 
