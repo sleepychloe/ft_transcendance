@@ -24,29 +24,27 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
 
 ## Modules
 
-```
-  • Web
-      Major: Use a Framework as backend (1)
-      Minor: Use a front-end framework or toolkit (0.5)
-      Minor: Use a database for the backend (0.5)
-  • User Management
-      Major: Implementing a remote authentication (1)
-  • Gameplay and UX
-      Major: Remote Players (1)
-      Major: Multiplayers (1)
-  • Devops
-      Major: Infrastructure Setup for Log Management (1)
-  • Graphics
-      Major: Use of advanced 3D techniques (1)
-  • Accessibility
-      Minor: Support on all devices (0.5)
-      Minor: Expanding Browser Compatibility (0.5)
-      Minor: Multiple Language Supports (0.5)
-  • Server-Side Pong
-      Major: Replacing Basic Pong with Server-Side Pong and Implementing an API (1)
+• Web
+    Major: [Use a Framework as backend](#web-backend) (1)
+    Minor: Use a front-end framework or toolkit (0.5)
+    Minor: Use a database for the backend (0.5)
+• User Management
+    Major: Implementing a remote authentication (1)
+• Gameplay and UX
+    Major: Remote Players (1)
+    Major: Multiplayers (1)
+• Devops
+    Major: Infrastructure Setup for Log Management (1)
+• Graphics
+    Major: Use of advanced 3D techniques (1)
+• Accessibility
+    Minor: Support on all devices (0.5)
+    Minor: Expanding Browser Compatibility (0.5)
+    Minor: Multiple Language Supports (0.5)
+• Server-Side Pong
+    Major: Replacing Basic Pong with Server-Side Pong and Implementing an API (1)
 
-  Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
-```
+Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
 
 
 ## Transcendance page
@@ -76,7 +74,7 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
 
 ## Modules
 
-### Web: Use a Framework as backend
+### Web: Use a Framework as backend{#web-backend}
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/063fd48d-29b5-40df-ab85-0b90cc92259e)
 
 
