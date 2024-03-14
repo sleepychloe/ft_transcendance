@@ -180,14 +180,13 @@ DON'T FORGET TO REMOVE .env FILE BEFORE SUBMITTING !
 ```
 
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/8a1e1299-5848-4258-9ff0-413a7cbdbdd9)
-###### ↳ join to the room that room_id is 1a6d9c10202a4569973f6728c5781ce3<br>    (client_id: 7b1bc09220044793ba11a3b76f19a5e6, n_client: client4)
+###### ↳ join to the room that room_id is 1a6d9c10202a4569973f6728c5781ce3<br>&nbsp;&nbsp;&nbsp;&nbsp (client_id: 7b1bc09220044793ba11a3b76f19a5e6, n_client: client4)
 ```
   python joinroom.py "1a6d9c10202a4569973f6728c5781ce3"
 ```
 
 ![image](https://github.com/sleepychloe/ft_transcendance/assets/78352910/a5bf998d-df57-4ff7-9a55-a790c2c1d7b9)
-###### ↳ connect websocket for player in the room (room_id: 1a6d9c10202a4569973f6728c5781ce3)
-######    for player whose client_id is 7b1bc09220044793ba11a3b76f19a5e6, and  n_client is client4
+###### ↳ connect websocket for player in the room (room_id: 1a6d9c10202a4569973f6728c5781ce3)<br>&nbsp;&nbsp;&nbsp;&nbsp for player whose client_id is 7b1bc09220044793ba11a3b76f19a5e6, and  n_client is client4
 ```
   python3 wsgame.py "1a6d9c10202a4569973f6728c5781ce3" "7b1bc09220044793ba11a3b76f19a5e6" "client4"
 ```
