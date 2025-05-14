@@ -183,3 +183,4 @@ Total 9.5 Modules (7 Modules for mandatory, 2.5 Modules for bonus)
 
 ![Animated GIF](https://github.com/sleepychloe/ft_transcendance/blob/main/img/modules/server-side_pong/server-side_5.gif)
 ###### ↳ move paddle after starting game, using key w(paddle up) and key s(paddle down)<br><br>[cmd] python3 wsgame.py "1a6d9c10202a4569973f6728c5781ce3" "7b1bc09220044793ba11a3b76f19a5e6"
+
